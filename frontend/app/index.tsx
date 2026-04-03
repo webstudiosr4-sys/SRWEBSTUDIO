@@ -798,6 +798,16 @@ export default function Index() {
   const portfolioSectionY = useRef(0);
   const aboutSectionY = useRef(0);
 
+  // Testimonials carousel state
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
+  const testimonialScrollRef = useRef<ScrollView>(null);
+  const testimonialScrollX = useRef(new Animated.Value(0)).current;
+  const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const isUserTouchingRef = useRef(false);
+  const CARD_WIDTH = Math.min(width - 80, 380);
+  const CARD_GAP = 16;
+  const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
+
   useEffect(() => {
     // Hero animations
     Animated.parallel([
@@ -923,6 +933,55 @@ export default function Index() {
       ])
     ).start();
   }, []);
+
+  // Testimonials auto-scroll
+  useEffect(() => {
+    const startAutoScroll = () => {
+      autoScrollTimerRef.current = setInterval(() => {
+        if (isUserTouchingRef.current) return;
+        setActiveTestimonial((prev) => {
+          const next = (prev + 1) % TESTIMONIALS.length;
+          testimonialScrollRef.current?.scrollTo({
+            x: next * SNAP_INTERVAL,
+            animated: true,
+          });
+          return next;
+        });
+      }, 4000);
+    };
+    startAutoScroll();
+    return () => {
+      if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
+    };
+  }, []);
+
+  const onTestimonialScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / SNAP_INTERVAL);
+    if (index !== activeTestimonial && index >= 0 && index < TESTIMONIALS.length) {
+      setActiveTestimonial(index);
+    }
+  };
+
+  const onTestimonialTouchStart = () => {
+    isUserTouchingRef.current = true;
+    if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
+  };
+
+  const onTestimonialTouchEnd = () => {
+    isUserTouchingRef.current = false;
+    autoScrollTimerRef.current = setInterval(() => {
+      if (isUserTouchingRef.current) return;
+      setActiveTestimonial((prev) => {
+        const next = (prev + 1) % TESTIMONIALS.length;
+        testimonialScrollRef.current?.scrollTo({
+          x: next * SNAP_INTERVAL,
+          animated: true,
+        });
+        return next;
+      });
+    }, 4000);
+  };
 
   // Parallax interpolations
   const parallaxBg = scrollY.interpolate({
@@ -1513,7 +1572,7 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
-        {/* Testimonials Section */}
+        {/* Testimonials Section - Horizontal Carousel */}
         <View style={styles.testimonialsSection}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
@@ -1523,49 +1582,101 @@ export default function Index() {
             <Text style={styles.sectionSubtitleSmall}>Realne opinie</Text>
           </View>
 
-          <View style={styles.testimonialsGrid}>
-            {TESTIMONIALS.map((testimonial, index) => (
-              <View key={index} style={styles.testimonialCard}>
-                <LinearGradient
-                  colors={['rgba(139, 92, 246, 0.1)', 'rgba(59, 130, 246, 0.05)']}
-                  style={styles.testimonialCardGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
+          <Animated.ScrollView
+            ref={testimonialScrollRef}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            snapToInterval={SNAP_INTERVAL}
+            decelerationRate="fast"
+            contentContainerStyle={styles.carouselContainer}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: testimonialScrollX } } }],
+              { useNativeDriver: true, listener: onTestimonialScroll }
+            )}
+            scrollEventThrottle={16}
+            onTouchStart={onTestimonialTouchStart}
+            onTouchEnd={onTestimonialTouchEnd}
+            onMomentumScrollEnd={onTestimonialScroll}
+          >
+            {TESTIMONIALS.map((testimonial, index) => {
+              const inputRange = [
+                (index - 1) * SNAP_INTERVAL,
+                index * SNAP_INTERVAL,
+                (index + 1) * SNAP_INTERVAL,
+              ];
+              const scale = testimonialScrollX.interpolate({
+                inputRange,
+                outputRange: [0.92, 1, 0.92],
+                extrapolate: 'clamp',
+              });
+              const opacity = testimonialScrollX.interpolate({
+                inputRange,
+                outputRange: [0.6, 1, 0.6],
+                extrapolate: 'clamp',
+              });
+
+              return (
+                <Animated.View
+                  key={index}
+                  style={[
+                    styles.testimonialCard,
+                    { width: CARD_WIDTH, transform: [{ scale }], opacity },
+                  ]}
                 >
-                  {/* Quote icon */}
-                  <View style={styles.quoteIconWrapper}>
-                    <Ionicons name="chatbubble-ellipses" size={20} color="#8b5cf6" />
-                  </View>
-                  
-                  {/* Rating stars */}
-                  <View style={styles.ratingContainer}>
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Ionicons key={i} name="star" size={16} color="#f59e0b" />
-                    ))}
-                  </View>
-                  
-                  {/* Review text */}
-                  <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
-                  
-                  {/* Author info */}
-                  <View style={styles.testimonialAuthor}>
-                    <View style={styles.testimonialAvatar}>
-                      <LinearGradient
-                        colors={['#8b5cf6', '#ec4899']}
-                        style={styles.testimonialAvatarGradient}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                      >
-                        <Text style={styles.testimonialAvatarText}>{testimonial.name.charAt(0)}</Text>
-                      </LinearGradient>
+                  <LinearGradient
+                    colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
+                    style={styles.testimonialCardGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    {/* Quote icon */}
+                    <View style={styles.quoteIconWrapper}>
+                      <Ionicons name="chatbubble-ellipses" size={20} color="#8b5cf6" />
                     </View>
-                    <View>
-                      <Text style={styles.testimonialName}>{testimonial.name}</Text>
-                      <Text style={styles.testimonialBusiness}>{testimonial.business}</Text>
+                    
+                    {/* Rating stars */}
+                    <View style={styles.ratingContainer}>
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Ionicons key={i} name="star" size={16} color="#f59e0b" />
+                      ))}
                     </View>
-                  </View>
-                </LinearGradient>
-              </View>
+                    
+                    {/* Review text */}
+                    <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
+                    
+                    {/* Author info */}
+                    <View style={styles.testimonialAuthor}>
+                      <View style={styles.testimonialAvatar}>
+                        <LinearGradient
+                          colors={['#8b5cf6', '#ec4899']}
+                          style={styles.testimonialAvatarGradient}
+                          start={{ x: 0, y: 0 }}
+                          end={{ x: 1, y: 1 }}
+                        >
+                          <Text style={styles.testimonialAvatarText}>{testimonial.name.charAt(0)}</Text>
+                        </LinearGradient>
+                      </View>
+                      <View>
+                        <Text style={styles.testimonialName}>{testimonial.name}</Text>
+                        <Text style={styles.testimonialBusiness}>{testimonial.business}</Text>
+                      </View>
+                    </View>
+                  </LinearGradient>
+                </Animated.View>
+              );
+            })}
+          </Animated.ScrollView>
+
+          {/* Dots Indicator */}
+          <View style={styles.dotsContainer}>
+            {TESTIMONIALS.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  activeTestimonial === index && styles.dotActive,
+                ]}
+              />
             ))}
           </View>
         </View>
@@ -2780,21 +2891,23 @@ const styles = StyleSheet.create({
 
   // Testimonials section
   testimonialsSection: {
-    paddingHorizontal: 24,
     paddingVertical: 50,
   },
-  testimonialsGrid: {
+  carouselContainer: {
+    paddingHorizontal: Math.max((width - Math.min(width - 80, 380)) / 2, 24),
     gap: 16,
+    alignItems: 'center',
   },
   testimonialCard: {
     borderRadius: 18,
     overflow: 'hidden',
   },
   testimonialCardGradient: {
-    padding: 22,
+    padding: 24,
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    minHeight: 200,
   },
   quoteIconWrapper: {
     marginBottom: 12,
@@ -2841,6 +2954,27 @@ const styles = StyleSheet.create({
   testimonialBusiness: {
     color: '#71717a',
     fontSize: 12,
+  },
+
+  // Carousel dots indicator
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    gap: 8,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(139, 92, 246, 0.25)',
+  },
+  dotActive: {
+    width: 24,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#a78bfa',
   },
 
   // CTA urgency
