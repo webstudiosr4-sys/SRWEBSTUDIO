@@ -1943,29 +1943,34 @@ const styles = StyleSheet.create({
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
     marginBottom: 40,
+    gap: 10,
   },
   logoGlowWrapper: {
-    borderRadius: 14,
+    borderRadius: 16,
     padding: 2,
+    position: 'relative',
   },
   logoGradient: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
+    width: 56,
+    height: 56,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
   },
   logoText: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '800',
     color: '#fff',
+    includeFontPadding: false,
   },
   logoName: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     color: '#fff',
+    includeFontPadding: false,
   },
   headline: {
     fontSize: isSmallScreen ? 28 : 36,
@@ -2929,12 +2934,12 @@ const styles = StyleSheet.create({
   // Logo neon glow
   logoNeonGlow: {
     position: 'absolute',
-    top: -4,
-    left: -4,
-    right: -4,
-    bottom: -4,
-    borderRadius: 16,
-    backgroundColor: 'rgba(139, 92, 246, 0.4)',
+    top: -5,
+    left: -5,
+    right: -5,
+    bottom: -5,
+    borderRadius: 18,
+    backgroundColor: 'rgba(139, 92, 246, 0.45)',
   },
 
   // Primary button neon glow wrapper
