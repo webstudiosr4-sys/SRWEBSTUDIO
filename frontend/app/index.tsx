@@ -31,45 +31,45 @@ const SERVICES = [
     icon: 'globe-outline',
     iconFamily: 'Ionicons',
     title: 'Tworzenie stron WWW',
-    description: 'Szybkie i nowoczesne strony zoptymalizowane pod SEO i wydajność',
+    description: 'Nowoczesne, szybkie strony zoptymalizowane pod SEO i konwersję klientów',
   },
   {
     icon: 'cart-outline',
     iconFamily: 'Ionicons',
     title: 'Sklepy internetowe (E-commerce)',
-    description: 'Zaawansowane sklepy online zwiększające sprzedaż',
+    description: 'Sklepy online zaprojektowane tak, aby maksymalizować sprzedaż',
   },
   {
     icon: 'color-palette-outline',
     iconFamily: 'Ionicons',
     title: 'Projektowanie UX/UI',
-    description: 'Nowoczesny design, który prowadzi użytkownika do zakupu',
+    description: 'Intuicyjny design, który prowadzi użytkownika do zakupu',
   },
   {
     icon: 'code-slash-outline',
     iconFamily: 'Ionicons',
     title: 'Aplikacje dedykowane',
-    description: 'Indywidualne rozwiązania dopasowane do Twojego biznesu',
+    description: 'Systemy dopasowane do Twojego biznesu i jego procesów',
   },
   {
     icon: 'search-outline',
     iconFamily: 'Ionicons',
     title: 'SEO i optymalizacja',
-    description: 'Zwiększamy widoczność Twojej strony w Google',
+    description: 'Zwiększamy widoczność Twojej strony i pozyskujemy ruch z Google',
   },
 ];
 
 // Portfolio Data
 const PORTFOLIO = [
   {
-    title: 'Platforma dla firmy usługowej',
-    description: 'Nowoczesna strona zwiększająca liczbę klientów o 40%',
+    title: 'Strona dla firmy usługowej',
+    description: 'Zwiększenie liczby zapytań o 40% dzięki nowej stronie',
     tag: 'Strona WWW',
     gradient: ['#8b5cf6', '#6366f1'],
   },
   {
     title: 'Sklep e-commerce',
-    description: 'Optymalizacja procesu zakupowego i wzrost sprzedaży',
+    description: 'Optymalizacja koszyka i wzrost sprzedaży',
     tag: 'E-commerce',
     gradient: ['#ec4899', '#8b5cf6'],
   },
@@ -86,12 +86,12 @@ const PROCESS_STEPS = [
   {
     number: '01',
     title: 'Analiza i strategia',
-    description: 'Badamy potrzeby i planujemy rozwiązanie',
+    description: 'Rozumiemy Twój biznes i planujemy rozwiązanie',
   },
   {
     number: '02',
     title: 'Projektowanie UX/UI',
-    description: 'Tworzymy intuicyjny i nowoczesny design',
+    description: 'Tworzymy nowoczesny i intuicyjny design',
   },
   {
     number: '03',
@@ -101,7 +101,7 @@ const PROCESS_STEPS = [
   {
     number: '04',
     title: 'Wdrożenie',
-    description: 'Testujemy i publikujemy projekt',
+    description: 'Testujemy i uruchamiamy projekt',
   },
 ];
 
@@ -282,12 +282,12 @@ export default function Index() {
 
             {/* Headline */}
             <Text style={styles.headline}>
-              Nowoczesne strony internetowe i sklepy online
+              Strony internetowe, które przyciągają klientów i zwiększają sprzedaż
             </Text>
 
             {/* Subheadline */}
             <Text style={styles.subheadline}>
-              Tworzymy szybkie, nowoczesne i zoptymalizowane strony, które przyciągają klientów i zwiększają sprzedaż
+              Tworzymy szybkie, nowoczesne strony i sklepy online, które nie tylko wyglądają dobrze, ale realnie zarabiają dla Twojego biznesu
             </Text>
 
             {/* Small text */}
@@ -299,7 +299,7 @@ export default function Index() {
                 end={{ x: 1, y: 0 }}
               >
                 <Ionicons name="location-outline" size={14} color="#8b5cf6" />
-                <Text style={styles.badgeText}>Dla firm w całej Polsce</Text>
+                <Text style={styles.badgeText}>Dla firm usługowych i lokalnych biznesów w Polsce</Text>
               </LinearGradient>
             </View>
 
@@ -343,7 +343,7 @@ export default function Index() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Nasze realizacje</Text>
-            <Text style={styles.sectionSubtitleSmall}>Projekty, które przynoszą rezultaty</Text>
+            <Text style={styles.sectionSubtitleSmall}>Projekty, które przynoszą realne wyniki</Text>
           </View>
 
           <View style={styles.portfolioGrid}>
@@ -361,8 +361,8 @@ export default function Index() {
         {/* Process Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Proces tworzenia</Text>
-            <Text style={styles.sectionSubtitleSmall}>Jak pracujemy nad Twoim projektem</Text>
+            <Text style={styles.sectionTitle}>Jak wygląda współpraca</Text>
+            <Text style={styles.sectionSubtitleSmall}>Proces tworzenia Twojego projektu</Text>
           </View>
 
           <View style={styles.processContainer}>
@@ -385,9 +385,9 @@ export default function Index() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Text style={styles.ctaSectionTitle}>Rozpocznijmy współpracę</Text>
+            <Text style={styles.ctaSectionTitle}>Zbuduj stronę, która zacznie zarabiać</Text>
             <Text style={styles.ctaSectionText}>
-              Chcesz nowoczesną stronę lub sklep? Skontaktuj się z nami
+              Otrzymaj darmową analizę i dowiedz się, jak możemy zwiększyć liczbę klientów w Twoim biznesie
             </Text>
 
             <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.8}>
