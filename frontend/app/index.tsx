@@ -213,12 +213,16 @@ export default function Index() {
   const insets = useSafeAreaInsets();
   const heroFadeAnim = useRef(new Animated.Value(0)).current;
   const heroScaleAnim = useRef(new Animated.Value(0.9)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
   
   // Refs for scrolling
   const scrollViewRef = useRef<ScrollView>(null);
+  const servicesSectionY = useRef(0);
   const portfolioSectionY = useRef(0);
+  const aboutSectionY = useRef(0);
 
   useEffect(() => {
+    // Hero animations
     Animated.parallel([
       Animated.timing(heroFadeAnim, {
         toValue: 1,
@@ -232,6 +236,22 @@ export default function Index() {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Continuous glow animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const openLink = (url: string) => {
@@ -248,6 +268,15 @@ export default function Index() {
     Linking.openURL(`mailto:${CONTACT.email}`);
   };
 
+  const scrollToServices = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({
+        y: servicesSectionY.current,
+        animated: true,
+      });
+    }
+  };
+
   const scrollToPortfolio = () => {
     if (scrollViewRef.current) {
       scrollViewRef.current.scrollTo({
@@ -256,6 +285,21 @@ export default function Index() {
       });
     }
   };
+
+  const scrollToAbout = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({
+        y: aboutSectionY.current,
+        animated: true,
+      });
+    }
+  };
+
+  // Interpolate glow opacity
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.3, 0.6],
+  });
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -269,24 +313,42 @@ export default function Index() {
       >
         {/* Hero Section */}
         <View style={styles.heroSection}>
+          {/* Animated Glow Background */}
+          <Animated.View style={[styles.heroGlowAnimated, { opacity: glowOpacity }]}>
+            <LinearGradient
+              colors={['rgba(139, 92, 246, 0.4)', 'rgba(236, 72, 153, 0.2)', 'transparent']}
+              style={styles.heroGlowGradient}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+            />
+          </Animated.View>
           <LinearGradient
-            colors={['rgba(139, 92, 246, 0.2)', 'transparent']}
+            colors={['rgba(139, 92, 246, 0.25)', 'rgba(236, 72, 153, 0.1)', 'transparent']}
             style={styles.heroGlow}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           />
           
+          {/* Floating orbs for visual effect */}
+          <View style={styles.orbContainer}>
+            <Animated.View style={[styles.orb, styles.orbPurple, { opacity: glowOpacity }]} />
+            <Animated.View style={[styles.orb, styles.orbPink, { opacity: glowOpacity }]} />
+            <Animated.View style={[styles.orb, styles.orbBlue, { opacity: glowOpacity }]} />
+          </View>
+          
           <Animated.View style={[styles.heroContent, { opacity: heroFadeAnim, transform: [{ scale: heroScaleAnim }] }]}>
             {/* Logo */}
             <View style={styles.logoContainer}>
-              <LinearGradient
-                colors={['#8b5cf6', '#ec4899', '#3b82f6']}
-                style={styles.logoGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.logoText}>SR</Text>
-              </LinearGradient>
+              <View style={styles.logoGlowWrapper}>
+                <LinearGradient
+                  colors={['#8b5cf6', '#ec4899', '#3b82f6']}
+                  style={styles.logoGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.logoText}>SR</Text>
+                </LinearGradient>
+              </View>
               <Text style={styles.logoName}>Web Studio</Text>
             </View>
 
@@ -303,33 +365,35 @@ export default function Index() {
             {/* Small text */}
             <View style={styles.badgeContainer}>
               <LinearGradient
-                colors={['rgba(139, 92, 246, 0.3)', 'rgba(59, 130, 246, 0.3)']}
+                colors={['rgba(139, 92, 246, 0.35)', 'rgba(59, 130, 246, 0.35)']}
                 style={styles.badge}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Ionicons name="location-outline" size={14} color="#8b5cf6" />
+                <Ionicons name="location-outline" size={14} color="#a78bfa" />
                 <Text style={styles.badgeText}>Dla firm usługowych i lokalnych biznesów w Polsce</Text>
               </LinearGradient>
             </View>
 
             {/* CTA Buttons */}
             <View style={styles.ctaContainer}>
-              <TouchableOpacity onPress={openEmail} activeOpacity={0.8}>
-                <LinearGradient
-                  colors={['#8b5cf6', '#ec4899']}
-                  style={styles.primaryButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
-                  <Ionicons name="arrow-forward" size={18} color="#fff" />
-                </LinearGradient>
+              <TouchableOpacity onPress={openEmail} activeOpacity={0.85}>
+                <View style={styles.primaryButtonGlow}>
+                  <LinearGradient
+                    colors={['#8b5cf6', '#d946ef', '#ec4899']}
+                    style={styles.primaryButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  </LinearGradient>
+                </View>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
                 <Text style={styles.secondaryButtonText}>Zobacz realizacje</Text>
-                <Ionicons name="chevron-down" size={18} color="#8b5cf6" />
+                <Ionicons name="chevron-down" size={18} color="#a78bfa" />
               </TouchableOpacity>
             </View>
           </Animated.View>
@@ -416,7 +480,12 @@ export default function Index() {
         </View>
 
         {/* Services Section */}
-        <View style={styles.section}>
+        <View 
+          style={styles.section}
+          onLayout={(event) => {
+            servicesSectionY.current = event.nativeEvent.layout.y;
+          }}
+        >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Usługi programistyczne</Text>
             <Text style={styles.sectionSubtitle}>& Web Development</Text>
@@ -472,10 +541,59 @@ export default function Index() {
           </View>
         </View>
 
+        {/* About Section */}
+        <View 
+          style={styles.aboutSection}
+          onLayout={(event) => {
+            aboutSectionY.current = event.nativeEvent.layout.y;
+          }}
+        >
+          <LinearGradient
+            colors={['rgba(139, 92, 246, 0.1)', 'rgba(59, 130, 246, 0.05)']}
+            style={styles.aboutGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <View style={styles.aboutIconWrapper}>
+              <LinearGradient
+                colors={['#8b5cf6', '#ec4899']}
+                style={styles.aboutIconGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Ionicons name="people" size={28} color="#fff" />
+              </LinearGradient>
+            </View>
+            <Text style={styles.aboutTitle}>O nas</Text>
+            <Text style={styles.aboutText}>
+              Jesteśmy zespołem pasjonatów web developmentu. Specjalizujemy się w tworzeniu nowoczesnych stron internetowych i sklepów online dla firm usługowych i lokalnych biznesów w Polsce.
+            </Text>
+            <Text style={styles.aboutText}>
+              Łączymy kreatywność z technologią, aby dostarczać rozwiązania, które nie tylko wyglądają profesjonalnie, ale przede wszystkim przynoszą realne rezultaty biznesowe.
+            </Text>
+            <View style={styles.aboutStats}>
+              <View style={styles.aboutStat}>
+                <Text style={styles.aboutStatNumber}>10+</Text>
+                <Text style={styles.aboutStatLabel}>Projektów</Text>
+              </View>
+              <View style={styles.aboutStatDivider} />
+              <View style={styles.aboutStat}>
+                <Text style={styles.aboutStatNumber}>100%</Text>
+                <Text style={styles.aboutStatLabel}>Zadowolenia</Text>
+              </View>
+              <View style={styles.aboutStatDivider} />
+              <View style={styles.aboutStat}>
+                <Text style={styles.aboutStatNumber}>24/7</Text>
+                <Text style={styles.aboutStatLabel}>Wsparcie</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </View>
+
         {/* Final CTA Section */}
         <View style={styles.ctaSection}>
           <LinearGradient
-            colors={['rgba(139, 92, 246, 0.15)', 'rgba(236, 72, 153, 0.1)']}
+            colors={['rgba(139, 92, 246, 0.2)', 'rgba(236, 72, 153, 0.15)']}
             style={styles.ctaSectionGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
@@ -485,21 +603,23 @@ export default function Index() {
               Otrzymaj darmową analizę i dowiedz się, jak możemy zwiększyć liczbę klientów w Twoim biznesie
             </Text>
 
-            <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.8}>
-              <LinearGradient
-                colors={['#25D366', '#128C7E']}
-                style={styles.primaryButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
-              </LinearGradient>
+            <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
+              <View style={styles.ctaButtonGlow}>
+                <LinearGradient
+                  colors={['#25D366', '#20c060', '#128C7E']}
+                  style={styles.primaryButton}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                  <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                </LinearGradient>
+              </View>
             </TouchableOpacity>
 
             {/* Secondary Contact Option */}
             <TouchableOpacity style={styles.secondaryContactButton} onPress={openEmail} activeOpacity={0.7}>
-              <Ionicons name="mail-outline" size={18} color="#8b5cf6" />
+              <Ionicons name="mail-outline" size={18} color="#a78bfa" />
               <Text style={styles.secondaryContactText}>lub napisz email</Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -509,26 +629,28 @@ export default function Index() {
         <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
           {/* Logo */}
           <View style={styles.footerLogo}>
-            <LinearGradient
-              colors={['#8b5cf6', '#ec4899', '#3b82f6']}
-              style={styles.footerLogoGradient}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Text style={styles.footerLogoText}>SR</Text>
-            </LinearGradient>
+            <View style={styles.footerLogoGlowWrapper}>
+              <LinearGradient
+                colors={['#8b5cf6', '#ec4899', '#3b82f6']}
+                style={styles.footerLogoGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.footerLogoText}>SR</Text>
+              </LinearGradient>
+            </View>
             <Text style={styles.footerLogoName}>Web Studio</Text>
           </View>
 
           {/* Footer Menu */}
           <View style={styles.footerMenu}>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity onPress={scrollToPortfolio} activeOpacity={0.7}>
               <Text style={styles.footerLink}>Realizacje</Text>
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity onPress={scrollToServices} activeOpacity={0.7}>
               <Text style={styles.footerLink}>Usługi</Text>
             </TouchableOpacity>
-            <TouchableOpacity activeOpacity={0.7}>
+            <TouchableOpacity onPress={scrollToAbout} activeOpacity={0.7}>
               <Text style={styles.footerLink}>O nas</Text>
             </TouchableOpacity>
           </View>
@@ -576,26 +698,75 @@ const styles = StyleSheet.create({
 
   // Hero Section
   heroSection: {
-    minHeight: 600,
+    minHeight: 620,
     paddingHorizontal: 24,
     paddingTop: 40,
     paddingBottom: 60,
     position: 'relative',
+    overflow: 'hidden',
   },
   heroGlow: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
-    height: 400,
+    height: 450,
+  },
+  heroGlowAnimated: {
+    position: 'absolute',
+    top: -50,
+    left: -50,
+    right: -50,
+    height: 500,
+  },
+  heroGlowGradient: {
+    flex: 1,
+    borderRadius: 200,
+  },
+  orbContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  orb: {
+    position: 'absolute',
+    borderRadius: 100,
+  },
+  orbPurple: {
+    width: 200,
+    height: 200,
+    top: -50,
+    right: -80,
+    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+  },
+  orbPink: {
+    width: 150,
+    height: 150,
+    top: 200,
+    left: -60,
+    backgroundColor: 'rgba(236, 72, 153, 0.12)',
+  },
+  orbBlue: {
+    width: 120,
+    height: 120,
+    bottom: 100,
+    right: -40,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
   },
   heroContent: {
     alignItems: 'center',
+    zIndex: 1,
   },
   logoContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 40,
+  },
+  logoGlowWrapper: {
+    borderRadius: 14,
+    padding: 2,
   },
   logoGradient: {
     width: 50,
@@ -638,25 +809,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
+    borderColor: 'rgba(139, 92, 246, 0.4)',
   },
   badgeText: {
-    color: '#d4d4d8',
-    fontSize: 14,
+    color: '#e4e4e7',
+    fontSize: 13,
     marginLeft: 6,
   },
   ctaContainer: {
     alignItems: 'center',
     gap: 16,
   },
+  primaryButtonGlow: {
+    borderRadius: 14,
+    padding: 2,
+  },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 28,
-    paddingVertical: 16,
+    paddingHorizontal: 30,
+    paddingVertical: 17,
     borderRadius: 12,
     gap: 10,
   },
@@ -899,6 +1074,70 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
 
+  // About Section
+  aboutSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  aboutGradient: {
+    padding: 28,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.25)',
+    alignItems: 'center',
+  },
+  aboutIconWrapper: {
+    marginBottom: 20,
+  },
+  aboutIconGradient: {
+    width: 60,
+    height: 60,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  aboutTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  aboutText: {
+    fontSize: 15,
+    color: '#a1a1aa',
+    textAlign: 'center',
+    lineHeight: 24,
+    marginBottom: 12,
+  },
+  aboutStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  aboutStat: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  aboutStatNumber: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: '#a78bfa',
+    marginBottom: 4,
+  },
+  aboutStatLabel: {
+    fontSize: 12,
+    color: '#71717a',
+    fontWeight: '500',
+  },
+  aboutStatDivider: {
+    width: 1,
+    height: 40,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+  },
+
   // CTA Section
   ctaSection: {
     paddingHorizontal: 24,
@@ -909,7 +1148,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(139, 92, 246, 0.3)',
   },
   ctaSectionTitle: {
     fontSize: 26,
@@ -924,6 +1163,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 28,
     lineHeight: 24,
+  },
+  ctaButtonGlow: {
+    borderRadius: 14,
+    padding: 2,
   },
   contactOptions: {
     flexDirection: 'row',
@@ -956,7 +1199,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   secondaryContactText: {
-    color: '#8b5cf6',
+    color: '#a78bfa',
     fontSize: 14,
     fontWeight: '500',
   },
@@ -966,13 +1209,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingTop: 40,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.1)',
+    borderTopColor: 'rgba(139, 92, 246, 0.15)',
     alignItems: 'center',
   },
   footerLogo: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
+  },
+  footerLogoGlowWrapper: {
+    borderRadius: 10,
+    padding: 2,
   },
   footerLogoGradient: {
     width: 36,
@@ -994,15 +1241,15 @@ const styles = StyleSheet.create({
   },
   footerMenu: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 28,
     marginBottom: 24,
     flexWrap: 'wrap',
     justifyContent: 'center',
   },
   footerLink: {
-    color: '#a1a1aa',
+    color: '#a78bfa',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   socialLinks: {
     flexDirection: 'row',
@@ -1013,11 +1260,11 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(139, 92, 246, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(139, 92, 246, 0.2)',
   },
   copyright: {
     color: '#52525b',
