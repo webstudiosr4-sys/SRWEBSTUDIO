@@ -804,8 +804,8 @@ export default function Index() {
   const testimonialScrollX = useRef(new Animated.Value(0)).current;
   const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isUserTouchingRef = useRef(false);
-  const CARD_WIDTH = Math.min(width - 80, 380);
-  const CARD_GAP = 16;
+  const CARD_WIDTH = isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400);
+  const CARD_GAP = 18;
   const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
 
   useEffect(() => {
@@ -1606,12 +1606,22 @@ export default function Index() {
               ];
               const scale = testimonialScrollX.interpolate({
                 inputRange,
-                outputRange: [0.92, 1, 0.92],
+                outputRange: [0.88, 1.03, 0.88],
                 extrapolate: 'clamp',
               });
               const opacity = testimonialScrollX.interpolate({
                 inputRange,
-                outputRange: [0.6, 1, 0.6],
+                outputRange: [0.5, 1, 0.5],
+                extrapolate: 'clamp',
+              });
+              const translateY = testimonialScrollX.interpolate({
+                inputRange,
+                outputRange: [8, -2, 8],
+                extrapolate: 'clamp',
+              });
+              const rotateY = testimonialScrollX.interpolate({
+                inputRange,
+                outputRange: ['4deg', '0deg', '-4deg'],
                 extrapolate: 'clamp',
               });
 
@@ -1620,12 +1630,31 @@ export default function Index() {
                   key={index}
                   style={[
                     styles.testimonialCard,
-                    { width: CARD_WIDTH, transform: [{ scale }], opacity },
+                    {
+                      width: CARD_WIDTH,
+                      transform: [
+                        { perspective: 1000 },
+                        { scale },
+                        { translateY },
+                        { rotateY },
+                      ],
+                      opacity,
+                    },
                   ]}
                 >
                   <LinearGradient
-                    colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
-                    style={styles.testimonialCardGradient}
+                    colors={[
+                      activeTestimonial === index
+                        ? 'rgba(139, 92, 246, 0.18)'
+                        : 'rgba(139, 92, 246, 0.08)',
+                      activeTestimonial === index
+                        ? 'rgba(59, 130, 246, 0.1)'
+                        : 'rgba(59, 130, 246, 0.03)',
+                    ]}
+                    style={[
+                      styles.testimonialCardGradient,
+                      activeTestimonial === index && styles.testimonialCardActive,
+                    ]}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                   >
@@ -2894,20 +2923,29 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
   },
   carouselContainer: {
-    paddingHorizontal: Math.max((width - Math.min(width - 80, 380)) / 2, 24),
-    gap: 16,
+    paddingHorizontal: Math.round((width - (isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400))) / 2),
+    gap: 18,
     alignItems: 'center',
+    paddingVertical: 12,
   },
   testimonialCard: {
-    borderRadius: 18,
-    overflow: 'hidden',
+    borderRadius: 20,
+    overflow: 'visible',
   },
   testimonialCardGradient: {
     padding: 24,
-    borderRadius: 18,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.25)',
-    minHeight: 200,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    minHeight: 210,
+  },
+  testimonialCardActive: {
+    borderColor: 'rgba(139, 92, 246, 0.45)',
+    shadowColor: '#8b5cf6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
   quoteIconWrapper: {
     marginBottom: 12,
@@ -2961,20 +2999,25 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
-    gap: 8,
+    marginTop: 24,
+    gap: 10,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(139, 92, 246, 0.25)',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
   },
   dotActive: {
-    width: 24,
+    width: 28,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#a78bfa',
+    backgroundColor: '#c084fc',
+    shadowColor: '#a855f7',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 8,
+    elevation: 6,
   },
 
   // CTA urgency
