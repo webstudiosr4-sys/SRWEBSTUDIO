@@ -779,6 +779,10 @@ export default function Index() {
   const orb3Anim = useRef(new Animated.Value(0)).current;
   const orb4Anim = useRef(new Animated.Value(0)).current;
   
+  // CTA pulse animation
+  const ctaPulseAnim = useRef(new Animated.Value(1)).current;
+  const ctaGlowAnim = useRef(new Animated.Value(0)).current;
+  
   // Parallax scroll position
   const scrollY = useRef(new Animated.Value(0)).current;
   
@@ -886,6 +890,38 @@ export default function Index() {
         }),
       ])
     ).start();
+
+    // CTA button pulse animation - subtle scale pulse for attention
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(ctaPulseAnim, {
+          toValue: 1.045,
+          duration: 1800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(ctaPulseAnim, {
+          toValue: 1,
+          duration: 1800,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // CTA glow animation - neon glow intensity pulse
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(ctaGlowAnim, {
+          toValue: 1,
+          duration: 2000,
+          useNativeDriver: false,
+        }),
+        Animated.timing(ctaGlowAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
   }, []);
 
   // Parallax interpolations
@@ -932,6 +968,16 @@ export default function Index() {
   const orb4TranslateX = orb4Anim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -20],
+  });
+
+  // CTA glow interpolation - animate shadow/glow intensity
+  const ctaGlowShadowRadius = ctaGlowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [8, 25],
+  });
+  const ctaGlowShadowOpacity = ctaGlowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.4, 0.9],
   });
 
   // Handle scroll for parallax
@@ -983,8 +1029,9 @@ export default function Index() {
   };
 
   const openWhatsApp = () => {
-    const phone = CONTACT.whatsapp.replace(/\s/g, '').replace('+', '');
-    const url = `https://wa.me/${phone}`;
+    const phone = '48452688251';
+    const message = encodeURIComponent('Cześć, chcę darmową analizę mojej strony. Moja firma: ... Miasto: ...');
+    const url = `https://wa.me/${phone}?text=${message}`;
     Linking.openURL(url);
   };
 
@@ -1208,9 +1255,10 @@ export default function Index() {
           </Animated.View>
           
           <Animated.View style={[styles.heroContent, { opacity: heroFadeAnim, transform: [{ scale: heroScaleAnim }] }]}>
-            {/* Logo */}
+            {/* Logo with enhanced glow */}
             <View style={styles.logoContainer}>
               <View style={styles.logoGlowWrapper}>
+                <View style={styles.logoNeonGlow} />
                 <LinearGradient
                   colors={['#8b5cf6', '#ec4899', '#3b82f6']}
                   style={styles.logoGradient}
@@ -1223,50 +1271,71 @@ export default function Index() {
               <Text style={styles.logoName}>Web Studio</Text>
             </View>
 
-            {/* Pain-focused Headline */}
-            <Text style={styles.headline}>
-              Masz stronę, ale nie masz klientów?
-            </Text>
+            {/* Stacked Headline - Line by Line */}
+            <View style={styles.headlineContainer}>
+              <Text style={styles.headlineLine}>Masz stronę,</Text>
+              <Text style={styles.headlineLine}>ale nie masz</Text>
+              <View style={styles.headlineHighlightRow}>
+                <Text style={styles.headlineHighlight}>klientów</Text>
+                <Text style={styles.headlineLine}>?</Text>
+              </View>
+            </View>
 
-            {/* Solution Subheadline */}
-            <Text style={styles.subheadline}>
-              Tworzę strony, które przyciągają klientów i zwiększają sprzedaż. Bez skomplikowanych procesów, bez pustych obietnic.
-            </Text>
+            {/* Stacked Subheadline */}
+            <View style={styles.subheadlineContainer}>
+              <Text style={styles.subheadlineLine}>Tworzę strony, które</Text>
+              <Text style={styles.subheadlineHighlight}>przyciągają klientów</Text>
+              <Text style={styles.subheadlineLine}>i zwiększają</Text>
+              <Text style={styles.subheadlineHighlight}>sprzedaż</Text>
+            </View>
 
             {/* Urgency Badge */}
             <View style={styles.badgeContainer}>
               <LinearGradient
-                colors={['rgba(16, 185, 129, 0.3)', 'rgba(16, 185, 129, 0.15)']}
+                colors={['rgba(16, 185, 129, 0.35)', 'rgba(16, 185, 129, 0.15)']}
                 style={styles.urgencyBadge}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
                 <Ionicons name="flash" size={14} color="#10b981" />
-                <Text style={styles.urgencyBadgeText}>Odpowiadam w ciągu 15 minut</Text>
+                <Text style={styles.urgencyBadgeText}>Odpowiadam w 15 minut</Text>
               </LinearGradient>
             </View>
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons with enhanced glow */}
             <View style={styles.ctaContainer}>
               <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
-                <View style={styles.primaryButtonGlow}>
-                  <LinearGradient
-                    colors={['#8b5cf6', '#d946ef', '#ec4899']}
-                    style={styles.primaryButton}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                  >
-                    <Text style={styles.primaryButtonText}>Sprawdź ile klientów tracisz</Text>
-                    <Ionicons name="arrow-forward" size={18} color="#fff" />
-                  </LinearGradient>
-                </View>
+                <Animated.View style={[styles.ctaPulseWrapper, {
+                  transform: [{ scale: ctaPulseAnim }],
+                }]}>
+                  <Animated.View style={[styles.primaryButtonNeonGlow, {
+                    shadowColor: '#d946ef',
+                    shadowOffset: { width: 0, height: 0 },
+                    shadowOpacity: ctaGlowShadowOpacity,
+                    shadowRadius: ctaGlowShadowRadius,
+                    elevation: 12,
+                  }]}>
+                    <View style={styles.primaryButtonGlow}>
+                      <LinearGradient
+                        colors={['#a855f7', '#d946ef', '#ec4899']}
+                        style={styles.primaryButton}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                      >
+                        <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                        <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                        <Ionicons name="arrow-forward" size={18} color="#fff" />
+                      </LinearGradient>
+                    </View>
+                  </Animated.View>
+                </Animated.View>
               </TouchableOpacity>
 
               {/* Trust line */}
               <Text style={styles.trustLine}>Bez zobowiązań • Darmowa analiza</Text>
 
               <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
-                <Text style={styles.secondaryButtonText}>Zobacz wyniki klientów</Text>
+                <Text style={styles.secondaryButtonText}>Zobacz wyniki</Text>
                 <Ionicons name="chevron-down" size={18} color="#a78bfa" />
               </TouchableOpacity>
             </View>
@@ -1356,20 +1425,24 @@ export default function Index() {
         {/* Benefits Section - "What You Get" */}
         <View style={styles.benefitsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Co zyskujesz?</Text>
-            <Text style={styles.sectionSubtitleSmall}>Konkretne rezultaty, nie puste obietnice</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Co</Text>
+              <Text style={styles.sectionTitleHighlight}>zyskujesz?</Text>
+            </View>
+            <Text style={styles.sectionSubtitleSmall}>Konkretne rezultaty</Text>
           </View>
 
           <View style={styles.benefitsGrid}>
             {BENEFITS.map((benefit, index) => (
               <View key={index} style={styles.benefitCard}>
                 <LinearGradient
-                  colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
+                  colors={['rgba(139, 92, 246, 0.15)', 'rgba(59, 130, 246, 0.08)']}
                   style={styles.benefitCardGradient}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                 >
                   <View style={styles.benefitIconWrapper}>
+                    <View style={styles.benefitIconNeonGlow} />
                     <LinearGradient
                       colors={['#8b5cf6', '#ec4899']}
                       style={styles.benefitIconGradient}
@@ -1395,8 +1468,11 @@ export default function Index() {
           }}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Usługi programistyczne</Text>
-            <Text style={styles.sectionSubtitle}>& Web Development</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Usługi</Text>
+              <Text style={styles.sectionTitleHighlight}>programistyczne</Text>
+            </View>
+            <Text style={styles.sectionSubtitleSmall}>Web Development</Text>
           </View>
 
           <View style={styles.servicesGrid}>
@@ -1414,8 +1490,11 @@ export default function Index() {
           }}
         >
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Nasze realizacje</Text>
-            <Text style={styles.sectionSubtitleSmall}>Projekty, które przynoszą realne wyniki</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Nasze</Text>
+              <Text style={styles.sectionTitleHighlight}>realizacje</Text>
+            </View>
+            <Text style={styles.sectionSubtitleSmall}>Realne wyniki klientów</Text>
           </View>
 
           <View style={styles.portfolioGrid}>
@@ -1430,7 +1509,7 @@ export default function Index() {
           </View>
 
           <TouchableOpacity style={styles.viewAllButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
-            <Text style={styles.viewAllButtonText}>Zobacz wszystkie projekty</Text>
+            <Text style={styles.viewAllButtonText}>Wszystkie projekty</Text>
             <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
           </TouchableOpacity>
         </View>
@@ -1438,8 +1517,11 @@ export default function Index() {
         {/* Testimonials Section */}
         <View style={styles.testimonialsSection}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Co mówią klienci</Text>
-            <Text style={styles.sectionSubtitleSmall}>Realne opinie, realne wyniki</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Co mówią</Text>
+              <Text style={styles.sectionTitleHighlight}>klienci</Text>
+            </View>
+            <Text style={styles.sectionSubtitleSmall}>Realne opinie</Text>
           </View>
 
           <View style={styles.testimonialsGrid}>
@@ -1492,8 +1574,11 @@ export default function Index() {
         {/* Process Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Jak wygląda współpraca</Text>
-            <Text style={styles.sectionSubtitleSmall}>Proces tworzenia Twojego projektu</Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Jak wygląda</Text>
+              <Text style={styles.sectionTitleHighlight}>współpraca</Text>
+            </View>
+            <Text style={styles.sectionSubtitleSmall}>Prosty proces</Text>
           </View>
 
           <View style={styles.processContainer}>
@@ -1577,17 +1662,28 @@ export default function Index() {
             </View>
 
             <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
-              <View style={styles.ctaButtonGlow}>
-                <LinearGradient
-                  colors={['#25D366', '#20c060', '#128C7E']}
-                  style={styles.primaryButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                  <Text style={styles.primaryButtonText}>Napisz teraz na WhatsApp</Text>
-                </LinearGradient>
-              </View>
+              <Animated.View style={[styles.ctaPulseWrapper, {
+                transform: [{ scale: ctaPulseAnim }],
+              }]}>
+                <Animated.View style={[styles.ctaButtonGlow, {
+                  shadowColor: '#25D366',
+                  shadowOffset: { width: 0, height: 0 },
+                  shadowOpacity: ctaGlowShadowOpacity,
+                  shadowRadius: ctaGlowShadowRadius,
+                  elevation: 12,
+                }]}>
+                  <LinearGradient
+                    colors={['#25D366', '#20c060', '#128C7E']}
+                    style={styles.primaryButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                  >
+                    <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                    <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                    <Ionicons name="arrow-forward" size={18} color="#fff" />
+                  </LinearGradient>
+                </Animated.View>
+              </Animated.View>
             </TouchableOpacity>
 
             {/* Trust line */}
@@ -1916,15 +2012,19 @@ const styles = StyleSheet.create({
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 30,
-    paddingVertical: 17,
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    paddingVertical: 18,
     borderRadius: 12,
     gap: 10,
+    minHeight: 56,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
   },
   primaryButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   secondaryButton: {
     flexDirection: 'row',
@@ -2324,6 +2424,11 @@ const styles = StyleSheet.create({
   ctaButtonGlow: {
     borderRadius: 14,
     padding: 2,
+    shadowColor: '#25D366',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 12,
+    elevation: 10,
   },
   contactOptions: {
     flexDirection: 'row',
@@ -2739,5 +2844,110 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginTop: 12,
     marginBottom: 8,
+  },
+
+  // Enhanced Typography - Stacked Headlines
+  headlineContainer: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  headlineLine: {
+    fontSize: isSmallScreen ? 32 : 40,
+    fontWeight: '800',
+    color: '#fff',
+    textAlign: 'center',
+    lineHeight: isSmallScreen ? 40 : 50,
+    letterSpacing: -0.5,
+  },
+  headlineHighlightRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headlineHighlight: {
+    fontSize: isSmallScreen ? 32 : 40,
+    fontWeight: '800',
+    color: '#a78bfa',
+    textAlign: 'center',
+    lineHeight: isSmallScreen ? 40 : 50,
+    letterSpacing: -0.5,
+  },
+
+  // Subheadline stacked
+  subheadlineContainer: {
+    alignItems: 'center',
+    marginBottom: 28,
+    gap: 4,
+  },
+  subheadlineLine: {
+    fontSize: 17,
+    color: '#a1a1aa',
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+  subheadlineHighlight: {
+    fontSize: 17,
+    color: '#e4e4e7',
+    fontWeight: '600',
+    textAlign: 'center',
+    lineHeight: 26,
+  },
+
+  // Section title stacked
+  sectionTitleContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  sectionTitleLine: {
+    fontSize: 28,
+    fontWeight: '300',
+    color: '#a1a1aa',
+    textAlign: 'center',
+    lineHeight: 36,
+  },
+  sectionTitleHighlight: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#fff',
+    textAlign: 'center',
+    lineHeight: 42,
+  },
+
+  // Logo neon glow
+  logoNeonGlow: {
+    position: 'absolute',
+    top: -4,
+    left: -4,
+    right: -4,
+    bottom: -4,
+    borderRadius: 16,
+    backgroundColor: 'rgba(139, 92, 246, 0.4)',
+  },
+
+  // Primary button neon glow wrapper
+  primaryButtonNeonGlow: {
+    borderRadius: 16,
+    padding: 3,
+    backgroundColor: 'rgba(168, 85, 247, 0.35)',
+    shadowColor: '#d946ef',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 15,
+    elevation: 10,
+  },
+
+  // CTA pulse animation wrapper
+  ctaPulseWrapper: {
+    alignSelf: 'center',
+  },
+
+  // Benefit icon neon glow
+  benefitIconNeonGlow: {
+    position: 'absolute',
+    top: -3,
+    left: -3,
+    right: -3,
+    bottom: -3,
+    borderRadius: 15,
+    backgroundColor: 'rgba(139, 92, 246, 0.35)',
   },
 });
