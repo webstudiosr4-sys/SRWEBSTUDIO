@@ -335,6 +335,86 @@ export default function Index() {
           </Animated.View>
         </View>
 
+        {/* Trust Section */}
+        <View style={styles.trustSection}>
+          <View style={styles.trustGrid}>
+            {/* Card 1 - Projects */}
+            <View style={styles.trustCard}>
+              <LinearGradient
+                colors={['rgba(139, 92, 246, 0.15)', 'rgba(59, 130, 246, 0.08)']}
+                style={styles.trustCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.trustIconWrapper}>
+                  <LinearGradient
+                    colors={['#8b5cf6', '#6366f1']}
+                    style={styles.trustIconGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Ionicons name="checkmark-done" size={20} color="#fff" />
+                  </LinearGradient>
+                </View>
+                <View style={styles.trustCardContent}>
+                  <Text style={styles.trustCardTitle}>10+ zrealizowanych projektów</Text>
+                  <Text style={styles.trustCardDescription}>Doświadczenie w tworzeniu stron i sklepów online</Text>
+                </View>
+              </LinearGradient>
+            </View>
+
+            {/* Card 2 - Technologies */}
+            <View style={styles.trustCard}>
+              <LinearGradient
+                colors={['rgba(236, 72, 153, 0.15)', 'rgba(139, 92, 246, 0.08)']}
+                style={styles.trustCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.trustIconWrapper}>
+                  <LinearGradient
+                    colors={['#ec4899', '#8b5cf6']}
+                    style={styles.trustIconGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Ionicons name="code-slash" size={20} color="#fff" />
+                  </LinearGradient>
+                </View>
+                <View style={styles.trustCardContent}>
+                  <Text style={styles.trustCardTitle}>Nowoczesne technologie</Text>
+                  <Text style={styles.trustCardDescription}>Pracujemy z wykorzystaniem Next.js, SEO i najlepszych praktyk</Text>
+                </View>
+              </LinearGradient>
+            </View>
+
+            {/* Card 3 - Fast delivery */}
+            <View style={styles.trustCard}>
+              <LinearGradient
+                colors={['rgba(59, 130, 246, 0.15)', 'rgba(6, 182, 212, 0.08)']}
+                style={styles.trustCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.trustIconWrapper}>
+                  <LinearGradient
+                    colors={['#3b82f6', '#06b6d4']}
+                    style={styles.trustIconGradient}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Ionicons name="flash" size={20} color="#fff" />
+                  </LinearGradient>
+                </View>
+                <View style={styles.trustCardContent}>
+                  <Text style={styles.trustCardTitle}>Szybka realizacja</Text>
+                  <Text style={styles.trustCardDescription}>Sprawna komunikacja i wsparcie na każdym etapie projektu</Text>
+                </View>
+              </LinearGradient>
+            </View>
+          </View>
+        </View>
+
         {/* Services Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -600,6 +680,53 @@ const styles = StyleSheet.create({
     color: '#8b5cf6',
     fontSize: 15,
     fontWeight: '600',
+  },
+
+  // Trust Section Styles
+  trustSection: {
+    paddingHorizontal: 24,
+    paddingTop: 20,
+    paddingBottom: 40,
+  },
+  trustGrid: {
+    gap: 12,
+  },
+  trustCard: {
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  trustCardGradient: {
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  trustIconWrapper: {
+    flexShrink: 0,
+  },
+  trustIconGradient: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  trustCardContent: {
+    flex: 1,
+  },
+  trustCardTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  trustCardDescription: {
+    fontSize: 13,
+    color: '#a1a1aa',
+    lineHeight: 18,
   },
 
   // Section Styles
