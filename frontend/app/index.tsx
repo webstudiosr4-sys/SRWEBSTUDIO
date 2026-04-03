@@ -110,14 +110,17 @@ const PROCESS_STEPS = [
   },
 ];
 
-// Enhanced 3D Service Card Component with hover effects
+// Enhanced 3D Service Card Component with micro-interactions
 const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: number }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(40)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const iconFloatAnim = useRef(new Animated.Value(0)).current;
+  const shineAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // Entrance animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -133,18 +136,39 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Subtle icon floating animation
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(iconFloatAnim, {
+          toValue: 1,
+          duration: 2000 + (index * 200),
+          useNativeDriver: true,
+        }),
+        Animated.timing(iconFloatAnim, {
+          toValue: 0,
+          duration: 2000 + (index * 200),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const handlePressIn = () => {
     Animated.parallel([
       Animated.spring(scaleAnim, {
-        toValue: 1.03,
+        toValue: 1.02,
         friction: 8,
         useNativeDriver: true,
       }),
       Animated.timing(glowAnim, {
         toValue: 1,
-        duration: 200,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shineAnim, {
+        toValue: 1,
+        duration: 300,
         useNativeDriver: true,
       }),
     ]).start();
@@ -159,7 +183,12 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
       }),
       Animated.timing(glowAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shineAnim, {
+        toValue: 0,
+        duration: 400,
         useNativeDriver: true,
       }),
     ]).start();
@@ -167,7 +196,22 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
 
   const glowOpacity = glowAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 0.15],
+    outputRange: [0, 0.12],
+  });
+
+  const iconFloat = iconFloatAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -3],
+  });
+
+  const shineTranslate = shineAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-100, 100],
+  });
+
+  const shineOpacity = shineAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, 0.15, 0],
   });
 
   return (
@@ -182,13 +226,25 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
         {/* Glow effect overlay */}
         <Animated.View style={[styles.cardGlowOverlay, { opacity: glowOpacity }]} />
         
+        {/* Shine effect */}
+        <Animated.View style={[
+          styles.cardShineEffect,
+          { 
+            opacity: shineOpacity,
+            transform: [{ translateX: shineTranslate }]
+          }
+        ]} />
+        
         <LinearGradient
           colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
           style={styles.serviceCardGradient}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <View style={styles.serviceIconContainer}>
+          <Animated.View style={[
+            styles.serviceIconContainer,
+            { transform: [{ translateY: iconFloat }] }
+          ]}>
             <LinearGradient
               colors={['#8b5cf6', '#3b82f6']}
               style={styles.serviceIconGradient}
@@ -197,7 +253,7 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
             >
               <Ionicons name={service.icon as any} size={24} color="#fff" />
             </LinearGradient>
-          </View>
+          </Animated.View>
           <Text style={styles.serviceTitle}>{service.title}</Text>
           <Text style={styles.serviceDescription}>{service.description}</Text>
         </LinearGradient>
@@ -206,12 +262,14 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
   );
 };
 
-// Enhanced Portfolio Card Component with 3D hover effects
+// Enhanced Portfolio Card Component with micro-interactions
 const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[0]; index: number; onPress: () => void }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(50)).current;
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  const shineAnim = useRef(new Animated.Value(0)).current;
+  const expandIconAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
@@ -229,18 +287,39 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Subtle expand icon pulse
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(expandIconAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(expandIconAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
   }, []);
 
   const handlePressIn = () => {
     Animated.parallel([
       Animated.spring(scaleAnim, {
-        toValue: 1.02,
+        toValue: 1.015,
         friction: 8,
         useNativeDriver: true,
       }),
       Animated.timing(glowAnim, {
         toValue: 1,
-        duration: 200,
+        duration: 150,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shineAnim, {
+        toValue: 1,
+        duration: 400,
         useNativeDriver: true,
       }),
     ]).start();
@@ -255,7 +334,12 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
       }),
       Animated.timing(glowAnim, {
         toValue: 0,
-        duration: 300,
+        duration: 250,
+        useNativeDriver: true,
+      }),
+      Animated.timing(shineAnim, {
+        toValue: 0,
+        duration: 500,
         useNativeDriver: true,
       }),
     ]).start();
@@ -263,7 +347,27 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
 
   const glowOpacity = glowAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [0, 0.2],
+    outputRange: [0, 0.15],
+  });
+
+  const shineTranslate = shineAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-150, 150],
+  });
+
+  const shineOpacity = shineAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: [0, 0.2, 0],
+  });
+
+  const expandIconScale = expandIconAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 1.1],
+  });
+
+  const expandIconOpacity = expandIconAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0.7, 1],
   });
 
   return (
@@ -278,6 +382,15 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
         {/* Glow effect overlay */}
         <Animated.View style={[styles.portfolioGlowOverlay, { opacity: glowOpacity }]} />
         
+        {/* Shine effect */}
+        <Animated.View style={[
+          styles.portfolioShineEffect,
+          { 
+            opacity: shineOpacity,
+            transform: [{ translateX: shineTranslate }]
+          }
+        ]} />
+        
         <LinearGradient
           colors={project.gradient}
           style={styles.portfolioCardHeader}
@@ -287,13 +400,21 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
           <View style={styles.portfolioTag}>
             <Text style={styles.portfolioTagText}>{project.tag}</Text>
           </View>
-          <TouchableOpacity 
-            onPress={onPress}
-            style={styles.expandButton}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.9)" />
-          </TouchableOpacity>
+          <Animated.View style={[
+            styles.expandButton,
+            { 
+              transform: [{ scale: expandIconScale }],
+              opacity: expandIconOpacity
+            }
+          ]}>
+            <TouchableOpacity 
+              onPress={onPress}
+              activeOpacity={0.7}
+              style={styles.expandButtonInner}
+            >
+              <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.95)" />
+            </TouchableOpacity>
+          </Animated.View>
         </LinearGradient>
         <View style={styles.portfolioCardContent}>
           <Text style={styles.portfolioTitle}>{project.title}</Text>
@@ -620,9 +741,79 @@ export default function Index() {
     outputRange: [0.3, 0.6],
   });
 
+  // Floating particles component
+  const FloatingParticles = () => {
+    const particles = [
+      { top: '10%', left: '15%', size: 4, delay: 0, duration: 4000, color: 'rgba(139, 92, 246, 0.08)' },
+      { top: '25%', right: '20%', size: 3, delay: 500, duration: 5000, color: 'rgba(236, 72, 153, 0.06)' },
+      { top: '40%', left: '80%', size: 5, delay: 1000, duration: 4500, color: 'rgba(59, 130, 246, 0.07)' },
+      { top: '55%', left: '10%', size: 3, delay: 1500, duration: 5500, color: 'rgba(139, 92, 246, 0.05)' },
+      { top: '70%', right: '25%', size: 4, delay: 2000, duration: 4200, color: 'rgba(6, 182, 212, 0.06)' },
+      { top: '85%', left: '45%', size: 3, delay: 2500, duration: 5800, color: 'rgba(236, 72, 153, 0.05)' },
+    ];
+
+    return (
+      <View style={styles.particlesContainer} pointerEvents="none">
+        {particles.map((p, i) => {
+          const particleAnim = useRef(new Animated.Value(0)).current;
+          
+          useEffect(() => {
+            Animated.loop(
+              Animated.sequence([
+                Animated.timing(particleAnim, {
+                  toValue: 1,
+                  duration: p.duration,
+                  delay: p.delay,
+                  useNativeDriver: true,
+                }),
+                Animated.timing(particleAnim, {
+                  toValue: 0,
+                  duration: p.duration,
+                  useNativeDriver: true,
+                }),
+              ])
+            ).start();
+          }, []);
+
+          const particleY = particleAnim.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0, -15],
+          });
+
+          const particleOpacity = particleAnim.interpolate({
+            inputRange: [0, 0.5, 1],
+            outputRange: [0.3, 0.8, 0.3],
+          });
+
+          return (
+            <Animated.View
+              key={i}
+              style={[
+                styles.particle,
+                {
+                  top: p.top,
+                  left: p.left,
+                  right: p.right,
+                  width: p.size,
+                  height: p.size,
+                  backgroundColor: p.color,
+                  opacity: particleOpacity,
+                  transform: [{ translateY: particleY }],
+                },
+              ]}
+            />
+          );
+        })}
+      </View>
+    );
+  };
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar style="light" />
+      
+      {/* Floating micro particles */}
+      <FloatingParticles />
       
       <Animated.ScrollView 
         ref={scrollViewRef}
@@ -1439,9 +1630,19 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 18,
-    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    backgroundColor: 'rgba(139, 92, 246, 0.25)',
     zIndex: 10,
     pointerEvents: 'none',
+  },
+  cardShineEffect: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 60,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    zIndex: 11,
+    pointerEvents: 'none',
+    transform: [{ skewX: '-15deg' }],
   },
   serviceCardGradient: {
     padding: 24,
@@ -1490,9 +1691,19 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     borderRadius: 18,
-    backgroundColor: 'rgba(139, 92, 246, 0.25)',
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
     zIndex: 10,
     pointerEvents: 'none',
+  },
+  portfolioShineEffect: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 80,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    zIndex: 11,
+    pointerEvents: 'none',
+    transform: [{ skewX: '-15deg' }],
   },
   portfolioCardHeader: {
     height: 150,
@@ -1903,5 +2114,26 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '700',
+  },
+
+  // Micro-interaction styles
+  particlesContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+    overflow: 'hidden',
+  },
+  particle: {
+    position: 'absolute',
+    borderRadius: 50,
+  },
+  expandButtonInner: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
