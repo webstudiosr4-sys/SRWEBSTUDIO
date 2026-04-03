@@ -213,6 +213,10 @@ export default function Index() {
   const insets = useSafeAreaInsets();
   const heroFadeAnim = useRef(new Animated.Value(0)).current;
   const heroScaleAnim = useRef(new Animated.Value(0.9)).current;
+  
+  // Refs for scrolling
+  const scrollViewRef = useRef<ScrollView>(null);
+  const portfolioSectionY = useRef(0);
 
   useEffect(() => {
     Animated.parallel([
@@ -244,8 +248,13 @@ export default function Index() {
     Linking.openURL(`mailto:${CONTACT.email}`);
   };
 
-  const scrollToSection = () => {
-    // For now, just a visual feedback
+  const scrollToPortfolio = () => {
+    if (scrollViewRef.current) {
+      scrollViewRef.current.scrollTo({
+        y: portfolioSectionY.current,
+        animated: true,
+      });
+    }
   };
 
   return (
@@ -253,6 +262,7 @@ export default function Index() {
       <StatusBar style="light" />
       
       <ScrollView 
+        ref={scrollViewRef}
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
@@ -317,7 +327,7 @@ export default function Index() {
                 </LinearGradient>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.secondaryButton} onPress={scrollToSection} activeOpacity={0.7}>
+              <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
                 <Text style={styles.secondaryButtonText}>Zobacz realizacje</Text>
                 <Ionicons name="chevron-down" size={18} color="#8b5cf6" />
               </TouchableOpacity>
@@ -340,7 +350,12 @@ export default function Index() {
         </View>
 
         {/* Portfolio Section */}
-        <View style={styles.section}>
+        <View 
+          style={styles.section}
+          onLayout={(event) => {
+            portfolioSectionY.current = event.nativeEvent.layout.y;
+          }}
+        >
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Nasze realizacje</Text>
             <Text style={styles.sectionSubtitleSmall}>Projekty, które przynoszą realne wyniki</Text>
@@ -352,7 +367,7 @@ export default function Index() {
             ))}
           </View>
 
-          <TouchableOpacity style={styles.viewAllButton} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.viewAllButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
             <Text style={styles.viewAllButtonText}>Zobacz wszystkie projekty</Text>
             <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
           </TouchableOpacity>
