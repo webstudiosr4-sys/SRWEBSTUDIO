@@ -2066,10 +2066,10 @@ const styles = StyleSheet.create({
 
   // Hero Section
   heroSection: {
-    minHeight: 620,
+    minHeight: 540,
     paddingHorizontal: 24,
-    paddingTop: 40,
-    paddingBottom: 60,
+    paddingTop: 30,
+    paddingBottom: 40,
     position: 'relative',
     overflow: 'hidden',
   },
@@ -2156,7 +2156,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center',
-    marginBottom: 40,
+    marginBottom: 28,
     gap: 10,
   },
   logoGlowWrapper: {
@@ -2192,18 +2192,18 @@ const styles = StyleSheet.create({
     color: '#fff',
     textAlign: 'center',
     lineHeight: isSmallScreen ? 36 : 46,
-    marginBottom: 20,
+    marginBottom: 14,
   },
   subheadline: {
     fontSize: 16,
     color: '#a1a1aa',
     textAlign: 'center',
     lineHeight: 26,
-    marginBottom: 24,
+    marginBottom: 16,
     paddingHorizontal: 10,
   },
   badgeContainer: {
-    marginBottom: 32,
+    marginBottom: 22,
   },
   badge: {
     flexDirection: 'row',
@@ -2264,8 +2264,8 @@ const styles = StyleSheet.create({
   // Trust Section Styles
   trustSection: {
     paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingTop: 12,
+    paddingBottom: 28,
   },
   trustGrid: {
     gap: 12,
@@ -2311,11 +2311,11 @@ const styles = StyleSheet.create({
   // Section Styles
   section: {
     paddingHorizontal: 24,
-    paddingVertical: 60,
+    paddingVertical: 40,
   },
   sectionHeader: {
     alignItems: 'center',
-    marginBottom: 40,
+    marginBottom: 28,
   },
   sectionTitle: {
     fontSize: 28,
@@ -2530,7 +2530,7 @@ const styles = StyleSheet.create({
   processStepContent: {
     flex: 1,
     paddingTop: 4,
-    paddingBottom: 32,
+    paddingBottom: 22,
   },
   processTitle: {
     fontSize: 18,
@@ -2547,10 +2547,10 @@ const styles = StyleSheet.create({
   // About Section
   aboutSection: {
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingVertical: 28,
   },
   aboutGradient: {
-    padding: 28,
+    padding: 24,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: 'rgba(139, 92, 246, 0.25)',
@@ -2616,10 +2616,10 @@ const styles = StyleSheet.create({
   // CTA Section
   ctaSection: {
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingVertical: 28,
   },
   ctaSectionGradient: {
-    padding: 32,
+    padding: 26,
     borderRadius: 24,
     alignItems: 'center',
     borderWidth: 1,
@@ -2636,7 +2636,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#a1a1aa',
     textAlign: 'center',
-    marginBottom: 28,
+    marginBottom: 20,
     lineHeight: 24,
   },
   ctaButtonGlow: {
@@ -2687,7 +2687,7 @@ const styles = StyleSheet.create({
   // Footer
   footer: {
     paddingHorizontal: 24,
-    paddingTop: 40,
+    paddingTop: 28,
     borderTopWidth: 1,
     borderTopColor: 'rgba(139, 92, 246, 0.15)',
     alignItems: 'center',
@@ -2931,7 +2931,7 @@ const styles = StyleSheet.create({
   // Target audience section ("Dla kogo?")
   targetSection: {
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingVertical: 28,
   },
   targetGrid: {
     flexDirection: isSmallScreen ? 'column' : 'row',
@@ -2975,9 +2975,9 @@ const styles = StyleSheet.create({
   // Mid-page CTA (after testimonials)
   midCtaSection: {
     alignItems: 'center',
-    paddingVertical: 36,
+    paddingVertical: 24,
     paddingHorizontal: 24,
-    gap: 16,
+    gap: 14,
   },
   midCtaText: {
     color: '#d4d4d8',
@@ -2990,7 +2990,7 @@ const styles = StyleSheet.create({
   // Benefits section
   benefitsSection: {
     paddingHorizontal: 24,
-    paddingVertical: 50,
+    paddingVertical: 34,
   },
   benefitsGrid: {
     flexDirection: 'row',
@@ -3053,7 +3053,7 @@ const styles = StyleSheet.create({
 
   // Testimonials section
   testimonialsSection: {
-    paddingVertical: 50,
+    paddingVertical: 34,
   },
   carouselContainer: {
     paddingHorizontal: Math.round((width - (isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400))) / 2),
