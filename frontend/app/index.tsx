@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
   Animated,
   Modal,
   Pressable,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
@@ -19,6 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width, height } = Dimensions.get('window');
 const isSmallScreen = width < 400;
+const isWeb = Platform.OS === 'web';
 
 // Contact Info
 const CONTACT = {
@@ -107,116 +110,239 @@ const PROCESS_STEPS = [
   },
 ];
 
-// Animated Service Card Component
+// Enhanced 3D Service Card Component with hover effects
 const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: number }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(30)).current;
+  const translateY = useRef(new Animated.Value(40)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 500,
-        delay: index * 100,
+        duration: 600,
+        delay: index * 120,
         useNativeDriver: true,
       }),
-      Animated.timing(translateY, {
+      Animated.spring(translateY, {
         toValue: 0,
-        duration: 500,
-        delay: index * 100,
+        friction: 8,
+        tension: 40,
+        delay: index * 120,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handlePressIn = () => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1.03,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0.15],
+  });
+
+  return (
+    <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
+      <Animated.View style={[
+        styles.serviceCard, 
+        { 
+          opacity: fadeAnim, 
+          transform: [{ translateY }, { scale: scaleAnim }] 
+        }
+      ]}>
+        {/* Glow effect overlay */}
+        <Animated.View style={[styles.cardGlowOverlay, { opacity: glowOpacity }]} />
+        
+        <LinearGradient
+          colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
+          style={styles.serviceCardGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.serviceIconContainer}>
+            <LinearGradient
+              colors={['#8b5cf6', '#3b82f6']}
+              style={styles.serviceIconGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Ionicons name={service.icon as any} size={24} color="#fff" />
+            </LinearGradient>
+          </View>
+          <Text style={styles.serviceTitle}>{service.title}</Text>
+          <Text style={styles.serviceDescription}>{service.description}</Text>
+        </LinearGradient>
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+// Enhanced Portfolio Card Component with 3D hover effects
+const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[0]; index: number; onPress: () => void }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 700,
+        delay: index * 150,
+        useNativeDriver: true,
+      }),
+      Animated.spring(translateY, {
+        toValue: 0,
+        friction: 8,
+        tension: 35,
+        delay: index * 150,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
+
+  const handlePressIn = () => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1.02,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+      Animated.timing(glowAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  const glowOpacity = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 0.2],
+  });
+
+  return (
+    <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={onPress}>
+      <Animated.View style={[
+        styles.portfolioCard, 
+        { 
+          opacity: fadeAnim, 
+          transform: [{ translateY }, { scale: scaleAnim }] 
+        }
+      ]}>
+        {/* Glow effect overlay */}
+        <Animated.View style={[styles.portfolioGlowOverlay, { opacity: glowOpacity }]} />
+        
+        <LinearGradient
+          colors={project.gradient}
+          style={styles.portfolioCardHeader}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.portfolioTag}>
+            <Text style={styles.portfolioTagText}>{project.tag}</Text>
+          </View>
+          <TouchableOpacity 
+            onPress={onPress}
+            style={styles.expandButton}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.9)" />
+          </TouchableOpacity>
+        </LinearGradient>
+        <View style={styles.portfolioCardContent}>
+          <Text style={styles.portfolioTitle}>{project.title}</Text>
+          <Text style={styles.portfolioDescription}>{project.description}</Text>
+        </View>
+      </Animated.View>
+    </Pressable>
+  );
+};
+
+// Enhanced Process Step Component with entrance animation
+const ProcessStep = ({ step, index, isLast }: { step: typeof PROCESS_STEPS[0]; index: number; isLast: boolean }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(-30)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        delay: index * 150,
+        useNativeDriver: true,
+      }),
+      Animated.spring(translateX, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        delay: index * 150,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        delay: index * 150,
         useNativeDriver: true,
       }),
     ]).start();
   }, []);
 
   return (
-    <Animated.View style={[styles.serviceCard, { opacity: fadeAnim, transform: [{ translateY }] }]}>
-      <LinearGradient
-        colors={['rgba(139, 92, 246, 0.1)', 'rgba(59, 130, 246, 0.05)']}
-        style={styles.serviceCardGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.serviceIconContainer}>
-          <LinearGradient
-            colors={['#8b5cf6', '#3b82f6']}
-            style={styles.serviceIconGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Ionicons name={service.icon as any} size={24} color="#fff" />
-          </LinearGradient>
-        </View>
-        <Text style={styles.serviceTitle}>{service.title}</Text>
-        <Text style={styles.serviceDescription}>{service.description}</Text>
-      </LinearGradient>
-    </Animated.View>
-  );
-};
-
-// Portfolio Card Component
-const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[0]; index: number; onPress: () => void }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    Animated.timing(fadeAnim, {
-      toValue: 1,
-      duration: 600,
-      delay: index * 150,
-      useNativeDriver: true,
-    }).start();
-  }, []);
-
-  const handlePressIn = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.98,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  };
-
-  return (
-    <Animated.View style={[styles.portfolioCard, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
-      <LinearGradient
-        colors={project.gradient}
-        style={styles.portfolioCardHeader}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.portfolioTag}>
-          <Text style={styles.portfolioTagText}>{project.tag}</Text>
-        </View>
-        <TouchableOpacity 
-          onPress={onPress}
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          style={styles.expandButton}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.9)" />
-        </TouchableOpacity>
-      </LinearGradient>
-      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-        <View style={styles.portfolioCardContent}>
-          <Text style={styles.portfolioTitle}>{project.title}</Text>
-          <Text style={styles.portfolioDescription}>{project.description}</Text>
-        </View>
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
-
-// Process Step Component
-const ProcessStep = ({ step, index, isLast }: { step: typeof PROCESS_STEPS[0]; index: number; isLast: boolean }) => {
-  return (
-    <View style={styles.processStep}>
+    <Animated.View style={[
+      styles.processStep, 
+      { 
+        opacity: fadeAnim, 
+        transform: [{ translateX }, { scale: scaleAnim }] 
+      }
+    ]}>
       <View style={styles.processStepLeft}>
         <LinearGradient
           colors={['#8b5cf6', '#ec4899']}
@@ -232,7 +358,7 @@ const ProcessStep = ({ step, index, isLast }: { step: typeof PROCESS_STEPS[0]; i
         <Text style={styles.processTitle}>{step.title}</Text>
         <Text style={styles.processDescription}>{step.description}</Text>
       </View>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -241,6 +367,15 @@ export default function Index() {
   const heroFadeAnim = useRef(new Animated.Value(0)).current;
   const heroScaleAnim = useRef(new Animated.Value(0.9)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  
+  // Floating orbs animations
+  const orb1Anim = useRef(new Animated.Value(0)).current;
+  const orb2Anim = useRef(new Animated.Value(0)).current;
+  const orb3Anim = useRef(new Animated.Value(0)).current;
+  const orb4Anim = useRef(new Animated.Value(0)).current;
+  
+  // Parallax scroll position
+  const scrollY = useRef(new Animated.Value(0)).current;
   
   // Modal state for portfolio preview
   const [modalVisible, setModalVisible] = useState(false);
@@ -275,17 +410,130 @@ export default function Index() {
       Animated.sequence([
         Animated.timing(glowAnim, {
           toValue: 1,
-          duration: 2000,
+          duration: 2500,
           useNativeDriver: true,
         }),
         Animated.timing(glowAnim, {
           toValue: 0,
-          duration: 2000,
+          duration: 2500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // Floating orb animations
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb1Anim, {
+          toValue: 1,
+          duration: 4000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(orb1Anim, {
+          toValue: 0,
+          duration: 4000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb2Anim, {
+          toValue: 1,
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(orb2Anim, {
+          toValue: 0,
+          duration: 5000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb3Anim, {
+          toValue: 1,
+          duration: 3500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(orb3Anim, {
+          toValue: 0,
+          duration: 3500,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(orb4Anim, {
+          toValue: 1,
+          duration: 6000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(orb4Anim, {
+          toValue: 0,
+          duration: 6000,
           useNativeDriver: true,
         }),
       ])
     ).start();
   }, []);
+
+  // Parallax interpolations
+  const parallaxBg = scrollY.interpolate({
+    inputRange: [0, 500],
+    outputRange: [0, -50],
+    extrapolate: 'clamp',
+  });
+
+  const parallaxOrbs = scrollY.interpolate({
+    inputRange: [0, 500],
+    outputRange: [0, -100],
+    extrapolate: 'clamp',
+  });
+
+  // Orb floating translations
+  const orb1TranslateY = orb1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -20],
+  });
+  const orb1TranslateX = orb1Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 15],
+  });
+
+  const orb2TranslateY = orb2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 25],
+  });
+  const orb2TranslateX = orb2Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -10],
+  });
+
+  const orb3TranslateY = orb3Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -15],
+  });
+
+  const orb4TranslateY = orb4Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 20],
+  });
+  const orb4TranslateX = orb4Anim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -20],
+  });
+
+  // Handle scroll for parallax
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
 
   // Open modal with animation
   const openProjectModal = (project: typeof PORTFOLIO[0]) => {
@@ -376,36 +624,92 @@ export default function Index() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar style="light" />
       
-      <ScrollView 
+      <Animated.ScrollView 
         ref={scrollViewRef}
         style={styles.scrollView} 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          {/* Animated Glow Background */}
-          <Animated.View style={[styles.heroGlowAnimated, { opacity: glowOpacity }]}>
+          {/* Animated Glow Background with Parallax */}
+          <Animated.View style={[
+            styles.heroGlowAnimated, 
+            { 
+              opacity: glowOpacity,
+              transform: [{ translateY: parallaxBg }]
+            }
+          ]}>
             <LinearGradient
-              colors={['rgba(139, 92, 246, 0.4)', 'rgba(236, 72, 153, 0.2)', 'transparent']}
+              colors={['rgba(139, 92, 246, 0.45)', 'rgba(236, 72, 153, 0.25)', 'transparent']}
               style={styles.heroGlowGradient}
               start={{ x: 0.5, y: 0 }}
               end={{ x: 0.5, y: 1 }}
             />
           </Animated.View>
           <LinearGradient
-            colors={['rgba(139, 92, 246, 0.25)', 'rgba(236, 72, 153, 0.1)', 'transparent']}
+            colors={['rgba(139, 92, 246, 0.3)', 'rgba(236, 72, 153, 0.15)', 'transparent']}
             style={styles.heroGlow}
             start={{ x: 0.5, y: 0 }}
             end={{ x: 0.5, y: 1 }}
           />
           
-          {/* Floating orbs for visual effect */}
-          <View style={styles.orbContainer}>
-            <Animated.View style={[styles.orb, styles.orbPurple, { opacity: glowOpacity }]} />
-            <Animated.View style={[styles.orb, styles.orbPink, { opacity: glowOpacity }]} />
-            <Animated.View style={[styles.orb, styles.orbBlue, { opacity: glowOpacity }]} />
-          </View>
+          {/* Enhanced floating orbs with parallax and animations */}
+          <Animated.View style={[styles.orbContainer, { transform: [{ translateY: parallaxOrbs }] }]}>
+            {/* Large purple orb - top right */}
+            <Animated.View style={[
+              styles.orb, 
+              styles.orbPurple, 
+              { 
+                opacity: glowOpacity,
+                transform: [{ translateY: orb1TranslateY }, { translateX: orb1TranslateX }]
+              }
+            ]} />
+            
+            {/* Pink orb - left side */}
+            <Animated.View style={[
+              styles.orb, 
+              styles.orbPink, 
+              { 
+                opacity: glowOpacity,
+                transform: [{ translateY: orb2TranslateY }, { translateX: orb2TranslateX }]
+              }
+            ]} />
+            
+            {/* Blue orb - bottom right */}
+            <Animated.View style={[
+              styles.orb, 
+              styles.orbBlue, 
+              { 
+                opacity: glowOpacity,
+                transform: [{ translateY: orb3TranslateY }]
+              }
+            ]} />
+            
+            {/* Additional cyan orb - bottom left */}
+            <Animated.View style={[
+              styles.orb, 
+              styles.orbCyan, 
+              { 
+                opacity: glowOpacity,
+                transform: [{ translateY: orb4TranslateY }, { translateX: orb4TranslateX }]
+              }
+            ]} />
+            
+            {/* Small accent orbs */}
+            <Animated.View style={[
+              styles.orbSmall, 
+              styles.orbSmallPurple, 
+              { opacity: glowOpacity }
+            ]} />
+            <Animated.View style={[
+              styles.orbSmall, 
+              styles.orbSmallPink, 
+              { opacity: glowOpacity }
+            ]} />
+          </Animated.View>
           
           <Animated.View style={[styles.heroContent, { opacity: heroFadeAnim, transform: [{ scale: heroScaleAnim }] }]}>
             {/* Logo */}
@@ -754,7 +1058,7 @@ export default function Index() {
             © 2025 SR Web Studio. Wszystkie prawa zastrzeżone.
           </Text>
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {/* Project Preview Modal */}
       <Modal
@@ -891,31 +1195,55 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
+    overflow: 'hidden',
   },
   orb: {
     position: 'absolute',
-    borderRadius: 100,
+    borderRadius: 200,
   },
   orbPurple: {
-    width: 200,
-    height: 200,
-    top: -50,
-    right: -80,
-    backgroundColor: 'rgba(139, 92, 246, 0.15)',
+    width: 250,
+    height: 250,
+    top: -80,
+    right: -100,
+    backgroundColor: 'rgba(139, 92, 246, 0.18)',
   },
   orbPink: {
-    width: 150,
-    height: 150,
-    top: 200,
-    left: -60,
-    backgroundColor: 'rgba(236, 72, 153, 0.12)',
+    width: 180,
+    height: 180,
+    top: 220,
+    left: -80,
+    backgroundColor: 'rgba(236, 72, 153, 0.15)',
   },
   orbBlue: {
-    width: 120,
-    height: 120,
-    bottom: 100,
-    right: -40,
-    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    width: 140,
+    height: 140,
+    bottom: 80,
+    right: -50,
+    backgroundColor: 'rgba(59, 130, 246, 0.12)',
+  },
+  orbCyan: {
+    width: 160,
+    height: 160,
+    bottom: 180,
+    left: -70,
+    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+  },
+  orbSmall: {
+    position: 'absolute',
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+  },
+  orbSmallPurple: {
+    top: 350,
+    right: 30,
+    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  orbSmallPink: {
+    top: 120,
+    left: 50,
+    backgroundColor: 'rgba(236, 72, 153, 0.15)',
   },
   heroContent: {
     alignItems: 'center',
@@ -1100,14 +1428,26 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   serviceCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  cardGlowOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 18,
+    backgroundColor: 'rgba(139, 92, 246, 0.3)',
+    zIndex: 10,
+    pointerEvents: 'none',
   },
   serviceCardGradient: {
     padding: 24,
-    borderRadius: 16,
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
+    borderColor: 'rgba(139, 92, 246, 0.25)',
   },
   serviceIconContainer: {
     marginBottom: 16,
@@ -1136,14 +1476,26 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   portfolioCard: {
-    borderRadius: 16,
+    borderRadius: 18,
     overflow: 'hidden',
     backgroundColor: '#18181b',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    position: 'relative',
+  },
+  portfolioGlowOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: 18,
+    backgroundColor: 'rgba(139, 92, 246, 0.25)',
+    zIndex: 10,
+    pointerEvents: 'none',
   },
   portfolioCardHeader: {
-    height: 140,
+    height: 150,
     padding: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
