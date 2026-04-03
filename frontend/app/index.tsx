@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,15 @@ import {
   Linking,
   Platform,
   Animated,
+  Modal,
+  Pressable,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
-import { Ionicons, MaterialCommunityIcons, FontAwesome5, Feather, AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 const isSmallScreen = width < 400;
 
 // Contact Info
@@ -153,8 +155,9 @@ const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: n
 };
 
 // Portfolio Card Component
-const PortfolioCard = ({ project, index }: { project: typeof PORTFOLIO[0]; index: number }) => {
+const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[0]; index: number; onPress: () => void }) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.timing(fadeAnim, {
@@ -165,8 +168,22 @@ const PortfolioCard = ({ project, index }: { project: typeof PORTFOLIO[0]; index
     }).start();
   }, []);
 
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <Animated.View style={[styles.portfolioCard, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.portfolioCard, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}>
       <LinearGradient
         colors={project.gradient}
         style={styles.portfolioCardHeader}
@@ -176,12 +193,22 @@ const PortfolioCard = ({ project, index }: { project: typeof PORTFOLIO[0]; index
         <View style={styles.portfolioTag}>
           <Text style={styles.portfolioTagText}>{project.tag}</Text>
         </View>
-        <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.7)" />
+        <TouchableOpacity 
+          onPress={onPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={styles.expandButton}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="expand-outline" size={24} color="rgba(255,255,255,0.9)" />
+        </TouchableOpacity>
       </LinearGradient>
-      <View style={styles.portfolioCardContent}>
-        <Text style={styles.portfolioTitle}>{project.title}</Text>
-        <Text style={styles.portfolioDescription}>{project.description}</Text>
-      </View>
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+        <View style={styles.portfolioCardContent}>
+          <Text style={styles.portfolioTitle}>{project.title}</Text>
+          <Text style={styles.portfolioDescription}>{project.description}</Text>
+        </View>
+      </TouchableOpacity>
     </Animated.View>
   );
 };
@@ -214,6 +241,12 @@ export default function Index() {
   const heroFadeAnim = useRef(new Animated.Value(0)).current;
   const heroScaleAnim = useRef(new Animated.Value(0.9)).current;
   const glowAnim = useRef(new Animated.Value(0)).current;
+  
+  // Modal state for portfolio preview
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<typeof PORTFOLIO[0] | null>(null);
+  const modalScaleAnim = useRef(new Animated.Value(0)).current;
+  const modalOpacityAnim = useRef(new Animated.Value(0)).current;
   
   // Refs for scrolling
   const scrollViewRef = useRef<ScrollView>(null);
@@ -253,6 +286,44 @@ export default function Index() {
       ])
     ).start();
   }, []);
+
+  // Open modal with animation
+  const openProjectModal = (project: typeof PORTFOLIO[0]) => {
+    setSelectedProject(project);
+    setModalVisible(true);
+    Animated.parallel([
+      Animated.spring(modalScaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 65,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacityAnim, {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  };
+
+  // Close modal with animation
+  const closeProjectModal = () => {
+    Animated.parallel([
+      Animated.timing(modalScaleAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(modalOpacityAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setModalVisible(false);
+      setSelectedProject(null);
+    });
+  };
 
   const openLink = (url: string) => {
     Linking.openURL(url);
@@ -512,7 +583,12 @@ export default function Index() {
 
           <View style={styles.portfolioGrid}>
             {PORTFOLIO.map((project, index) => (
-              <PortfolioCard key={index} project={project} index={index} />
+              <PortfolioCard 
+                key={index} 
+                project={project} 
+                index={index} 
+                onPress={() => openProjectModal(project)}
+              />
             ))}
           </View>
 
@@ -679,6 +755,92 @@ export default function Index() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Project Preview Modal */}
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="none"
+        onRequestClose={closeProjectModal}
+      >
+        <Animated.View style={[styles.modalOverlay, { opacity: modalOpacityAnim }]}>
+          <Pressable style={styles.modalBackdrop} onPress={closeProjectModal} />
+          <Animated.View style={[
+            styles.modalContainer,
+            { transform: [{ scale: modalScaleAnim }] }
+          ]}>
+            {selectedProject && (
+              <View style={styles.modalContent}>
+                {/* Modal Header with Gradient */}
+                <LinearGradient
+                  colors={selectedProject.gradient}
+                  style={styles.modalHeader}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={styles.modalHeaderContent}>
+                    <View style={styles.modalTag}>
+                      <Text style={styles.modalTagText}>{selectedProject.tag}</Text>
+                    </View>
+                    <TouchableOpacity 
+                      onPress={closeProjectModal}
+                      style={styles.modalCloseButton}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons name="close" size={24} color="#fff" />
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.modalHeaderIcon}>
+                    <Ionicons 
+                      name={
+                        selectedProject.tag === 'Strona WWW' ? 'globe-outline' :
+                        selectedProject.tag === 'E-commerce' ? 'cart-outline' : 'code-slash-outline'
+                      } 
+                      size={48} 
+                      color="rgba(255,255,255,0.9)" 
+                    />
+                  </View>
+                </LinearGradient>
+
+                {/* Modal Body */}
+                <View style={styles.modalBody}>
+                  <Text style={styles.modalTitle}>{selectedProject.title}</Text>
+                  <Text style={styles.modalDescription}>{selectedProject.description}</Text>
+                  
+                  {/* Project Details */}
+                  <View style={styles.modalDetails}>
+                    <View style={styles.modalDetailItem}>
+                      <Ionicons name="checkmark-circle" size={20} color="#8b5cf6" />
+                      <Text style={styles.modalDetailText}>Projekt zakończony</Text>
+                    </View>
+                    <View style={styles.modalDetailItem}>
+                      <Ionicons name="trending-up" size={20} color="#10b981" />
+                      <Text style={styles.modalDetailText}>Zwiększona konwersja</Text>
+                    </View>
+                    <View style={styles.modalDetailItem}>
+                      <Ionicons name="star" size={20} color="#f59e0b" />
+                      <Text style={styles.modalDetailText}>Zadowolony klient</Text>
+                    </View>
+                  </View>
+
+                  {/* CTA Button */}
+                  <TouchableOpacity onPress={() => { closeProjectModal(); openWhatsApp(); }} activeOpacity={0.8}>
+                    <LinearGradient
+                      colors={['#8b5cf6', '#ec4899']}
+                      style={styles.modalCTA}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                    >
+                      <Text style={styles.modalCTAText}>Zamów podobny projekt</Text>
+                      <Ionicons name="arrow-forward" size={18} color="#fff" />
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+          </Animated.View>
+        </Animated.View>
+      </Modal>
     </View>
   );
 }
@@ -1112,30 +1274,35 @@ const styles = StyleSheet.create({
   aboutStats: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 20,
-    paddingTop: 20,
+    justifyContent: 'space-between',
+    marginTop: 24,
+    paddingTop: 24,
     borderTopWidth: 1,
     borderTopColor: 'rgba(139, 92, 246, 0.2)',
+    width: '100%',
   },
   aboutStat: {
     flex: 1,
     alignItems: 'center',
+    paddingVertical: 8,
   },
   aboutStatNumber: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '800',
     color: '#a78bfa',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   aboutStatLabel: {
-    fontSize: 12,
+    fontSize: 13,
     color: '#71717a',
     fontWeight: '500',
+    textAlign: 'center',
   },
   aboutStatDivider: {
     width: 1,
-    height: 40,
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    height: 50,
+    backgroundColor: 'rgba(139, 92, 246, 0.25)',
+    marginHorizontal: 8,
   },
 
   // CTA Section
@@ -1270,5 +1437,119 @@ const styles = StyleSheet.create({
     color: '#52525b',
     fontSize: 13,
     textAlign: 'center',
+  },
+
+  // Portfolio expand button
+  expandButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalBackdrop: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  modalContainer: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#18181b',
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.3)',
+  },
+  modalContent: {
+    width: '100%',
+  },
+  modalHeader: {
+    padding: 20,
+    minHeight: 160,
+    justifyContent: 'space-between',
+  },
+  modalHeaderContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  modalTag: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  modalTagText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  modalCloseButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalHeaderIcon: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  modalBody: {
+    padding: 24,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 12,
+  },
+  modalDescription: {
+    fontSize: 15,
+    color: '#a1a1aa',
+    lineHeight: 24,
+    marginBottom: 24,
+  },
+  modalDetails: {
+    marginBottom: 24,
+    gap: 12,
+  },
+  modalDetailItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  modalDetailText: {
+    fontSize: 14,
+    color: '#d4d4d8',
+    fontWeight: '500',
+  },
+  modalCTA: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    gap: 10,
+  },
+  modalCTAText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });
