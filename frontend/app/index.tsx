@@ -64,25 +64,77 @@ const SERVICES = [
   },
 ];
 
-// Portfolio Data
+// Portfolio Data - with RESULTS focus
 const PORTFOLIO = [
   {
-    title: 'Strona dla firmy usługowej',
-    description: 'Zwiększenie liczby zapytań o 40% dzięki nowej stronie',
+    title: 'Firma hydrauliczna',
+    description: 'Nowa strona z SEO i formularzem kontaktowym',
     tag: 'Strona WWW',
+    result: '+40% zapytań',
+    resultIcon: 'trending-up',
     gradient: ['#8b5cf6', '#6366f1'],
   },
   {
-    title: 'Sklep e-commerce',
-    description: 'Optymalizacja koszyka i wzrost sprzedaży',
+    title: 'Sklep z odzieżą',
+    description: 'Optymalizacja procesu zakupowego i UX',
     tag: 'E-commerce',
+    result: '2x więcej sprzedaży',
+    resultIcon: 'cart',
     gradient: ['#ec4899', '#8b5cf6'],
   },
   {
-    title: 'Aplikacja webowa',
-    description: 'System zarządzania zamówieniami dla biznesu',
-    tag: 'Web App',
+    title: 'Gabinet kosmetyczny',
+    description: 'Strona z systemem rezerwacji online',
+    tag: 'Strona WWW',
+    result: '+60% rezerwacji',
+    resultIcon: 'calendar',
     gradient: ['#3b82f6', '#06b6d4'],
+  },
+];
+
+// Benefits Data - "What you get"
+const BENEFITS = [
+  {
+    icon: 'people',
+    title: 'Więcej klientów',
+    description: 'Strona zaprojektowana tak, aby zamieniać odwiedzających w klientów',
+  },
+  {
+    icon: 'mail',
+    title: 'Więcej zapytań',
+    description: 'Formularze i CTA, które zachęcają do kontaktu',
+  },
+  {
+    icon: 'search',
+    title: 'Widoczność w Google',
+    description: 'SEO od podstaw - klienci sami Cię znajdują',
+  },
+  {
+    icon: 'rocket',
+    title: 'Szybka strona',
+    description: 'Błyskawiczne ładowanie = mniej porzuceń',
+  },
+];
+
+// Testimonials Data
+const TESTIMONIALS = [
+  {
+    name: 'Michał K.',
+    business: 'Firma hydrauliczna',
+    text: 'Po nowej stronie mam 3x więcej telefonów. Klienci mówią, że łatwo ich znaleźć w Google.',
+    rating: 5,
+  },
+  {
+    name: 'Anna W.',
+    business: 'Salon kosmetyczny',
+    text: 'Rezerwacje online to była najlepsza decyzja. Oszczędzam 2 godziny dziennie na telefonach.',
+    rating: 5,
+  },
+  {
+    name: 'Tomasz B.',
+    business: 'Sklep z elektroniką',
+    text: 'Sprzedaż wzrosła o 80% w 3 miesiące. Strona się zwróciła w miesiąc.',
+    rating: 5,
   },
 ];
 
@@ -644,6 +696,11 @@ const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[
           styles.portfolioCardContent,
           { transform: [{ translateY: textLift }] }
         ]}>
+          {/* Result badge */}
+          <View style={styles.resultBadge}>
+            <Ionicons name={project.resultIcon as any || 'trending-up'} size={14} color="#10b981" />
+            <Text style={styles.resultBadgeText}>{project.result}</Text>
+          </View>
           <Text style={styles.portfolioTitle}>{project.title}</Text>
           <Text style={styles.portfolioDescription}>{project.description}</Text>
         </Animated.View>
@@ -1166,32 +1223,32 @@ export default function Index() {
               <Text style={styles.logoName}>Web Studio</Text>
             </View>
 
-            {/* Headline */}
+            {/* Pain-focused Headline */}
             <Text style={styles.headline}>
-              Strony internetowe, które przyciągają klientów i zwiększają sprzedaż
+              Masz stronę, ale nie masz klientów?
             </Text>
 
-            {/* Subheadline */}
+            {/* Solution Subheadline */}
             <Text style={styles.subheadline}>
-              Tworzymy szybkie, nowoczesne strony i sklepy online, które nie tylko wyglądają dobrze, ale realnie zarabiają dla Twojego biznesu
+              Tworzę strony, które przyciągają klientów i zwiększają sprzedaż. Bez skomplikowanych procesów, bez pustych obietnic.
             </Text>
 
-            {/* Small text */}
+            {/* Urgency Badge */}
             <View style={styles.badgeContainer}>
               <LinearGradient
-                colors={['rgba(139, 92, 246, 0.35)', 'rgba(59, 130, 246, 0.35)']}
-                style={styles.badge}
+                colors={['rgba(16, 185, 129, 0.3)', 'rgba(16, 185, 129, 0.15)']}
+                style={styles.urgencyBadge}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Ionicons name="location-outline" size={14} color="#a78bfa" />
-                <Text style={styles.badgeText}>Dla firm usługowych i lokalnych biznesów w Polsce</Text>
+                <Ionicons name="flash" size={14} color="#10b981" />
+                <Text style={styles.urgencyBadgeText}>Odpowiadam w ciągu 15 minut</Text>
               </LinearGradient>
             </View>
 
             {/* CTA Buttons */}
             <View style={styles.ctaContainer}>
-              <TouchableOpacity onPress={openEmail} activeOpacity={0.85}>
+              <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
                 <View style={styles.primaryButtonGlow}>
                   <LinearGradient
                     colors={['#8b5cf6', '#d946ef', '#ec4899']}
@@ -1199,14 +1256,17 @@ export default function Index() {
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                   >
-                    <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                    <Text style={styles.primaryButtonText}>Sprawdź ile klientów tracisz</Text>
                     <Ionicons name="arrow-forward" size={18} color="#fff" />
                   </LinearGradient>
                 </View>
               </TouchableOpacity>
 
+              {/* Trust line */}
+              <Text style={styles.trustLine}>Bez zobowiązań • Darmowa analiza</Text>
+
               <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
-                <Text style={styles.secondaryButtonText}>Zobacz realizacje</Text>
+                <Text style={styles.secondaryButtonText}>Zobacz wyniki klientów</Text>
                 <Ionicons name="chevron-down" size={18} color="#a78bfa" />
               </TouchableOpacity>
             </View>
@@ -1293,6 +1353,40 @@ export default function Index() {
           </View>
         </View>
 
+        {/* Benefits Section - "What You Get" */}
+        <View style={styles.benefitsSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Co zyskujesz?</Text>
+            <Text style={styles.sectionSubtitleSmall}>Konkretne rezultaty, nie puste obietnice</Text>
+          </View>
+
+          <View style={styles.benefitsGrid}>
+            {BENEFITS.map((benefit, index) => (
+              <View key={index} style={styles.benefitCard}>
+                <LinearGradient
+                  colors={['rgba(139, 92, 246, 0.12)', 'rgba(59, 130, 246, 0.06)']}
+                  style={styles.benefitCardGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <View style={styles.benefitIconWrapper}>
+                    <LinearGradient
+                      colors={['#8b5cf6', '#ec4899']}
+                      style={styles.benefitIconGradient}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 1 }}
+                    >
+                      <Ionicons name={benefit.icon as any} size={24} color="#fff" />
+                    </LinearGradient>
+                  </View>
+                  <Text style={styles.benefitTitle}>{benefit.title}</Text>
+                  <Text style={styles.benefitDescription}>{benefit.description}</Text>
+                </LinearGradient>
+              </View>
+            ))}
+          </View>
+        </View>
+
         {/* Services Section */}
         <View 
           style={styles.section}
@@ -1339,6 +1433,60 @@ export default function Index() {
             <Text style={styles.viewAllButtonText}>Zobacz wszystkie projekty</Text>
             <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
           </TouchableOpacity>
+        </View>
+
+        {/* Testimonials Section */}
+        <View style={styles.testimonialsSection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Co mówią klienci</Text>
+            <Text style={styles.sectionSubtitleSmall}>Realne opinie, realne wyniki</Text>
+          </View>
+
+          <View style={styles.testimonialsGrid}>
+            {TESTIMONIALS.map((testimonial, index) => (
+              <View key={index} style={styles.testimonialCard}>
+                <LinearGradient
+                  colors={['rgba(139, 92, 246, 0.1)', 'rgba(59, 130, 246, 0.05)']}
+                  style={styles.testimonialCardGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  {/* Quote icon */}
+                  <View style={styles.quoteIconWrapper}>
+                    <Ionicons name="chatbubble-ellipses" size={20} color="#8b5cf6" />
+                  </View>
+                  
+                  {/* Rating stars */}
+                  <View style={styles.ratingContainer}>
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Ionicons key={i} name="star" size={16} color="#f59e0b" />
+                    ))}
+                  </View>
+                  
+                  {/* Review text */}
+                  <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
+                  
+                  {/* Author info */}
+                  <View style={styles.testimonialAuthor}>
+                    <View style={styles.testimonialAvatar}>
+                      <LinearGradient
+                        colors={['#8b5cf6', '#ec4899']}
+                        style={styles.testimonialAvatarGradient}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                      >
+                        <Text style={styles.testimonialAvatarText}>{testimonial.name.charAt(0)}</Text>
+                      </LinearGradient>
+                    </View>
+                    <View>
+                      <Text style={styles.testimonialName}>{testimonial.name}</Text>
+                      <Text style={styles.testimonialBusiness}>{testimonial.business}</Text>
+                    </View>
+                  </View>
+                </LinearGradient>
+              </View>
+            ))}
+          </View>
         </View>
 
         {/* Process Section */}
@@ -1417,10 +1565,16 @@ export default function Index() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Text style={styles.ctaSectionTitle}>Zbuduj stronę, która zacznie zarabiać</Text>
+            <Text style={styles.ctaSectionTitle}>Zobacz ile możesz zarabiać więcej</Text>
             <Text style={styles.ctaSectionText}>
-              Otrzymaj darmową analizę i dowiedz się, jak możemy zwiększyć liczbę klientów w Twoim biznesie
+              Napisz i zobacz jak zdobywać klientów. Darmowa analiza Twojej strony w 15 minut.
             </Text>
+
+            {/* Urgency element */}
+            <View style={styles.ctaUrgency}>
+              <Ionicons name="time-outline" size={16} color="#10b981" />
+              <Text style={styles.ctaUrgencyText}>Pierwsze 5 analiz dziennie • Odpowiedź w 15 minut</Text>
+            </View>
 
             <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
               <View style={styles.ctaButtonGlow}>
@@ -1431,10 +1585,13 @@ export default function Index() {
                   end={{ x: 1, y: 0 }}
                 >
                   <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                  <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                  <Text style={styles.primaryButtonText}>Napisz teraz na WhatsApp</Text>
                 </LinearGradient>
               </View>
             </TouchableOpacity>
+
+            {/* Trust line */}
+            <Text style={styles.ctaTrustLine}>Bez zobowiązań • 100% darmowo</Text>
 
             {/* Secondary Contact Option */}
             <TouchableOpacity style={styles.secondaryContactButton} onPress={openEmail} activeOpacity={0.7}>
@@ -2408,5 +2565,179 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+
+  // Urgency badge
+  urgencyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    marginBottom: 32,
+  },
+  urgencyBadgeText: {
+    color: '#10b981',
+    fontSize: 13,
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+
+  // Trust line
+  trustLine: {
+    color: '#71717a',
+    fontSize: 13,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+
+  // Benefits section
+  benefitsSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 50,
+  },
+  benefitsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 14,
+  },
+  benefitCard: {
+    width: '47%',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  benefitCardGradient: {
+    padding: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+    minHeight: 140,
+  },
+  benefitIconWrapper: {
+    marginBottom: 12,
+  },
+  benefitIconGradient: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  benefitTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 6,
+  },
+  benefitDescription: {
+    fontSize: 12,
+    color: '#a1a1aa',
+    lineHeight: 18,
+  },
+
+  // Result badge on portfolio
+  resultBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
+  resultBadgeText: {
+    color: '#10b981',
+    fontSize: 13,
+    fontWeight: '700',
+    marginLeft: 5,
+  },
+
+  // Testimonials section
+  testimonialsSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 50,
+  },
+  testimonialsGrid: {
+    gap: 16,
+  },
+  testimonialCard: {
+    borderRadius: 18,
+    overflow: 'hidden',
+  },
+  testimonialCardGradient: {
+    padding: 22,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.2)',
+  },
+  quoteIconWrapper: {
+    marginBottom: 12,
+    opacity: 0.6,
+  },
+  ratingContainer: {
+    flexDirection: 'row',
+    marginBottom: 12,
+    gap: 2,
+  },
+  testimonialText: {
+    fontSize: 15,
+    color: '#e4e4e7',
+    lineHeight: 24,
+    fontStyle: 'italic',
+    marginBottom: 16,
+  },
+  testimonialAuthor: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  testimonialAvatar: {
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  testimonialAvatarGradient: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  testimonialAvatarText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  testimonialName: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  testimonialBusiness: {
+    color: '#71717a',
+    fontSize: 12,
+  },
+
+  // CTA urgency
+  ctaUrgency: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    gap: 6,
+  },
+  ctaUrgencyText: {
+    color: '#10b981',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  ctaTrustLine: {
+    color: '#71717a',
+    fontSize: 13,
+    marginTop: 12,
+    marginBottom: 8,
   },
 });
