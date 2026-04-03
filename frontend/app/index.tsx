@@ -312,7 +312,7 @@ export default function Index() {
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                 >
-                  <Text style={styles.primaryButtonText}>Darmowa wycena</Text>
+                  <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
                   <Ionicons name="arrow-forward" size={18} color="#fff" />
                 </LinearGradient>
               </TouchableOpacity>
@@ -390,35 +390,23 @@ export default function Index() {
               Chcesz nowoczesną stronę lub sklep? Skontaktuj się z nami
             </Text>
 
-            <TouchableOpacity onPress={openEmail} activeOpacity={0.8}>
+            <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.8}>
               <LinearGradient
-                colors={['#8b5cf6', '#ec4899']}
+                colors={['#25D366', '#128C7E']}
                 style={styles.primaryButton}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Text style={styles.primaryButtonText}>Darmowa wycena</Text>
-                <Ionicons name="mail-outline" size={18} color="#fff" />
+                <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Contact Options */}
-            <View style={styles.contactOptions}>
-              <TouchableOpacity style={styles.contactOption} onPress={openWhatsApp} activeOpacity={0.7}>
-                <Ionicons name="logo-whatsapp" size={20} color="#25D366" />
-                <Text style={styles.contactOptionText}>WhatsApp</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.contactOption} onPress={openEmail} activeOpacity={0.7}>
-                <Ionicons name="mail-outline" size={20} color="#8b5cf6" />
-                <Text style={styles.contactOptionText}>Email</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.contactOption} onPress={() => openLink(CONTACT.facebook)} activeOpacity={0.7}>
-                <Ionicons name="logo-facebook" size={20} color="#1877F2" />
-                <Text style={styles.contactOptionText}>Facebook</Text>
-              </TouchableOpacity>
-            </View>
+            {/* Secondary Contact Option */}
+            <TouchableOpacity style={styles.secondaryContactButton} onPress={openEmail} activeOpacity={0.7}>
+              <Ionicons name="mail-outline" size={18} color="#8b5cf6" />
+              <Text style={styles.secondaryContactText}>lub napisz email</Text>
+            </TouchableOpacity>
           </LinearGradient>
         </View>
 
@@ -465,20 +453,6 @@ export default function Index() {
               activeOpacity={0.7}
             >
               <Ionicons name="logo-whatsapp" size={22} color="#a1a1aa" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.socialIcon} 
-              onPress={() => openLink('https://github.com')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-github" size={22} color="#a1a1aa" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.socialIcon} 
-              onPress={() => openLink('https://linkedin.com')}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-linkedin" size={22} color="#a1a1aa" />
             </TouchableOpacity>
           </View>
 
@@ -829,6 +803,18 @@ const styles = StyleSheet.create({
   },
   contactOptionText: {
     color: '#d4d4d8',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  secondaryContactButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    gap: 8,
+    paddingVertical: 8,
+  },
+  secondaryContactText: {
+    color: '#8b5cf6',
     fontSize: 14,
     fontWeight: '500',
   },
