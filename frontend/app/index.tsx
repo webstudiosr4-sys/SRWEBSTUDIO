@@ -142,23 +142,18 @@ const TESTIMONIALS = [
 const PROCESS_STEPS = [
   {
     number: '01',
-    title: 'Analiza i strategia',
-    description: 'Rozumiemy Twój biznes i planujemy rozwiązanie',
+    title: 'Piszesz do mnie',
+    description: 'Napisz na WhatsApp — odpowiadam w 15 minut',
   },
   {
     number: '02',
-    title: 'Projektowanie UX/UI',
-    description: 'Tworzymy nowoczesny i intuicyjny design',
+    title: 'Otrzymujesz darmową analizę',
+    description: 'Sprawdzam Twoją stronę i pokazuję co można poprawić',
   },
   {
     number: '03',
-    title: 'Programowanie',
-    description: 'Budujemy szybki i wydajny system',
-  },
-  {
-    number: '04',
-    title: 'Wdrożenie',
-    description: 'Testujemy i uruchamiamy projekt',
+    title: 'Tworzę stronę dla Ciebie',
+    description: 'Projektuję i buduję stronę dopasowaną do Twojego biznesu',
   },
 ];
 
@@ -1333,7 +1328,8 @@ export default function Index() {
             {/* Stacked Headline - Line by Line */}
             <View style={styles.headlineContainer}>
               <Text style={styles.headlineLine}>Potrzebujesz strony,</Text>
-              <Text style={styles.headlineLine}>która przyciąga</Text>
+              <Text style={styles.headlineLine}>która <Text style={styles.headlineHighlight}>zwiększa sprzedaż</Text></Text>
+              <Text style={styles.headlineLine}>i przyciąga</Text>
               <View style={styles.headlineHighlightRow}>
                 <Text style={styles.headlineHighlight}>klientów</Text>
                 <Text style={styles.headlineLine}>?</Text>
@@ -1475,6 +1471,60 @@ export default function Index() {
                   <Text style={styles.trustCardTitle}>Szybka realizacja</Text>
                   <Text style={styles.trustCardDescription}>Sprawna komunikacja i wsparcie na każdym etapie projektu</Text>
                 </View>
+              </LinearGradient>
+            </View>
+          </View>
+        </View>
+
+        {/* "Dla kogo?" Target Audience Section */}
+        <View style={styles.targetSection}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitleLine}>Dla</Text>
+              <Text style={styles.sectionTitleHighlight}>kogo?</Text>
+            </View>
+          </View>
+          <View style={styles.targetGrid}>
+            <View style={styles.targetCard}>
+              <LinearGradient
+                colors={['rgba(139, 92, 246, 0.15)', 'rgba(139, 92, 246, 0.05)']}
+                style={styles.targetCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.targetIconWrap}>
+                  <Ionicons name="storefront" size={24} color="#a78bfa" />
+                </View>
+                <Text style={styles.targetTitle}>Firmy lokalne</Text>
+                <Text style={styles.targetDesc}>Restauracje, salony, gabinety i inne biznesy stacjonarne</Text>
+              </LinearGradient>
+            </View>
+            <View style={styles.targetCard}>
+              <LinearGradient
+                colors={['rgba(236, 72, 153, 0.15)', 'rgba(236, 72, 153, 0.05)']}
+                style={styles.targetCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.targetIconWrap}>
+                  <Ionicons name="construct" size={24} color="#f472b6" />
+                </View>
+                <Text style={styles.targetTitle}>Usługi</Text>
+                <Text style={styles.targetDesc}>Hydraulicy, elektrycy, prawnicy i inne firmy usługowe</Text>
+              </LinearGradient>
+            </View>
+            <View style={styles.targetCard}>
+              <LinearGradient
+                colors={['rgba(59, 130, 246, 0.15)', 'rgba(59, 130, 246, 0.05)']}
+                style={styles.targetCardGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <View style={styles.targetIconWrap}>
+                  <Ionicons name="cart" size={24} color="#60a5fa" />
+                </View>
+                <Text style={styles.targetTitle}>Sklepy online</Text>
+                <Text style={styles.targetDesc}>E-commerce z nowoczesnym designem i optymalizacją sprzedaży</Text>
               </LinearGradient>
             </View>
           </View>
@@ -1710,12 +1760,33 @@ export default function Index() {
           </View>
         </View>
 
+        {/* Mid-page CTA after testimonials */}
+        <View style={styles.midCtaSection}>
+          <Text style={styles.midCtaText}>Chcesz takich samych wyników?</Text>
+          <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
+            <Animated.View style={[styles.ctaPulseWrapper, {
+              transform: [{ scale: ctaPulseAnim }],
+            }]}>
+              <LinearGradient
+                colors={['#a855f7', '#d946ef', '#ec4899']}
+                style={styles.primaryButton}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Ionicons name="logo-whatsapp" size={20} color="#fff" />
+                <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
+                <Ionicons name="arrow-forward" size={18} color="#fff" />
+              </LinearGradient>
+            </Animated.View>
+          </TouchableOpacity>
+        </View>
+
         {/* Process Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Jak wygląda</Text>
-              <Text style={styles.sectionTitleHighlight}>współpraca</Text>
+              <Text style={styles.sectionTitleLine}>Jak to</Text>
+              <Text style={styles.sectionTitleHighlight}>działa?</Text>
             </View>
             <Text style={styles.sectionSubtitleSmall}>Prosty proces</Text>
           </View>
@@ -2094,23 +2165,26 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   logoGradient: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
+    width: 62,
+    height: 62,
+    borderRadius: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },
   logoText: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     color: '#fff',
     includeFontPadding: false,
   },
   logoName: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     color: '#fff',
     includeFontPadding: false,
+    textShadowColor: 'rgba(139, 92, 246, 0.4)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
   },
   headline: {
     fontSize: isSmallScreen ? 28 : 36,
@@ -2854,6 +2928,65 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 
+  // Target audience section ("Dla kogo?")
+  targetSection: {
+    paddingHorizontal: 24,
+    paddingVertical: 40,
+  },
+  targetGrid: {
+    flexDirection: isSmallScreen ? 'column' : 'row',
+    gap: 14,
+  },
+  targetCard: {
+    flex: isSmallScreen ? undefined : 1,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  targetCardGradient: {
+    padding: 20,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(139, 92, 246, 0.15)',
+    alignItems: 'center',
+  },
+  targetIconWrap: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(139, 92, 246, 0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  targetTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+    textAlign: 'center',
+  },
+  targetDesc: {
+    color: '#a1a1aa',
+    fontSize: 13,
+    lineHeight: 18,
+    textAlign: 'center',
+  },
+
+  // Mid-page CTA (after testimonials)
+  midCtaSection: {
+    alignItems: 'center',
+    paddingVertical: 36,
+    paddingHorizontal: 24,
+    gap: 16,
+  },
+  midCtaText: {
+    color: '#d4d4d8',
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+
   // Benefits section
   benefitsSection: {
     paddingHorizontal: 24,
@@ -3111,12 +3244,12 @@ const styles = StyleSheet.create({
   // Logo neon glow
   logoNeonGlow: {
     position: 'absolute',
-    top: -5,
-    left: -5,
-    right: -5,
-    bottom: -5,
-    borderRadius: 18,
-    backgroundColor: 'rgba(139, 92, 246, 0.45)',
+    top: -6,
+    left: -6,
+    right: -6,
+    bottom: -6,
+    borderRadius: 20,
+    backgroundColor: 'rgba(139, 92, 246, 0.5)',
   },
 
   // Primary button neon glow wrapper
