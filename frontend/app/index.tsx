@@ -1273,20 +1273,19 @@ export default function Index() {
 
             {/* Stacked Headline - Line by Line */}
             <View style={styles.headlineContainer}>
-              <Text style={styles.headlineLine}>Masz stronę,</Text>
-              <Text style={styles.headlineLine}>ale nie masz</Text>
+              <Text style={styles.headlineLine}>Potrzebujesz strony,</Text>
+              <Text style={styles.headlineLine}>która przyciąga</Text>
               <View style={styles.headlineHighlightRow}>
                 <Text style={styles.headlineHighlight}>klientów</Text>
                 <Text style={styles.headlineLine}>?</Text>
               </View>
             </View>
 
-            {/* Stacked Subheadline */}
+            {/* Stacked Subheadline - Universal for both client types */}
             <View style={styles.subheadlineContainer}>
-              <Text style={styles.subheadlineLine}>Tworzę strony, które</Text>
-              <Text style={styles.subheadlineHighlight}>przyciągają klientów</Text>
-              <Text style={styles.subheadlineLine}>i zwiększają</Text>
-              <Text style={styles.subheadlineHighlight}>sprzedaż</Text>
+              <Text style={styles.subheadlineLine}>Tworzę i optymalizuję strony,</Text>
+              <Text style={styles.subheadlineLine}>które zamieniają odwiedzających</Text>
+              <Text style={styles.subheadlineLine}>w <Text style={styles.subheadlineHighlight}>płacących klientów</Text></Text>
             </View>
 
             {/* Urgency Badge */}
@@ -1331,8 +1330,8 @@ export default function Index() {
                 </Animated.View>
               </TouchableOpacity>
 
-              {/* Trust line */}
-              <Text style={styles.trustLine}>Bez zobowiązań • Darmowa analiza</Text>
+              {/* CTA subtitle */}
+              <Text style={styles.ctaSubtitle}>Sprawdź jak zwiększyć liczbę klientów w Twoim biznesie</Text>
 
               <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
                 <Text style={styles.secondaryButtonText}>Zobacz wyniki</Text>
@@ -2698,6 +2697,18 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
 
+  // CTA subtitle under button
+  ctaSubtitle: {
+    color: '#a1a1aa',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 14,
+    marginBottom: 6,
+    lineHeight: 20,
+    maxWidth: 320,
+    alignSelf: 'center',
+  },
+
   // Benefits section
   benefitsSection: {
     paddingHorizontal: 24,
@@ -2866,10 +2877,13 @@ const styles = StyleSheet.create({
   headlineHighlight: {
     fontSize: isSmallScreen ? 32 : 40,
     fontWeight: '800',
-    color: '#a78bfa',
+    color: '#c4b5fd',
     textAlign: 'center',
     lineHeight: isSmallScreen ? 40 : 50,
     letterSpacing: -0.5,
+    textShadowColor: 'rgba(167, 139, 250, 0.6)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
   },
 
   // Subheadline stacked
@@ -2886,8 +2900,8 @@ const styles = StyleSheet.create({
   },
   subheadlineHighlight: {
     fontSize: 17,
-    color: '#e4e4e7',
-    fontWeight: '600',
+    color: '#f5f5f5',
+    fontWeight: '700',
     textAlign: 'center',
     lineHeight: 26,
   },
@@ -2927,12 +2941,12 @@ const styles = StyleSheet.create({
   primaryButtonNeonGlow: {
     borderRadius: 16,
     padding: 3,
-    backgroundColor: 'rgba(168, 85, 247, 0.35)',
+    backgroundColor: 'rgba(168, 85, 247, 0.4)',
     shadowColor: '#d946ef',
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 15,
-    elevation: 10,
+    shadowOpacity: 0.7,
+    shadowRadius: 18,
+    elevation: 12,
   },
 
   // CTA pulse animation wrapper
