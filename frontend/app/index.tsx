@@ -43,7 +43,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     // Hero
     heroTitle1: 'Websites that bring clients', heroTitle2: '— fast and affordable',
     heroSub: 'I create modern websites for businesses in 2–3 days starting from ',
-    heroSubPrice: '$100',
+    heroSubPrice: '400 PLN',
     trustLine: 'Already helped multiple clients launch online',
     ctaOrder: 'Order a website', ctaConsult: 'Free consultation',
     // Services
@@ -54,7 +54,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     // Advantages
     advLabel: 'ADVANTAGES', advTitle: 'Why choose SR Web Studio',
     adv1: 'Fast delivery', adv1d: '2–3 days turnaround',
-    adv2: 'Affordable prices', adv2d: 'Starting from $100',
+    adv2: 'Affordable prices', adv2d: 'Starting from 400 PLN',
     adv3: 'Modern design', adv3d: 'Clean & professional',
     adv4: 'Mobile optimized', adv4d: 'Looks great everywhere',
     adv5: 'Personal approach', adv5d: 'Direct communication',
@@ -66,9 +66,9 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     // Pricing
     priceLabel: 'PRICING', priceTitle: 'Simple pricing', priceGet: 'Get started',
     pricePop: 'Most Popular',
-    p1: 'Basic', p1f1: '1 page website', p1f2: 'Clean design', p1f3: 'Mobile version', p1f4: 'Delivery in 2 days',
-    p2: 'Standard', p2f1: 'Up to 5 pages', p2f2: 'Custom design', p2f3: 'Basic SEO', p2f4: 'Contact form', p2f5: 'Delivery in 3 days',
-    p3: 'Premium', p3f1: 'Full website', p3f2: 'Advanced design', p3f3: 'SEO optimization', p3f4: '30 days support', p3f5: 'Priority delivery',
+    p1: 'Basic', p1f1: '1 page website', p1f2: 'Simple modern design', p1f3: 'Mobile optimization',
+    p2: 'Standard', p2f1: 'Up to 5 pages', p2f2: 'Custom design', p2f3: 'Mobile optimization', p2f4: 'Basic SEO', p2f5: 'Google Maps integration',
+    p3: 'Premium', p3f1: 'Full website', p3f2: 'Advanced design', p3f3: 'SEO optimization', p3f4: 'Multi-language support (2 languages)', p3f5: 'Priority support',
     // Testimonials
     testLabel: 'TESTIMONIALS', testTitle: 'What clients say',
     t1: 'Got my landing page in 2 days. Already got my first clients through it!',
@@ -90,7 +90,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     navServices: 'Usługi', navWork: 'Portfolio', navPricing: 'Cennik', navContact: 'Kontakt',
     heroTitle1: 'Strony, które przyciągają klientów', heroTitle2: '— szybko i w dobrej cenie',
     heroSub: 'Tworzę nowoczesne strony dla firm w 2–3 dni od ',
-    heroSubPrice: '$100',
+    heroSubPrice: '400 PLN',
     trustLine: 'Pomogłem wielu klientom zaistnieć w internecie',
     ctaOrder: 'Zamów stronę', ctaConsult: 'Bezpłatna konsultacja',
     svcLabel: 'USŁUGI', svcTitle: 'Co oferuję',
@@ -99,7 +99,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     svc3: 'Sklepy internetowe', svc3d: 'Sprzedawaj produkty z łatwością',
     advLabel: 'ZALETY', advTitle: 'Dlaczego SR Web Studio',
     adv1: 'Szybka realizacja', adv1d: 'Gotowe w 2–3 dni',
-    adv2: 'Przystępne ceny', adv2d: 'Już od $100',
+    adv2: 'Przystępne ceny', adv2d: 'Już od 400 PLN',
     adv3: 'Nowoczesny design', adv3d: 'Czysty i profesjonalny',
     adv4: 'Optymalizacja mobilna', adv4d: 'Świetnie wygląda wszędzie',
     adv5: 'Indywidualne podejście', adv5d: 'Bezpośredni kontakt',
@@ -109,9 +109,9 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     port3: 'Sklep z modą', port3d: 'Nowoczesny e-commerce z katalogiem produktów', port3t: 'Sklep online',
     priceLabel: 'CENNIK', priceTitle: 'Prosty cennik', priceGet: 'Rozpocznij',
     pricePop: 'Najpopularniejszy',
-    p1: 'Basic', p1f1: 'Strona 1-stronicowa', p1f2: 'Czysty design', p1f3: 'Wersja mobilna', p1f4: 'Realizacja w 2 dni',
-    p2: 'Standard', p2f1: 'Do 5 podstron', p2f2: 'Indywidualny design', p2f3: 'Podstawowe SEO', p2f4: 'Formularz kontaktowy', p2f5: 'Realizacja w 3 dni',
-    p3: 'Premium', p3f1: 'Pełna strona', p3f2: 'Zaawansowany design', p3f3: 'Optymalizacja SEO', p3f4: '30 dni wsparcia', p3f5: 'Priorytetowa realizacja',
+    p1: 'Basic', p1f1: 'Strona 1-stronicowa', p1f2: 'Prosty nowoczesny design', p1f3: 'Optymalizacja mobilna',
+    p2: 'Standard', p2f1: 'Do 5 podstron', p2f2: 'Indywidualny design', p2f3: 'Optymalizacja mobilna', p2f4: 'Podstawowe SEO', p2f5: 'Integracja Google Maps',
+    p3: 'Premium', p3f1: 'Pełna strona', p3f2: 'Zaawansowany design', p3f3: 'Optymalizacja SEO', p3f4: 'Wielojęzyczność (2 języki)', p3f5: 'Priorytetowe wsparcie',
     testLabel: 'OPINIE', testTitle: 'Co mówią klienci',
     t1: 'Landing page gotowy w 2 dni. Już mam pierwszych klientów!',
     t2: 'Szybko, profesjonalnie i w dobrej cenie. Strona świetnie wygląda na telefonie.',
@@ -401,9 +401,9 @@ export default function SRWebStudio() {
             <Text style={S.sectionTitle}>{t.priceTitle}</Text>
             <View style={S.pricingGrid}>
               {[
-                { name: t.p1, price: '$100', features: [t.p1f1, t.p1f2, t.p1f3, t.p1f4], popular: false, color: '#6366f1' },
-                { name: t.p2, price: '$250', features: [t.p2f1, t.p2f2, t.p2f3, t.p2f4, t.p2f5], popular: true, color: '#8b5cf6' },
-                { name: t.p3, price: '$500', features: [t.p3f1, t.p3f2, t.p3f3, t.p3f4, t.p3f5], popular: false, color: '#a855f7' },
+                { name: t.p1, price: 'od 400 PLN', features: [t.p1f1, t.p1f2, t.p1f3], popular: false, color: '#6366f1' },
+                { name: t.p2, price: 'od 700 PLN', features: [t.p2f1, t.p2f2, t.p2f3, t.p2f4, t.p2f5], popular: true, color: '#8b5cf6' },
+                { name: t.p3, price: 'od 1500 PLN', features: [t.p3f1, t.p3f2, t.p3f3, t.p3f4, t.p3f5], popular: false, color: '#a855f7' },
               ].map((plan, i) => (
                 <View key={i} style={[S.pricingCard, plan.popular && S.pricingCardPop]}>
                   {plan.popular && (
@@ -714,7 +714,7 @@ const S = StyleSheet.create({
   popularBadge: { position: 'absolute', top: 0, right: 0, paddingHorizontal: 14, paddingVertical: 6, borderBottomLeftRadius: 12 },
   popularBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   pricingName: { color: '#a1a1aa', fontSize: 14, fontWeight: '600', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 },
-  pricingPrice: { color: '#f5f5f5', fontSize: 36, fontWeight: '800', marginBottom: 18 },
+  pricingPrice: { color: '#f5f5f5', fontSize: 30, fontWeight: '800', marginBottom: 18 },
   pricingFeatures: { gap: 10, marginBottom: 20 },
   pricingFeatureRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   pricingFeatureText: { color: '#d4d4d8', fontSize: 14 },
