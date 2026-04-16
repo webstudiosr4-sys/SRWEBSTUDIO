@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime
 
@@ -35,6 +35,20 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+class ContactForm(BaseModel):
+    name: str
+    email: str
+    message: str
+    service: Optional[str] = None
+
+class ContactResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    message: str
+    service: Optional[str] = None
+    created_at: datetime
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
@@ -51,6 +65,25 @@ async def create_status_check(input: StatusCheckCreate):
 async def get_status_checks():
     status_checks = await db.status_checks.find().to_list(1000)
     return [StatusCheck(**status_check) for status_check in status_checks]
+
+@api_router.post("/contact", response_model=ContactResponse)
+async def submit_contact(form: ContactForm):
+    contact_id = str(uuid.uuid4())
+    contact_doc = {
+        "id": contact_id,
+        "name": form.name,
+        "email": form.email,
+        "message": form.message,
+        "service": form.service,
+        "created_at": datetime.utcnow(),
+    }
+    await db.contacts.insert_one(contact_doc)
+    return ContactResponse(**contact_doc)
+
+@api_router.get("/contacts", response_model=List[ContactResponse])
+async def get_contacts():
+    contacts = await db.contacts.find().sort("created_at", -1).to_list(100)
+    return [ContactResponse(**c) for c in contacts]
 
 # Include the router in the main app
 app.include_router(api_router)

@@ -9,8 +9,10 @@ import {
   Linking,
   Platform,
   Animated,
-  Modal,
-  Pressable,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
   NativeScrollEvent,
   NativeSyntheticEvent,
 } from 'react-native';
@@ -18,3265 +20,1196 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Constants from 'expo-constants';
 
 const { width, height } = Dimensions.get('window');
-const isSmallScreen = width < 400;
+const isSmallScreen = width < 500;
 const isWeb = Platform.OS === 'web';
 
-// Contact Info
+// ── Contact Info ──
 const CONTACT = {
+  telegram: '@srwebstudio',
+  telegramUrl: 'https://t.me/srwebstudio',
   email: 'webstudiosr4@gmail.com',
-  facebook: 'https://www.facebook.com/share/1CZRtaAYT3/',
-  whatsapp: '+48 452 688 251',
 };
 
-// Services Data
+// ── Services Data ──
 const SERVICES = [
   {
-    icon: 'globe-outline',
-    iconFamily: 'Ionicons',
-    title: 'Tworzenie stron WWW',
-    description: 'Nowoczesne, szybkie strony zoptymalizowane pod SEO i konwersję klientów',
+    icon: 'rocket-outline' as const,
+    title: 'Landing Pages',
+    desc: 'Perfect for ads and quick sales',
+    color: '#6366f1',
   },
   {
-    icon: 'cart-outline',
-    iconFamily: 'Ionicons',
-    title: 'Sklepy internetowe (E-commerce)',
-    description: 'Sklepy online zaprojektowane tak, aby maksymalizować sprzedaż',
+    icon: 'briefcase-outline' as const,
+    title: 'Business Websites',
+    desc: 'Professional sites for your company',
+    color: '#8b5cf6',
   },
   {
-    icon: 'color-palette-outline',
-    iconFamily: 'Ionicons',
-    title: 'Projektowanie UX/UI',
-    description: 'Intuicyjny design, który prowadzi użytkownika do zakupu',
-  },
-  {
-    icon: 'code-slash-outline',
-    iconFamily: 'Ionicons',
-    title: 'Aplikacje dedykowane',
-    description: 'Systemy dopasowane do Twojego biznesu i jego procesów',
-  },
-  {
-    icon: 'search-outline',
-    iconFamily: 'Ionicons',
-    title: 'SEO i optymalizacja',
-    description: 'Zwiększamy widoczność Twojej strony i pozyskujemy ruch z Google',
+    icon: 'cart-outline' as const,
+    title: 'Online Stores',
+    desc: 'Sell your products easily',
+    color: '#a855f7',
   },
 ];
 
-// Portfolio Data - with RESULTS focus
+// ── Why Choose Me ──
+const ADVANTAGES = [
+  { icon: 'flash-outline' as const, title: 'Fast delivery', desc: '2–3 days turnaround' },
+  { icon: 'wallet-outline' as const, title: 'Affordable prices', desc: 'Starting from $100' },
+  { icon: 'color-palette-outline' as const, title: 'Modern design', desc: 'Clean & professional' },
+  { icon: 'phone-portrait-outline' as const, title: 'Mobile optimized', desc: 'Looks great everywhere' },
+  { icon: 'person-outline' as const, title: 'Personal approach', desc: 'Direct communication' },
+];
+
+// ── Portfolio Data ──
 const PORTFOLIO = [
   {
-    title: 'Firma hydrauliczna',
-    description: 'Nowa strona z SEO i formularzem kontaktowym',
-    tag: 'Strona WWW',
-    result: '+40% zapytań',
-    resultIcon: 'trending-up',
-    gradient: ['#8b5cf6', '#6366f1'],
+    title: 'Fitness Coach Landing',
+    desc: 'High-converting landing page for a personal trainer',
+    tag: 'Landing Page',
+    colors: ['#6366f1', '#8b5cf6'] as [string, string],
+    icon: 'fitness-outline' as const,
   },
   {
-    title: 'Sklep z odzieżą',
-    description: 'Optymalizacja procesu zakupowego i UX',
-    tag: 'E-commerce',
-    result: '2x więcej sprzedaży',
-    resultIcon: 'cart',
-    gradient: ['#ec4899', '#8b5cf6'],
+    title: 'Restaurant Website',
+    desc: 'Elegant multi-page site for a local café',
+    tag: 'Business Site',
+    colors: ['#ec4899', '#f472b6'] as [string, string],
+    icon: 'restaurant-outline' as const,
   },
   {
-    title: 'Gabinet kosmetyczny',
-    description: 'Strona z systemem rezerwacji online',
-    tag: 'Strona WWW',
-    result: '+60% rezerwacji',
-    resultIcon: 'calendar',
-    gradient: ['#3b82f6', '#06b6d4'],
+    title: 'Fashion Store',
+    desc: 'Modern e-commerce with product catalog',
+    tag: 'Online Store',
+    colors: ['#8b5cf6', '#a855f7'] as [string, string],
+    icon: 'bag-outline' as const,
   },
 ];
 
-// Benefits Data - "What you get"
-const BENEFITS = [
+// ── Pricing Data ──
+const PRICING = [
   {
-    icon: 'people',
-    title: 'Więcej klientów',
-    description: 'Strona zaprojektowana tak, aby zamieniać odwiedzających w klientów',
+    name: 'Basic',
+    price: '$100',
+    features: ['1 page website', 'Clean design', 'Mobile version', 'Delivery in 2 days'],
+    popular: false,
+    color: '#6366f1',
   },
   {
-    icon: 'mail',
-    title: 'Więcej zapytań',
-    description: 'Formularze i CTA, które zachęcają do kontaktu',
+    name: 'Standard',
+    price: '$250',
+    features: ['Up to 5 pages', 'Custom design', 'Basic SEO', 'Contact form', 'Delivery in 3 days'],
+    popular: true,
+    color: '#8b5cf6',
   },
   {
-    icon: 'search',
-    title: 'Widoczność w Google',
-    description: 'SEO od podstaw - klienci sami Cię znajdują',
-  },
-  {
-    icon: 'rocket',
-    title: 'Szybka strona',
-    description: 'Błyskawiczne ładowanie = mniej porzuceń',
+    name: 'Premium',
+    price: '$500',
+    features: ['Full website', 'Advanced design', 'SEO optimization', '30 days support', 'Priority delivery'],
+    popular: false,
+    color: '#a855f7',
   },
 ];
 
-// Testimonials Data
+// ── Testimonials Data ──
 const TESTIMONIALS = [
   {
-    name: 'Michał K.',
-    business: 'Firma hydrauliczna',
-    text: 'Po nowej stronie mam 3x więcej telefonów. Klienci mówią, że łatwo ich znaleźć w Google.',
+    name: 'Alex M.',
+    role: 'Fitness Coach',
+    text: 'Got my landing page in 2 days. Already got my first clients through it!',
     rating: 5,
   },
   {
-    name: 'Anna W.',
-    business: 'Salon kosmetyczny',
-    text: 'Rezerwacje online to była najlepsza decyzja. Oszczędzam 2 godziny dziennie na telefonach.',
+    name: 'Sarah K.',
+    role: 'Café Owner',
+    text: 'Fast, professional, and affordable. The website looks amazing on mobile.',
     rating: 5,
   },
   {
-    name: 'Tomasz B.',
-    business: 'Sklep z elektroniką',
-    text: 'Sprzedaż wzrosła o 80% w 3 miesiące. Strona się zwróciła w miesiąc.',
+    name: 'Mike T.',
+    role: 'E-commerce',
+    text: 'My online store was ready in 3 days. Sales started coming in right away.',
     rating: 5,
   },
 ];
 
-// Process Steps Data
-const PROCESS_STEPS = [
-  {
-    number: '01',
-    title: 'Piszesz do mnie',
-    description: 'Napisz na WhatsApp — odpowiadam w 15 minut',
-  },
-  {
-    number: '02',
-    title: 'Otrzymujesz darmową analizę',
-    description: 'Sprawdzam Twoją stronę i pokazuję co można poprawić',
-  },
-  {
-    number: '03',
-    title: 'Tworzę stronę dla Ciebie',
-    description: 'Projektuję i buduję stronę dopasowaną do Twojego biznesu',
-  },
-];
-
-// Enhanced 3D Service Card Component with STRONG micro-interactions
-const ServiceCard = ({ service, index }: { service: typeof SERVICES[0]; index: number }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(50)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-  const iconFloatAnim = useRef(new Animated.Value(0)).current;
-  const shineAnim = useRef(new Animated.Value(0)).current;
-  const rotateXAnim = useRef(new Animated.Value(0)).current;
-  const rotateYAnim = useRef(new Animated.Value(0)).current;
-  const liftAnim = useRef(new Animated.Value(0)).current;
-  const breatheAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Entrance animation - stronger
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 700,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateY, {
-        toValue: 0,
-        friction: 6,
-        tension: 40,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Continuous icon floating animation - more visible
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(iconFloatAnim, {
-          toValue: 1,
-          duration: 1800 + (index * 150),
-          useNativeDriver: true,
-        }),
-        Animated.timing(iconFloatAnim, {
-          toValue: 0,
-          duration: 1800 + (index * 150),
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Mobile breathing effect - subtle 3D feel
-    if (!isWeb) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(breatheAnim, {
-            toValue: 1,
-            duration: 3000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(breatheAnim, {
-            toValue: 0,
-            duration: 3000,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }
-  }, []);
-
-  const handlePressIn = () => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1.04,
-        friction: 6,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(glowAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shineAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.spring(liftAnim, {
-        toValue: 1,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateXAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateYAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(glowAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shineAnim, {
-        toValue: 0,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.spring(liftAnim, {
-        toValue: 0,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateXAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateYAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  // Stronger glow effect
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.35],
-  });
-
-  // Icon float - more visible
-  const iconFloat = iconFloatAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -8],
-  });
-
-  const iconScale = iconFloatAnim.interpolate({
-    inputRange: [0, 0.5, 1],
-    outputRange: [1, 1.08, 1],
-  });
-
-  // Shine effect
-  const shineTranslate = shineAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-150, 200],
-  });
-
-  const shineOpacity = shineAnim.interpolate({
-    inputRange: [0, 0.3, 0.7, 1],
-    outputRange: [0, 0.4, 0.4, 0],
-  });
-
-  // 3D rotation
-  const rotateX = rotateXAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '-4deg'],
-  });
-
-  const rotateY = rotateYAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '6deg'],
-  });
-
-  // Lift effect
-  const lift = liftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -10],
-  });
-
-  // Mobile breathing
-  const breatheScale = breatheAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.015],
-  });
-
-  const breatheRotate = breatheAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '1deg'],
-  });
-
-  return (
-    <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut}>
-      <Animated.View style={[
-        styles.serviceCard, 
-        { 
-          opacity: fadeAnim, 
-          transform: [
-            { translateY: Animated.add(translateY, lift) }, 
-            { scale: isWeb ? scaleAnim : Animated.multiply(scaleAnim, breatheScale) },
-            { perspective: 1000 },
-            { rotateX },
-            { rotateY },
-            ...(!isWeb ? [{ rotate: breatheRotate }] : []),
-          ] 
-        }
-      ]}>
-        {/* Strong neon glow border */}
-        <Animated.View style={[styles.cardNeonGlow, { opacity: glowOpacity }]} />
-        
-        {/* Glow effect overlay */}
-        <Animated.View style={[styles.cardGlowOverlay, { opacity: glowOpacity }]} />
-        
-        {/* Diagonal shine effect */}
-        <Animated.View style={[
-          styles.cardShineEffect,
-          { 
-            opacity: shineOpacity,
-            transform: [{ translateX: shineTranslate }, { skewX: '-20deg' }]
-          }
-        ]} />
-        
-        <LinearGradient
-          colors={['rgba(139, 92, 246, 0.18)', 'rgba(59, 130, 246, 0.08)']}
-          style={styles.serviceCardGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          {/* Floating animated icon */}
-          <Animated.View style={[
-            styles.serviceIconContainer,
-            { transform: [{ translateY: iconFloat }, { scale: iconScale }] }
-          ]}>
-            <View style={styles.iconGlowWrapper}>
-              <LinearGradient
-                colors={['#8b5cf6', '#ec4899', '#3b82f6']}
-                style={styles.serviceIconGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Ionicons name={service.icon as any} size={26} color="#fff" />
-              </LinearGradient>
-            </View>
-          </Animated.View>
-          <Text style={styles.serviceTitle}>{service.title}</Text>
-          <Text style={styles.serviceDescription}>{service.description}</Text>
-        </LinearGradient>
-      </Animated.View>
-    </Pressable>
-  );
+// ── API ──
+const getApiUrl = () => {
+  const extra = Constants.expoConfig?.extra;
+  if (extra?.EXPO_PUBLIC_BACKEND_URL) return extra.EXPO_PUBLIC_BACKEND_URL;
+  if (Platform.OS === 'web') return '';
+  return 'http://localhost:8001';
 };
+const API_BASE = getApiUrl();
 
-// Enhanced Portfolio Card Component with STRONG 3D effects
-const PortfolioCard = ({ project, index, onPress }: { project: typeof PORTFOLIO[0]; index: number; onPress: () => void }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(60)).current;
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-  const shineAnim = useRef(new Animated.Value(0)).current;
-  const expandIconAnim = useRef(new Animated.Value(0)).current;
-  const rotateXAnim = useRef(new Animated.Value(0)).current;
-  const rotateYAnim = useRef(new Animated.Value(0)).current;
-  const liftAnim = useRef(new Animated.Value(0)).current;
-  const imageZoomAnim = useRef(new Animated.Value(1)).current;
-  const textLiftAnim = useRef(new Animated.Value(0)).current;
-  const breatheAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // Stronger entrance animation
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 800,
-        delay: index * 180,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateY, {
-        toValue: 0,
-        friction: 6,
-        tension: 35,
-        delay: index * 180,
-        useNativeDriver: true,
-      }),
-    ]).start();
-
-    // Expand icon pulse - more visible
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(expandIconAnim, {
-          toValue: 1,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(expandIconAnim, {
-          toValue: 0,
-          duration: 1200,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Mobile breathing effect
-    if (!isWeb) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(breatheAnim, {
-            toValue: 1,
-            duration: 3500,
-            useNativeDriver: true,
-          }),
-          Animated.timing(breatheAnim, {
-            toValue: 0,
-            duration: 3500,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }
-  }, []);
-
-  const handlePressIn = () => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1.035,
-        friction: 6,
-        tension: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(glowAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shineAnim, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }),
-      Animated.spring(liftAnim, {
-        toValue: 1,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateXAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateYAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(imageZoomAnim, {
-        toValue: 1.1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(textLiftAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.parallel([
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(glowAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(shineAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.spring(liftAnim, {
-        toValue: 0,
-        friction: 6,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateXAnim, {
-        toValue: 0,
-        duration: 350,
-        useNativeDriver: true,
-      }),
-      Animated.timing(rotateYAnim, {
-        toValue: 0,
-        duration: 350,
-        useNativeDriver: true,
-      }),
-      Animated.timing(imageZoomAnim, {
-        toValue: 1,
-        duration: 400,
-        useNativeDriver: true,
-      }),
-      Animated.timing(textLiftAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  // Stronger glow effect
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 0.4],
-  });
-
-  // Shine sweep
-  const shineTranslate = shineAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [-200, 250],
-  });
-
-  const shineOpacity = shineAnim.interpolate({
-    inputRange: [0, 0.2, 0.8, 1],
-    outputRange: [0, 0.5, 0.5, 0],
-  });
-
-  // Expand icon animations - more visible
-  const expandIconScale = expandIconAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.2],
-  });
-
-  const expandIconOpacity = expandIconAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.6, 1],
-  });
-
-  // 3D rotations
-  const rotateX = rotateXAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '-5deg'],
-  });
-
-  const rotateY = rotateYAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: ['0deg', '7deg'],
-  });
-
-  // Lift effect
-  const lift = liftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -12],
-  });
-
-  // Text lift on hover
-  const textLift = textLiftAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -5],
-  });
-
-  // Mobile breathing
-  const breatheScale = breatheAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [1, 1.012],
-  });
-
-  return (
-    <Pressable onPressIn={handlePressIn} onPressOut={handlePressOut} onPress={onPress}>
-      <Animated.View style={[
-        styles.portfolioCard, 
-        { 
-          opacity: fadeAnim, 
-          transform: [
-            { translateY: Animated.add(translateY, lift) }, 
-            { scale: isWeb ? scaleAnim : Animated.multiply(scaleAnim, breatheScale) },
-            { perspective: 1000 },
-            { rotateX },
-            { rotateY },
-          ] 
-        }
-      ]}>
-        {/* Neon glow border */}
-        <Animated.View style={[styles.portfolioNeonGlow, { opacity: glowOpacity }]} />
-        
-        {/* Glow effect overlay */}
-        <Animated.View style={[styles.portfolioGlowOverlay, { opacity: glowOpacity }]} />
-        
-        {/* Shine effect */}
-        <Animated.View style={[
-          styles.portfolioShineEffect,
-          { 
-            opacity: shineOpacity,
-            transform: [{ translateX: shineTranslate }, { skewX: '-20deg' }]
-          }
-        ]} />
-        
-        {/* Header with zoom effect */}
-        <Animated.View style={{ transform: [{ scale: imageZoomAnim }], overflow: 'hidden' }}>
-          <LinearGradient
-            colors={project.gradient}
-            style={styles.portfolioCardHeader}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.portfolioTag}>
-              <Text style={styles.portfolioTagText}>{project.tag}</Text>
-            </View>
-            <Animated.View style={[
-              styles.expandButton,
-              { 
-                transform: [{ scale: expandIconScale }],
-                opacity: expandIconOpacity
-              }
-            ]}>
-              <TouchableOpacity 
-                onPress={onPress}
-                activeOpacity={0.7}
-                style={styles.expandButtonInner}
-              >
-                <Ionicons name="expand-outline" size={26} color="rgba(255,255,255,1)" />
-              </TouchableOpacity>
-            </Animated.View>
-          </LinearGradient>
-        </Animated.View>
-        
-        {/* Content with text lift */}
-        <Animated.View style={[
-          styles.portfolioCardContent,
-          { transform: [{ translateY: textLift }] }
-        ]}>
-          {/* Result badge */}
-          <View style={styles.resultBadge}>
-            <Ionicons name={project.resultIcon as any || 'trending-up'} size={14} color="#10b981" />
-            <Text style={styles.resultBadgeText}>{project.result}</Text>
-          </View>
-          <Text style={styles.portfolioTitle}>{project.title}</Text>
-          <Text style={styles.portfolioDescription}>{project.description}</Text>
-        </Animated.View>
-      </Animated.View>
-    </Pressable>
-  );
-};
-
-// Enhanced Process Step Component with entrance animation
-const ProcessStep = ({ step, index, isLast }: { step: typeof PROCESS_STEPS[0]; index: number; isLast: boolean }) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const translateX = useRef(new Animated.Value(-30)).current;
-  const scaleAnim = useRef(new Animated.Value(0.9)).current;
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-      Animated.spring(translateX, {
-        toValue: 0,
-        friction: 8,
-        tension: 40,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        delay: index * 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  return (
-    <Animated.View style={[
-      styles.processStep, 
-      { 
-        opacity: fadeAnim, 
-        transform: [{ translateX }, { scale: scaleAnim }] 
-      }
-    ]}>
-      <View style={styles.processStepLeft}>
-        <LinearGradient
-          colors={['#8b5cf6', '#ec4899']}
-          style={styles.processNumber}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Text style={styles.processNumberText}>{step.number}</Text>
-        </LinearGradient>
-        {!isLast && <View style={styles.processLine} />}
-      </View>
-      <View style={styles.processStepContent}>
-        <Text style={styles.processTitle}>{step.title}</Text>
-        <Text style={styles.processDescription}>{step.description}</Text>
-      </View>
-    </Animated.View>
-  );
-};
-
-export default function Index() {
+// ═══════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════
+export default function SRWebStudio() {
   const insets = useSafeAreaInsets();
-  const heroFadeAnim = useRef(new Animated.Value(0)).current;
-  const heroScaleAnim = useRef(new Animated.Value(0.9)).current;
-  const glowAnim = useRef(new Animated.Value(0)).current;
-  
-  // Floating orbs animations
-  const orb1Anim = useRef(new Animated.Value(0)).current;
-  const orb2Anim = useRef(new Animated.Value(0)).current;
-  const orb3Anim = useRef(new Animated.Value(0)).current;
-  const orb4Anim = useRef(new Animated.Value(0)).current;
-  
-  // CTA pulse animation
-  const ctaPulseAnim = useRef(new Animated.Value(1)).current;
-  const ctaGlowAnim = useRef(new Animated.Value(0)).current;
-  
-  // Parallax scroll position
-  const scrollY = useRef(new Animated.Value(0)).current;
-  
-  // Modal state for portfolio preview
-  const [modalVisible, setModalVisible] = useState(false);
-  const [selectedProject, setSelectedProject] = useState<typeof PORTFOLIO[0] | null>(null);
-  const modalScaleAnim = useRef(new Animated.Value(0)).current;
-  const modalOpacityAnim = useRef(new Animated.Value(0)).current;
-  
-  // Refs for scrolling
   const scrollViewRef = useRef<ScrollView>(null);
-  const servicesSectionY = useRef(0);
-  const portfolioSectionY = useRef(0);
-  const aboutSectionY = useRef(0);
 
-  // Testimonials carousel state
+  // Section refs for scroll-to
+  const servicesY = useRef(0);
+  const portfolioY = useRef(0);
+  const pricingY = useRef(0);
+  const contactY = useRef(0);
+
+  // Animations
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  // Testimonials carousel
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const testimonialScrollRef = useRef<ScrollView>(null);
   const testimonialScrollX = useRef(new Animated.Value(0)).current;
-  const autoScrollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const isUserTouchingRef = useRef(false);
-  const CARD_WIDTH = isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400);
-  const CARD_GAP = 18;
-  const SNAP_INTERVAL = CARD_WIDTH + CARD_GAP;
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const touchingRef = useRef(false);
+  const CARD_W = isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400);
+  const CARD_GAP = 16;
+  const SNAP = CARD_W + CARD_GAP;
+
+  // Contact form
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formMessage, setFormMessage] = useState('');
+  const [formLoading, setFormLoading] = useState(false);
+  const [formSent, setFormSent] = useState(false);
 
   useEffect(() => {
-    // Hero animations
     Animated.parallel([
-      Animated.timing(heroFadeAnim, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.spring(heroScaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 40,
-        useNativeDriver: true,
-      }),
+      Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
     ]).start();
 
-    // Continuous glow animation
+    // CTA pulse
     Animated.loop(
       Animated.sequence([
-        Animated.timing(glowAnim, {
-          toValue: 1,
-          duration: 2500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(glowAnim, {
-          toValue: 0,
-          duration: 2500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // Floating orb animations
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(orb1Anim, {
-          toValue: 1,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(orb1Anim, {
-          toValue: 0,
-          duration: 4000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(orb2Anim, {
-          toValue: 1,
-          duration: 5000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(orb2Anim, {
-          toValue: 0,
-          duration: 5000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(orb3Anim, {
-          toValue: 1,
-          duration: 3500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(orb3Anim, {
-          toValue: 0,
-          duration: 3500,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(orb4Anim, {
-          toValue: 1,
-          duration: 6000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(orb4Anim, {
-          toValue: 0,
-          duration: 6000,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // CTA button pulse animation - subtle scale pulse for attention
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(ctaPulseAnim, {
-          toValue: 1.045,
-          duration: 1800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(ctaPulseAnim, {
-          toValue: 1,
-          duration: 1800,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-
-    // CTA glow animation - neon glow intensity pulse
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(ctaGlowAnim, {
-          toValue: 1,
-          duration: 2000,
-          useNativeDriver: false,
-        }),
-        Animated.timing(ctaGlowAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: false,
-        }),
+        Animated.timing(pulseAnim, { toValue: 1.04, duration: 1800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1800, useNativeDriver: true }),
       ])
     ).start();
   }, []);
 
   // Testimonials auto-scroll
   useEffect(() => {
-    const startAutoScroll = () => {
-      autoScrollTimerRef.current = setInterval(() => {
-        if (isUserTouchingRef.current) return;
-        setActiveTestimonial((prev) => {
+    const start = () => {
+      autoScrollRef.current = setInterval(() => {
+        if (touchingRef.current) return;
+        setActiveTestimonial(prev => {
           const next = (prev + 1) % TESTIMONIALS.length;
-          testimonialScrollRef.current?.scrollTo({
-            x: next * SNAP_INTERVAL,
-            animated: true,
-          });
+          testimonialScrollRef.current?.scrollTo({ x: next * SNAP, animated: true });
           return next;
         });
-      }, 4000);
+      }, 4500);
     };
-    startAutoScroll();
-    return () => {
-      if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
-    };
+    start();
+    return () => { if (autoScrollRef.current) clearInterval(autoScrollRef.current); };
   }, []);
 
-  const onTestimonialScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offsetX = event.nativeEvent.contentOffset.x;
-    const index = Math.round(offsetX / SNAP_INTERVAL);
-    if (index !== activeTestimonial && index >= 0 && index < TESTIMONIALS.length) {
-      setActiveTestimonial(index);
+  const onTestimonialScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const idx = Math.round(e.nativeEvent.contentOffset.x / SNAP);
+    if (idx >= 0 && idx < TESTIMONIALS.length && idx !== activeTestimonial) setActiveTestimonial(idx);
+  };
+
+  const scrollTo = (ref: React.MutableRefObject<number>) => {
+    scrollViewRef.current?.scrollTo({ y: ref.current - 60, animated: true });
+  };
+
+  const openTelegram = () => Linking.openURL(CONTACT.telegramUrl);
+  const openEmail = () => Linking.openURL(`mailto:${CONTACT.email}`);
+
+  const submitForm = async () => {
+    if (!formName.trim() || !formEmail.trim() || !formMessage.trim()) {
+      Alert.alert('Please fill in all fields');
+      return;
+    }
+    setFormLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formName, email: formEmail, message: formMessage }),
+      });
+      if (res.ok) {
+        setFormSent(true);
+        setFormName(''); setFormEmail(''); setFormMessage('');
+      }
+    } catch (e) {
+      Alert.alert('Something went wrong. Try Telegram instead!');
+    } finally {
+      setFormLoading(false);
     }
   };
 
-  const onTestimonialTouchStart = () => {
-    isUserTouchingRef.current = true;
-    if (autoScrollTimerRef.current) clearInterval(autoScrollTimerRef.current);
-  };
-
-  const onTestimonialTouchEnd = () => {
-    isUserTouchingRef.current = false;
-    autoScrollTimerRef.current = setInterval(() => {
-      if (isUserTouchingRef.current) return;
-      setActiveTestimonial((prev) => {
-        const next = (prev + 1) % TESTIMONIALS.length;
-        testimonialScrollRef.current?.scrollTo({
-          x: next * SNAP_INTERVAL,
-          animated: true,
-        });
-        return next;
-      });
-    }, 4000);
-  };
-
-  // Parallax interpolations
-  const parallaxBg = scrollY.interpolate({
-    inputRange: [0, 500],
-    outputRange: [0, -50],
-    extrapolate: 'clamp',
-  });
-
-  const parallaxOrbs = scrollY.interpolate({
-    inputRange: [0, 500],
-    outputRange: [0, -100],
-    extrapolate: 'clamp',
-  });
-
-  // Orb floating translations
-  const orb1TranslateY = orb1Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -20],
-  });
-  const orb1TranslateX = orb1Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 15],
-  });
-
-  const orb2TranslateY = orb2Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 25],
-  });
-  const orb2TranslateX = orb2Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -10],
-  });
-
-  const orb3TranslateY = orb3Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -15],
-  });
-
-  const orb4TranslateY = orb4Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 20],
-  });
-  const orb4TranslateX = orb4Anim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, -20],
-  });
-
-  // CTA glow interpolation - animate shadow/glow intensity
-  const ctaGlowShadowRadius = ctaGlowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [8, 25],
-  });
-  const ctaGlowShadowOpacity = ctaGlowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.4, 0.9],
-  });
-
-  // Handle scroll for parallax
-  const handleScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-    { useNativeDriver: true }
-  );
-
-  // Open modal with animation
-  const openProjectModal = (project: typeof PORTFOLIO[0]) => {
-    setSelectedProject(project);
-    setModalVisible(true);
-    Animated.parallel([
-      Animated.spring(modalScaleAnim, {
-        toValue: 1,
-        friction: 8,
-        tension: 65,
-        useNativeDriver: true,
-      }),
-      Animated.timing(modalOpacityAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  };
-
-  // Close modal with animation
-  const closeProjectModal = () => {
-    Animated.parallel([
-      Animated.timing(modalScaleAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(modalOpacityAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      setModalVisible(false);
-      setSelectedProject(null);
-    });
-  };
-
-  const openLink = (url: string) => {
-    Linking.openURL(url);
-  };
-
-  const openWhatsApp = () => {
-    const phone = '48452688251';
-    const message = encodeURIComponent('Cześć, chcę darmową analizę mojej strony. Moja firma: ... Miasto: ...');
-    const url = `https://wa.me/${phone}?text=${message}`;
-    Linking.openURL(url);
-  };
-
-  const openEmail = () => {
-    Linking.openURL(`mailto:${CONTACT.email}`);
-  };
-
-  const scrollToServices = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
-        y: servicesSectionY.current,
-        animated: true,
-      });
-    }
-  };
-
-  const scrollToPortfolio = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
-        y: portfolioSectionY.current,
-        animated: true,
-      });
-    }
-  };
-
-  const scrollToAbout = () => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollTo({
-        y: aboutSectionY.current,
-        animated: true,
-      });
-    }
-  };
-
-  // Interpolate glow opacity
-  const glowOpacity = glowAnim.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0.3, 0.6],
-  });
-
-  // Floating particles component - LARGER and more visible
-  const FloatingParticles = () => {
-    const particles = [
-      // Large glowing orbs
-      { top: '5%', left: '10%', size: 16, delay: 0, duration: 5000, color: 'rgba(139, 92, 246, 0.15)', blur: true },
-      { top: '20%', right: '15%', size: 20, delay: 800, duration: 6000, color: 'rgba(236, 72, 153, 0.12)', blur: true },
-      { top: '35%', left: '85%', size: 14, delay: 400, duration: 5500, color: 'rgba(59, 130, 246, 0.14)', blur: false },
-      // Medium particles
-      { top: '50%', left: '5%', size: 12, delay: 1200, duration: 4500, color: 'rgba(139, 92, 246, 0.18)', blur: false },
-      { top: '65%', right: '10%', size: 18, delay: 600, duration: 5800, color: 'rgba(6, 182, 212, 0.12)', blur: true },
-      { top: '78%', left: '40%', size: 10, delay: 1600, duration: 4200, color: 'rgba(236, 72, 153, 0.15)', blur: false },
-      // Small accent particles
-      { top: '15%', left: '60%', size: 8, delay: 300, duration: 3500, color: 'rgba(139, 92, 246, 0.2)', blur: false },
-      { top: '45%', right: '35%', size: 6, delay: 1000, duration: 4000, color: 'rgba(236, 72, 153, 0.18)', blur: false },
-      { top: '85%', left: '75%', size: 8, delay: 500, duration: 3800, color: 'rgba(59, 130, 246, 0.16)', blur: false },
-    ];
-
-    return (
-      <View style={styles.particlesContainer}>
-        {particles.map((p, i) => {
-          const particleAnim = useRef(new Animated.Value(0)).current;
-          
-          useEffect(() => {
-            Animated.loop(
-              Animated.sequence([
-                Animated.timing(particleAnim, {
-                  toValue: 1,
-                  duration: p.duration,
-                  delay: p.delay,
-                  useNativeDriver: true,
-                }),
-                Animated.timing(particleAnim, {
-                  toValue: 0,
-                  duration: p.duration,
-                  useNativeDriver: true,
-                }),
-              ])
-            ).start();
-          }, []);
-
-          const particleY = particleAnim.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, -25],
-          });
-
-          const particleX = particleAnim.interpolate({
-            inputRange: [0, 0.5, 1],
-            outputRange: [0, i % 2 === 0 ? 10 : -10, 0],
-          });
-
-          const particleOpacity = particleAnim.interpolate({
-            inputRange: [0, 0.5, 1],
-            outputRange: [0.4, 1, 0.4],
-          });
-
-          const particleScale = particleAnim.interpolate({
-            inputRange: [0, 0.5, 1],
-            outputRange: [1, 1.2, 1],
-          });
-
-          return (
-            <Animated.View
-              key={i}
-              style={[
-                styles.particle,
-                p.blur ? styles.particleBlurred : null,
-                {
-                  top: p.top,
-                  left: p.left,
-                  right: p.right,
-                  width: p.size,
-                  height: p.size,
-                  backgroundColor: p.color,
-                  opacity: particleOpacity,
-                  transform: [
-                    { translateY: particleY },
-                    { translateX: particleX },
-                    { scale: particleScale },
-                  ],
-                },
-              ]}
-            />
-          );
-        })}
-      </View>
-    );
-  };
-
+  // ───────────────────────────────────────
+  // RENDER
+  // ───────────────────────────────────────
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <StatusBar style="light" />
-      
-      {/* Floating micro particles */}
-      <FloatingParticles />
-      
-      <Animated.ScrollView 
-        ref={scrollViewRef}
-        style={styles.scrollView} 
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
-        {/* Hero Section */}
-        <View style={styles.heroSection}>
-          {/* Animated Glow Background with Parallax */}
-          <Animated.View style={[
-            styles.heroGlowAnimated, 
-            { 
-              opacity: glowOpacity,
-              transform: [{ translateY: parallaxBg }]
-            }
-          ]}>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <ScrollView
+          ref={scrollViewRef}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* ════════ HERO ════════ */}
+          <Animated.View style={[styles.hero, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            {/* Background gradient overlay */}
             <LinearGradient
-              colors={['rgba(139, 92, 246, 0.45)', 'rgba(236, 72, 153, 0.25)', 'transparent']}
-              style={styles.heroGlowGradient}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
+              colors={['rgba(99, 102, 241, 0.12)', 'rgba(0,0,0,0)', 'rgba(139, 92, 246, 0.08)']}
+              style={StyleSheet.absoluteFill}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
             />
-          </Animated.View>
-          <LinearGradient
-            colors={['rgba(139, 92, 246, 0.3)', 'rgba(236, 72, 153, 0.15)', 'transparent']}
-            style={styles.heroGlow}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          />
-          
-          {/* Enhanced floating orbs with parallax and animations */}
-          <Animated.View style={[styles.orbContainer, { transform: [{ translateY: parallaxOrbs }] }]}>
-            {/* Large purple orb - top right */}
-            <Animated.View style={[
-              styles.orb, 
-              styles.orbPurple, 
-              { 
-                opacity: glowOpacity,
-                transform: [{ translateY: orb1TranslateY }, { translateX: orb1TranslateX }]
-              }
-            ]} />
-            
-            {/* Pink orb - left side */}
-            <Animated.View style={[
-              styles.orb, 
-              styles.orbPink, 
-              { 
-                opacity: glowOpacity,
-                transform: [{ translateY: orb2TranslateY }, { translateX: orb2TranslateX }]
-              }
-            ]} />
-            
-            {/* Blue orb - bottom right */}
-            <Animated.View style={[
-              styles.orb, 
-              styles.orbBlue, 
-              { 
-                opacity: glowOpacity,
-                transform: [{ translateY: orb3TranslateY }]
-              }
-            ]} />
-            
-            {/* Additional cyan orb - bottom left */}
-            <Animated.View style={[
-              styles.orb, 
-              styles.orbCyan, 
-              { 
-                opacity: glowOpacity,
-                transform: [{ translateY: orb4TranslateY }, { translateX: orb4TranslateX }]
-              }
-            ]} />
-            
-            {/* Small accent orbs */}
-            <Animated.View style={[
-              styles.orbSmall, 
-              styles.orbSmallPurple, 
-              { opacity: glowOpacity }
-            ]} />
-            <Animated.View style={[
-              styles.orbSmall, 
-              styles.orbSmallPink, 
-              { opacity: glowOpacity }
-            ]} />
-          </Animated.View>
-          
-          <Animated.View style={[styles.heroContent, { opacity: heroFadeAnim, transform: [{ scale: heroScaleAnim }] }]}>
-            {/* Logo with enhanced glow */}
-            <View style={styles.logoContainer}>
-              <View style={styles.logoGlowWrapper}>
-                <View style={styles.logoNeonGlow} />
-                <LinearGradient
-                  colors={['#8b5cf6', '#ec4899', '#3b82f6']}
-                  style={styles.logoGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.logoText}>SR</Text>
-                </LinearGradient>
-              </View>
-              <Text style={styles.logoName}>Web Studio</Text>
-            </View>
 
-            {/* Stacked Headline - Line by Line */}
-            <View style={styles.headlineContainer}>
-              <Text style={styles.headlineLine}>Potrzebujesz strony,</Text>
-              <Text style={styles.headlineLine}>która <Text style={styles.headlineHighlight}>zwiększa sprzedaż</Text></Text>
-              <Text style={styles.headlineLine}>i przyciąga</Text>
-              <View style={styles.headlineHighlightRow}>
-                <Text style={styles.headlineHighlight}>klientów</Text>
-                <Text style={styles.headlineLine}>?</Text>
-              </View>
-            </View>
-
-            {/* Stacked Subheadline - Universal for both client types */}
-            <View style={styles.subheadlineContainer}>
-              <Text style={styles.subheadlineLine}>Tworzę i optymalizuję strony,</Text>
-              <Text style={styles.subheadlineLine}>które zamieniają odwiedzających</Text>
-              <Text style={styles.subheadlineLine}>w <Text style={styles.subheadlineHighlight}>płacących klientów</Text></Text>
-            </View>
-
-            {/* Urgency Badge */}
-            <View style={styles.badgeContainer}>
-              <LinearGradient
-                colors={['rgba(16, 185, 129, 0.35)', 'rgba(16, 185, 129, 0.15)']}
-                style={styles.urgencyBadge}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Ionicons name="flash" size={14} color="#10b981" />
-                <Text style={styles.urgencyBadgeText}>Odpowiadam w 15 minut</Text>
+            {/* Logo */}
+            <View style={styles.logoRow}>
+              <LinearGradient colors={['#6366f1', '#a855f7']} style={styles.logoBox} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <Text style={styles.logoLetters}>SR</Text>
               </LinearGradient>
+              <Text style={styles.logoLabel}>Web Studio</Text>
             </View>
 
-            {/* CTA Buttons with enhanced glow */}
-            <View style={styles.ctaContainer}>
-              <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
-                <Animated.View style={[styles.ctaPulseWrapper, {
-                  transform: [{ scale: ctaPulseAnim }],
-                }]}>
-                  <Animated.View style={[styles.primaryButtonNeonGlow, {
-                    shadowColor: '#d946ef',
-                    shadowOffset: { width: 0, height: 0 },
-                    shadowOpacity: ctaGlowShadowOpacity,
-                    shadowRadius: ctaGlowShadowRadius,
-                    elevation: 12,
-                  }]}>
-                    <View style={styles.primaryButtonGlow}>
-                      <LinearGradient
-                        colors={['#a855f7', '#d946ef', '#ec4899']}
-                        style={styles.primaryButton}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                      >
-                        <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                        <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
-                        <Ionicons name="arrow-forward" size={18} color="#fff" />
-                      </LinearGradient>
-                    </View>
-                  </Animated.View>
-                </Animated.View>
-              </TouchableOpacity>
-
-              {/* CTA subtitle */}
-              <Text style={styles.ctaSubtitle}>Sprawdź jak zwiększyć liczbę klientów w Twoim biznesie</Text>
-
-              <TouchableOpacity style={styles.secondaryButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
-                <Text style={styles.secondaryButtonText}>Zobacz wyniki</Text>
-                <Ionicons name="chevron-down" size={18} color="#a78bfa" />
-              </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-
-        {/* Trust Section */}
-        <View style={styles.trustSection}>
-          <View style={styles.trustGrid}>
-            {/* Card 1 - Projects */}
-            <View style={styles.trustCard}>
-              <LinearGradient
-                colors={['rgba(139, 92, 246, 0.15)', 'rgba(59, 130, 246, 0.08)']}
-                style={styles.trustCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.trustIconWrapper}>
-                  <LinearGradient
-                    colors={['#8b5cf6', '#6366f1']}
-                    style={styles.trustIconGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Ionicons name="checkmark-done" size={20} color="#fff" />
-                  </LinearGradient>
-                </View>
-                <View style={styles.trustCardContent}>
-                  <Text style={styles.trustCardTitle}>10+ zrealizowanych projektów</Text>
-                  <Text style={styles.trustCardDescription}>Doświadczenie w tworzeniu stron i sklepów online</Text>
-                </View>
-              </LinearGradient>
+            {/* Nav row */}
+            <View style={styles.navRow}>
+              <TouchableOpacity onPress={() => scrollTo(servicesY)}><Text style={styles.navLink}>Services</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => scrollTo(portfolioY)}><Text style={styles.navLink}>Work</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => scrollTo(pricingY)}><Text style={styles.navLink}>Pricing</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => scrollTo(contactY)}><Text style={styles.navLink}>Contact</Text></TouchableOpacity>
             </View>
 
-            {/* Card 2 - Technologies */}
-            <View style={styles.trustCard}>
-              <LinearGradient
-                colors={['rgba(236, 72, 153, 0.15)', 'rgba(139, 92, 246, 0.08)']}
-                style={styles.trustCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.trustIconWrapper}>
-                  <LinearGradient
-                    colors={['#ec4899', '#8b5cf6']}
-                    style={styles.trustIconGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Ionicons name="code-slash" size={20} color="#fff" />
-                  </LinearGradient>
-                </View>
-                <View style={styles.trustCardContent}>
-                  <Text style={styles.trustCardTitle}>Nowoczesne technologie</Text>
-                  <Text style={styles.trustCardDescription}>Pracujemy z wykorzystaniem Next.js, SEO i najlepszych praktyk</Text>
-                </View>
-              </LinearGradient>
-            </View>
-
-            {/* Card 3 - Fast delivery */}
-            <View style={styles.trustCard}>
-              <LinearGradient
-                colors={['rgba(59, 130, 246, 0.15)', 'rgba(6, 182, 212, 0.08)']}
-                style={styles.trustCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.trustIconWrapper}>
-                  <LinearGradient
-                    colors={['#3b82f6', '#06b6d4']}
-                    style={styles.trustIconGradient}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    <Ionicons name="flash" size={20} color="#fff" />
-                  </LinearGradient>
-                </View>
-                <View style={styles.trustCardContent}>
-                  <Text style={styles.trustCardTitle}>Szybka realizacja</Text>
-                  <Text style={styles.trustCardDescription}>Sprawna komunikacja i wsparcie na każdym etapie projektu</Text>
-                </View>
-              </LinearGradient>
-            </View>
-          </View>
-        </View>
-
-        {/* "Dla kogo?" Target Audience Section */}
-        <View style={styles.targetSection}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Dla</Text>
-              <Text style={styles.sectionTitleHighlight}>kogo?</Text>
-            </View>
-          </View>
-          <View style={styles.targetGrid}>
-            <View style={styles.targetCard}>
-              <LinearGradient
-                colors={['rgba(139, 92, 246, 0.15)', 'rgba(139, 92, 246, 0.05)']}
-                style={styles.targetCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.targetIconWrap}>
-                  <Ionicons name="storefront" size={24} color="#a78bfa" />
-                </View>
-                <Text style={styles.targetTitle}>Firmy lokalne</Text>
-                <Text style={styles.targetDesc}>Restauracje, salony, gabinety i inne biznesy stacjonarne</Text>
-              </LinearGradient>
-            </View>
-            <View style={styles.targetCard}>
-              <LinearGradient
-                colors={['rgba(236, 72, 153, 0.15)', 'rgba(236, 72, 153, 0.05)']}
-                style={styles.targetCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.targetIconWrap}>
-                  <Ionicons name="construct" size={24} color="#f472b6" />
-                </View>
-                <Text style={styles.targetTitle}>Usługi</Text>
-                <Text style={styles.targetDesc}>Hydraulicy, elektrycy, prawnicy i inne firmy usługowe</Text>
-              </LinearGradient>
-            </View>
-            <View style={styles.targetCard}>
-              <LinearGradient
-                colors={['rgba(59, 130, 246, 0.15)', 'rgba(59, 130, 246, 0.05)']}
-                style={styles.targetCardGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <View style={styles.targetIconWrap}>
-                  <Ionicons name="cart" size={24} color="#60a5fa" />
-                </View>
-                <Text style={styles.targetTitle}>Sklepy online</Text>
-                <Text style={styles.targetDesc}>E-commerce z nowoczesnym designem i optymalizacją sprzedaży</Text>
-              </LinearGradient>
-            </View>
-          </View>
-        </View>
-
-        {/* Benefits Section - "What You Get" */}
-        <View style={styles.benefitsSection}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Co</Text>
-              <Text style={styles.sectionTitleHighlight}>zyskujesz?</Text>
-            </View>
-            <Text style={styles.sectionSubtitleSmall}>Konkretne rezultaty</Text>
-          </View>
-
-          <View style={styles.benefitsGrid}>
-            {BENEFITS.map((benefit, index) => (
-              <View key={index} style={styles.benefitCard}>
-                <LinearGradient
-                  colors={['rgba(139, 92, 246, 0.15)', 'rgba(59, 130, 246, 0.08)']}
-                  style={styles.benefitCardGradient}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <View style={styles.benefitIconWrapper}>
-                    <View style={styles.benefitIconNeonGlow} />
-                    <LinearGradient
-                      colors={['#8b5cf6', '#ec4899']}
-                      style={styles.benefitIconGradient}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 1 }}
-                    >
-                      <Ionicons name={benefit.icon as any} size={24} color="#fff" />
-                    </LinearGradient>
-                  </View>
-                  <Text style={styles.benefitTitle}>{benefit.title}</Text>
-                  <Text style={styles.benefitDescription}>{benefit.description}</Text>
-                </LinearGradient>
-              </View>
-            ))}
-          </View>
-        </View>
-
-        {/* Services Section */}
-        <View 
-          style={styles.section}
-          onLayout={(event) => {
-            servicesSectionY.current = event.nativeEvent.layout.y;
-          }}
-        >
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Usługi</Text>
-              <Text style={styles.sectionTitleHighlight}>programistyczne</Text>
-            </View>
-            <Text style={styles.sectionSubtitleSmall}>Web Development</Text>
-          </View>
-
-          <View style={styles.servicesGrid}>
-            {SERVICES.map((service, index) => (
-              <ServiceCard key={index} service={service} index={index} />
-            ))}
-          </View>
-        </View>
-
-        {/* Portfolio Section */}
-        <View 
-          style={styles.section}
-          onLayout={(event) => {
-            portfolioSectionY.current = event.nativeEvent.layout.y;
-          }}
-        >
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Nasze</Text>
-              <Text style={styles.sectionTitleHighlight}>realizacje</Text>
-            </View>
-            <Text style={styles.sectionSubtitleSmall}>Realne wyniki klientów</Text>
-          </View>
-
-          <View style={styles.portfolioGrid}>
-            {PORTFOLIO.map((project, index) => (
-              <PortfolioCard 
-                key={index} 
-                project={project} 
-                index={index} 
-                onPress={() => openProjectModal(project)}
-              />
-            ))}
-          </View>
-
-          <TouchableOpacity style={styles.viewAllButton} onPress={scrollToPortfolio} activeOpacity={0.7}>
-            <Text style={styles.viewAllButtonText}>Wszystkie projekty</Text>
-            <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Testimonials Section - Horizontal Carousel */}
-        <View style={styles.testimonialsSection}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Co mówią</Text>
-              <Text style={styles.sectionTitleHighlight}>klienci</Text>
-            </View>
-            <Text style={styles.sectionSubtitleSmall}>Realne opinie</Text>
-          </View>
-
-          <Animated.ScrollView
-            ref={testimonialScrollRef}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={SNAP_INTERVAL}
-            decelerationRate="fast"
-            contentContainerStyle={styles.carouselContainer}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { x: testimonialScrollX } } }],
-              { useNativeDriver: true, listener: onTestimonialScroll }
-            )}
-            scrollEventThrottle={16}
-            onTouchStart={onTestimonialTouchStart}
-            onTouchEnd={onTestimonialTouchEnd}
-            onMomentumScrollEnd={onTestimonialScroll}
-          >
-            {TESTIMONIALS.map((testimonial, index) => {
-              const inputRange = [
-                (index - 1) * SNAP_INTERVAL,
-                index * SNAP_INTERVAL,
-                (index + 1) * SNAP_INTERVAL,
-              ];
-              const scale = testimonialScrollX.interpolate({
-                inputRange,
-                outputRange: [0.88, 1.03, 0.88],
-                extrapolate: 'clamp',
-              });
-              const opacity = testimonialScrollX.interpolate({
-                inputRange,
-                outputRange: [0.5, 1, 0.5],
-                extrapolate: 'clamp',
-              });
-              const translateY = testimonialScrollX.interpolate({
-                inputRange,
-                outputRange: [8, -2, 8],
-                extrapolate: 'clamp',
-              });
-              const rotateY = testimonialScrollX.interpolate({
-                inputRange,
-                outputRange: ['4deg', '0deg', '-4deg'],
-                extrapolate: 'clamp',
-              });
-
-              return (
-                <Animated.View
-                  key={index}
-                  style={[
-                    styles.testimonialCard,
-                    {
-                      width: CARD_WIDTH,
-                      transform: [
-                        { perspective: 1000 },
-                        { scale },
-                        { translateY },
-                        { rotateY },
-                      ],
-                      opacity,
-                    },
-                  ]}
-                >
-                  <LinearGradient
-                    colors={[
-                      activeTestimonial === index
-                        ? 'rgba(139, 92, 246, 0.18)'
-                        : 'rgba(139, 92, 246, 0.08)',
-                      activeTestimonial === index
-                        ? 'rgba(59, 130, 246, 0.1)'
-                        : 'rgba(59, 130, 246, 0.03)',
-                    ]}
-                    style={[
-                      styles.testimonialCardGradient,
-                      activeTestimonial === index && styles.testimonialCardActive,
-                    ]}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                  >
-                    {/* Quote icon */}
-                    <View style={styles.quoteIconWrapper}>
-                      <Ionicons name="chatbubble-ellipses" size={20} color="#8b5cf6" />
-                    </View>
-                    
-                    {/* Rating stars */}
-                    <View style={styles.ratingContainer}>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Ionicons key={i} name="star" size={16} color="#f59e0b" />
-                      ))}
-                    </View>
-                    
-                    {/* Review text */}
-                    <Text style={styles.testimonialText}>"{testimonial.text}"</Text>
-                    
-                    {/* Author info */}
-                    <View style={styles.testimonialAuthor}>
-                      <View style={styles.testimonialAvatar}>
-                        <LinearGradient
-                          colors={['#8b5cf6', '#ec4899']}
-                          style={styles.testimonialAvatarGradient}
-                          start={{ x: 0, y: 0 }}
-                          end={{ x: 1, y: 1 }}
-                        >
-                          <Text style={styles.testimonialAvatarText}>{testimonial.name.charAt(0)}</Text>
-                        </LinearGradient>
-                      </View>
-                      <View>
-                        <Text style={styles.testimonialName}>{testimonial.name}</Text>
-                        <Text style={styles.testimonialBusiness}>{testimonial.business}</Text>
-                      </View>
-                    </View>
-                  </LinearGradient>
-                </Animated.View>
-              );
-            })}
-          </Animated.ScrollView>
-
-          {/* Dots Indicator */}
-          <View style={styles.dotsContainer}>
-            {TESTIMONIALS.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  activeTestimonial === index && styles.dotActive,
-                ]}
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* Mid-page CTA after testimonials */}
-        <View style={styles.midCtaSection}>
-          <Text style={styles.midCtaText}>Chcesz takich samych wyników?</Text>
-          <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
-            <Animated.View style={[styles.ctaPulseWrapper, {
-              transform: [{ scale: ctaPulseAnim }],
-            }]}>
-              <LinearGradient
-                colors={['#a855f7', '#d946ef', '#ec4899']}
-                style={styles.primaryButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-              >
-                <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
-                <Ionicons name="arrow-forward" size={18} color="#fff" />
-              </LinearGradient>
-            </Animated.View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Process Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitleLine}>Jak to</Text>
-              <Text style={styles.sectionTitleHighlight}>działa?</Text>
-            </View>
-            <Text style={styles.sectionSubtitleSmall}>Prosty proces</Text>
-          </View>
-
-          <View style={styles.processContainer}>
-            {PROCESS_STEPS.map((step, index) => (
-              <ProcessStep 
-                key={index} 
-                step={step} 
-                index={index} 
-                isLast={index === PROCESS_STEPS.length - 1} 
-              />
-            ))}
-          </View>
-        </View>
-
-        {/* About Section */}
-        <View 
-          style={styles.aboutSection}
-          onLayout={(event) => {
-            aboutSectionY.current = event.nativeEvent.layout.y;
-          }}
-        >
-          <LinearGradient
-            colors={['rgba(139, 92, 246, 0.1)', 'rgba(59, 130, 246, 0.05)']}
-            style={styles.aboutGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.aboutIconWrapper}>
-              <LinearGradient
-                colors={['#8b5cf6', '#ec4899']}
-                style={styles.aboutIconGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Ionicons name="people" size={28} color="#fff" />
-              </LinearGradient>
-            </View>
-            <Text style={styles.aboutTitle}>O nas</Text>
-            <Text style={styles.aboutText}>
-              Jesteśmy zespołem pasjonatów web developmentu. Specjalizujemy się w tworzeniu nowoczesnych stron internetowych i sklepów online dla firm usługowych i lokalnych biznesów w Polsce.
-            </Text>
-            <Text style={styles.aboutText}>
-              Łączymy kreatywność z technologią, aby dostarczać rozwiązania, które nie tylko wyglądają profesjonalnie, ale przede wszystkim przynoszą realne rezultaty biznesowe.
-            </Text>
-            <View style={styles.aboutStats}>
-              <View style={styles.aboutStat}>
-                <Text style={styles.aboutStatNumber}>10+</Text>
-                <Text style={styles.aboutStatLabel}>Projektów</Text>
-              </View>
-              <View style={styles.aboutStatDivider} />
-              <View style={styles.aboutStat}>
-                <Text style={styles.aboutStatNumber}>100%</Text>
-                <Text style={styles.aboutStatLabel}>Zadowolenia</Text>
-              </View>
-              <View style={styles.aboutStatDivider} />
-              <View style={styles.aboutStat}>
-                <Text style={styles.aboutStatNumber}>24/7</Text>
-                <Text style={styles.aboutStatLabel}>Wsparcie</Text>
-              </View>
-            </View>
-          </LinearGradient>
-        </View>
-
-        {/* Final CTA Section */}
-        <View style={styles.ctaSection}>
-          <LinearGradient
-            colors={['rgba(139, 92, 246, 0.2)', 'rgba(236, 72, 153, 0.15)']}
-            style={styles.ctaSectionGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Text style={styles.ctaSectionTitle}>Zobacz ile możesz zarabiać więcej</Text>
-            <Text style={styles.ctaSectionText}>
-              Napisz i zobacz jak zdobywać klientów. Darmowa analiza Twojej strony w 15 minut.
+            {/* Headline */}
+            <Text style={styles.heroTitle}>
+              Websites that bring clients{'\n'}
+              <Text style={styles.heroAccent}>— fast and affordable</Text>
             </Text>
 
-            {/* Urgency element */}
-            <View style={styles.ctaUrgency}>
-              <Ionicons name="time-outline" size={16} color="#10b981" />
-              <Text style={styles.ctaUrgencyText}>Pierwsze 5 analiz dziennie • Odpowiedź w 15 minut</Text>
-            </View>
-
-            <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85}>
-              <Animated.View style={[styles.ctaPulseWrapper, {
-                transform: [{ scale: ctaPulseAnim }],
-              }]}>
-                <Animated.View style={[styles.ctaButtonGlow, {
-                  shadowColor: '#25D366',
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: ctaGlowShadowOpacity,
-                  shadowRadius: ctaGlowShadowRadius,
-                  elevation: 12,
-                }]}>
-                  <LinearGradient
-                    colors={['#25D366', '#20c060', '#128C7E']}
-                    style={styles.primaryButton}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 0 }}
-                  >
-                    <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                    <Text style={styles.primaryButtonText}>Darmowa analiza</Text>
-                    <Ionicons name="arrow-forward" size={18} color="#fff" />
-                  </LinearGradient>
-                </Animated.View>
-              </Animated.View>
-            </TouchableOpacity>
+            <Text style={styles.heroSub}>
+              I create modern websites for businesses in 2–3 days starting from <Text style={styles.heroAccent}>$100</Text>
+            </Text>
 
             {/* Trust line */}
-            <Text style={styles.ctaTrustLine}>Bez zobowiązań • 100% darmowo</Text>
-
-            {/* Secondary Contact Option */}
-            <TouchableOpacity style={styles.secondaryContactButton} onPress={openEmail} activeOpacity={0.7}>
-              <Ionicons name="mail-outline" size={18} color="#a78bfa" />
-              <Text style={styles.secondaryContactText}>lub napisz email</Text>
-            </TouchableOpacity>
-          </LinearGradient>
-        </View>
-
-        {/* Footer */}
-        <View style={[styles.footer, { paddingBottom: insets.bottom + 20 }]}>
-          {/* Logo */}
-          <View style={styles.footerLogo}>
-            <View style={styles.footerLogoGlowWrapper}>
-              <LinearGradient
-                colors={['#8b5cf6', '#ec4899', '#3b82f6']}
-                style={styles.footerLogoGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.footerLogoText}>SR</Text>
-              </LinearGradient>
+            <View style={styles.trustBadge}>
+              <Ionicons name="checkmark-circle" size={16} color="#6366f1" />
+              <Text style={styles.trustText}>Already helped multiple clients launch online</Text>
             </View>
-            <Text style={styles.footerLogoName}>Web Studio</Text>
+
+            {/* CTA Buttons */}
+            <View style={styles.ctaRow}>
+              <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
+                <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                  <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Ionicons name="paper-plane" size={18} color="#fff" />
+                    <Text style={styles.ctaPrimaryText}>Order a website</Text>
+                  </LinearGradient>
+                </Animated.View>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={() => scrollTo(contactY)} activeOpacity={0.85} style={styles.ctaSecondary}>
+                <Text style={styles.ctaSecondaryText}>Free consultation</Text>
+                <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+
+          {/* ════════ SERVICES ════════ */}
+          <View style={styles.section} onLayout={e => { servicesY.current = e.nativeEvent.layout.y; }}>
+            <Text style={styles.sectionLabel}>SERVICES</Text>
+            <Text style={styles.sectionTitle}>What I offer</Text>
+
+            <View style={styles.servicesGrid}>
+              {SERVICES.map((s, i) => (
+                <View key={i} style={styles.serviceCard}>
+                  <LinearGradient
+                    colors={[`${s.color}18`, `${s.color}08`]}
+                    style={styles.serviceCardInner}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <View style={[styles.serviceIcon, { backgroundColor: `${s.color}20` }]}>
+                      <Ionicons name={s.icon} size={26} color={s.color} />
+                    </View>
+                    <Text style={styles.serviceTitle}>{s.title}</Text>
+                    <Text style={styles.serviceDesc}>{s.desc}</Text>
+                  </LinearGradient>
+                </View>
+              ))}
+            </View>
           </View>
 
-          {/* Footer Menu */}
-          <View style={styles.footerMenu}>
-            <TouchableOpacity onPress={scrollToPortfolio} activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Realizacje</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={scrollToServices} activeOpacity={0.7}>
-              <Text style={styles.footerLink}>Usługi</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={scrollToAbout} activeOpacity={0.7}>
-              <Text style={styles.footerLink}>O nas</Text>
-            </TouchableOpacity>
+          {/* ════════ WHY CHOOSE ME ════════ */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>ADVANTAGES</Text>
+            <Text style={styles.sectionTitle}>Why choose SR Web Studio</Text>
+
+            <View style={styles.advantagesGrid}>
+              {ADVANTAGES.map((a, i) => (
+                <View key={i} style={styles.advantageRow}>
+                  <View style={styles.advantageIconWrap}>
+                    <Ionicons name={a.icon} size={22} color="#8b5cf6" />
+                  </View>
+                  <View style={styles.advantageTextWrap}>
+                    <Text style={styles.advantageTitle}>{a.title}</Text>
+                    <Text style={styles.advantageDesc}>{a.desc}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
 
-          {/* Social Links */}
-          <View style={styles.socialLinks}>
-            <TouchableOpacity 
-              style={styles.socialIcon} 
-              onPress={() => openLink(CONTACT.facebook)}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-facebook" size={22} color="#a1a1aa" />
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={styles.socialIcon} 
-              onPress={openWhatsApp}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="logo-whatsapp" size={22} color="#a1a1aa" />
-            </TouchableOpacity>
+          {/* ════════ PORTFOLIO ════════ */}
+          <View style={styles.section} onLayout={e => { portfolioY.current = e.nativeEvent.layout.y; }}>
+            <Text style={styles.sectionLabel}>PORTFOLIO</Text>
+            <Text style={styles.sectionTitle}>My work</Text>
+
+            <View style={styles.portfolioGrid}>
+              {PORTFOLIO.map((p, i) => (
+                <View key={i} style={styles.portfolioCard}>
+                  <LinearGradient colors={p.colors} style={styles.portfolioImage} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <Ionicons name={p.icon} size={48} color="rgba(255,255,255,0.7)" />
+                  </LinearGradient>
+                  <View style={styles.portfolioInfo}>
+                    <View style={styles.portfolioTagWrap}>
+                      <Text style={styles.portfolioTag}>{p.tag}</Text>
+                    </View>
+                    <Text style={styles.portfolioTitle}>{p.title}</Text>
+                    <Text style={styles.portfolioDesc}>{p.desc}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
           </View>
 
-          {/* Copyright */}
-          <Text style={styles.copyright}>
-            © 2025 SR Web Studio. Wszystkie prawa zastrzeżone.
-          </Text>
-        </View>
-      </Animated.ScrollView>
+          {/* ════════ PRICING ════════ */}
+          <View style={styles.section} onLayout={e => { pricingY.current = e.nativeEvent.layout.y; }}>
+            <Text style={styles.sectionLabel}>PRICING</Text>
+            <Text style={styles.sectionTitle}>Simple pricing</Text>
 
-      {/* Project Preview Modal */}
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="none"
-        onRequestClose={closeProjectModal}
-      >
-        <Animated.View style={[styles.modalOverlay, { opacity: modalOpacityAnim }]}>
-          <Pressable style={styles.modalBackdrop} onPress={closeProjectModal} />
-          <Animated.View style={[
-            styles.modalContainer,
-            { transform: [{ scale: modalScaleAnim }] }
-          ]}>
-            {selectedProject && (
-              <View style={styles.modalContent}>
-                {/* Modal Header with Gradient */}
-                <LinearGradient
-                  colors={selectedProject.gradient}
-                  style={styles.modalHeader}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <View style={styles.modalHeaderContent}>
-                    <View style={styles.modalTag}>
-                      <Text style={styles.modalTagText}>{selectedProject.tag}</Text>
-                    </View>
-                    <TouchableOpacity 
-                      onPress={closeProjectModal}
-                      style={styles.modalCloseButton}
-                      activeOpacity={0.7}
-                    >
-                      <Ionicons name="close" size={24} color="#fff" />
-                    </TouchableOpacity>
+            <View style={styles.pricingGrid}>
+              {PRICING.map((plan, i) => (
+                <View key={i} style={[styles.pricingCard, plan.popular && styles.pricingCardPopular]}>
+                  {plan.popular && (
+                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.popularBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                      <Text style={styles.popularBadgeText}>Most Popular</Text>
+                    </LinearGradient>
+                  )}
+                  <Text style={styles.pricingName}>{plan.name}</Text>
+                  <Text style={styles.pricingPrice}>{plan.price}</Text>
+                  <View style={styles.pricingFeatures}>
+                    {plan.features.map((f, fi) => (
+                      <View key={fi} style={styles.pricingFeatureRow}>
+                        <Ionicons name="checkmark-circle" size={16} color={plan.color} />
+                        <Text style={styles.pricingFeatureText}>{f}</Text>
+                      </View>
+                    ))}
                   </View>
-                  <View style={styles.modalHeaderIcon}>
-                    <Ionicons 
-                      name={
-                        selectedProject.tag === 'Strona WWW' ? 'globe-outline' :
-                        selectedProject.tag === 'E-commerce' ? 'cart-outline' : 'code-slash-outline'
-                      } 
-                      size={48} 
-                      color="rgba(255,255,255,0.9)" 
-                    />
-                  </View>
-                </LinearGradient>
-
-                {/* Modal Body */}
-                <View style={styles.modalBody}>
-                  <Text style={styles.modalTitle}>{selectedProject.title}</Text>
-                  <Text style={styles.modalDescription}>{selectedProject.description}</Text>
-                  
-                  {/* Project Details */}
-                  <View style={styles.modalDetails}>
-                    <View style={styles.modalDetailItem}>
-                      <Ionicons name="checkmark-circle" size={20} color="#8b5cf6" />
-                      <Text style={styles.modalDetailText}>Projekt zakończony</Text>
-                    </View>
-                    <View style={styles.modalDetailItem}>
-                      <Ionicons name="trending-up" size={20} color="#10b981" />
-                      <Text style={styles.modalDetailText}>Zwiększona konwersja</Text>
-                    </View>
-                    <View style={styles.modalDetailItem}>
-                      <Ionicons name="star" size={20} color="#f59e0b" />
-                      <Text style={styles.modalDetailText}>Zadowolony klient</Text>
-                    </View>
-                  </View>
-
-                  {/* CTA Button */}
-                  <TouchableOpacity onPress={() => { closeProjectModal(); openWhatsApp(); }} activeOpacity={0.8}>
+                  <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
                     <LinearGradient
-                      colors={['#8b5cf6', '#ec4899']}
-                      style={styles.modalCTA}
+                      colors={plan.popular ? ['#6366f1', '#8b5cf6'] : ['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.15)']}
+                      style={styles.pricingBtn}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                     >
-                      <Text style={styles.modalCTAText}>Zamów podobny projekt</Text>
-                      <Ionicons name="arrow-forward" size={18} color="#fff" />
+                      <Text style={[styles.pricingBtnText, !plan.popular && { color: '#8b5cf6' }]}>
+                        Get started
+                      </Text>
                     </LinearGradient>
                   </TouchableOpacity>
                 </View>
+              ))}
+            </View>
+          </View>
+
+          {/* ════════ TESTIMONIALS ════════ */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>TESTIMONIALS</Text>
+            <Text style={styles.sectionTitle}>What clients say</Text>
+
+            <Animated.ScrollView
+              ref={testimonialScrollRef}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={SNAP}
+              decelerationRate="fast"
+              contentContainerStyle={styles.carouselWrap}
+              onScroll={Animated.event(
+                [{ nativeEvent: { contentOffset: { x: testimonialScrollX } } }],
+                { useNativeDriver: true, listener: onTestimonialScroll }
+              )}
+              scrollEventThrottle={16}
+              onTouchStart={() => { touchingRef.current = true; if (autoScrollRef.current) clearInterval(autoScrollRef.current); }}
+              onTouchEnd={() => {
+                touchingRef.current = false;
+                autoScrollRef.current = setInterval(() => {
+                  if (touchingRef.current) return;
+                  setActiveTestimonial(prev => {
+                    const next = (prev + 1) % TESTIMONIALS.length;
+                    testimonialScrollRef.current?.scrollTo({ x: next * SNAP, animated: true });
+                    return next;
+                  });
+                }, 4500);
+              }}
+              onMomentumScrollEnd={onTestimonialScroll}
+            >
+              {TESTIMONIALS.map((t, i) => {
+                const range = [(i - 1) * SNAP, i * SNAP, (i + 1) * SNAP];
+                const scale = testimonialScrollX.interpolate({ inputRange: range, outputRange: [0.9, 1.02, 0.9], extrapolate: 'clamp' });
+                const opacity = testimonialScrollX.interpolate({ inputRange: range, outputRange: [0.5, 1, 0.5], extrapolate: 'clamp' });
+                return (
+                  <Animated.View key={i} style={[styles.testimonialCard, { width: CARD_W, transform: [{ scale }], opacity }]}>
+                    <View style={styles.testimonialStars}>
+                      {[...Array(t.rating)].map((_, si) => (
+                        <Ionicons key={si} name="star" size={14} color="#f59e0b" />
+                      ))}
+                    </View>
+                    <Text style={styles.testimonialText}>"{t.text}"</Text>
+                    <View style={styles.testimonialAuthor}>
+                      <View style={styles.testimonialAvatar}>
+                        <LinearGradient colors={['#6366f1', '#a855f7']} style={styles.testimonialAvatarBg}>
+                          <Text style={styles.testimonialAvatarLetter}>{t.name.charAt(0)}</Text>
+                        </LinearGradient>
+                      </View>
+                      <View>
+                        <Text style={styles.testimonialName}>{t.name}</Text>
+                        <Text style={styles.testimonialRole}>{t.role}</Text>
+                      </View>
+                    </View>
+                  </Animated.View>
+                );
+              })}
+            </Animated.ScrollView>
+
+            {/* Dots */}
+            <View style={styles.dots}>
+              {TESTIMONIALS.map((_, i) => (
+                <View key={i} style={[styles.dot, activeTestimonial === i && styles.dotActive]} />
+              ))}
+            </View>
+          </View>
+
+          {/* ════════ FINAL CTA ════════ */}
+          <View style={styles.finalCta}>
+            <LinearGradient
+              colors={['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.1)']}
+              style={styles.finalCtaInner}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Text style={styles.finalCtaTitle}>Ready to get your website?</Text>
+              <Text style={styles.finalCtaSub}>Let's build something that brings you clients</Text>
+
+              <View style={styles.ctaRow}>
+                <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
+                  <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                      <Ionicons name="paper-plane" size={18} color="#fff" />
+                      <Text style={styles.ctaPrimaryText}>Order now</Text>
+                    </LinearGradient>
+                  </Animated.View>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={openTelegram} activeOpacity={0.85} style={styles.ctaSecondary}>
+                  <Ionicons name="send" size={16} color="#8b5cf6" />
+                  <Text style={styles.ctaSecondaryText}>Telegram</Text>
+                </TouchableOpacity>
               </View>
-            )}
-          </Animated.View>
-        </Animated.View>
-      </Modal>
+            </LinearGradient>
+          </View>
+
+          {/* ════════ CONTACT ════════ */}
+          <View style={styles.section} onLayout={e => { contactY.current = e.nativeEvent.layout.y; }}>
+            <Text style={styles.sectionLabel}>CONTACT</Text>
+            <Text style={styles.sectionTitle}>Get in touch</Text>
+
+            {/* Quick contact buttons */}
+            <View style={styles.contactBtns}>
+              <TouchableOpacity onPress={openTelegram} activeOpacity={0.85} style={styles.contactBtn}>
+                <LinearGradient colors={['#2AABEE', '#229ED9']} style={styles.contactBtnGrad}>
+                  <Ionicons name="paper-plane" size={20} color="#fff" />
+                  <Text style={styles.contactBtnText}>Telegram</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={openEmail} activeOpacity={0.85} style={styles.contactBtn}>
+                <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.contactBtnGrad}>
+                  <Ionicons name="mail" size={20} color="#fff" />
+                  <Text style={styles.contactBtnText}>Email</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </View>
+
+            {/* Contact Form */}
+            <View style={styles.formCard}>
+              <Text style={styles.formTitle}>Or send a message</Text>
+
+              {formSent ? (
+                <View style={styles.formSuccess}>
+                  <Ionicons name="checkmark-circle" size={40} color="#22c55e" />
+                  <Text style={styles.formSuccessText}>Message sent! I'll reply soon.</Text>
+                  <TouchableOpacity onPress={() => setFormSent(false)}>
+                    <Text style={styles.formSuccessLink}>Send another</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Your name"
+                    placeholderTextColor="#52525b"
+                    value={formName}
+                    onChangeText={setFormName}
+                  />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Email"
+                    placeholderTextColor="#52525b"
+                    value={formEmail}
+                    onChangeText={setFormEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                  <TextInput
+                    style={[styles.input, styles.inputMulti]}
+                    placeholder="Tell me about your project..."
+                    placeholderTextColor="#52525b"
+                    value={formMessage}
+                    onChangeText={setFormMessage}
+                    multiline
+                    numberOfLines={4}
+                    textAlignVertical="top"
+                  />
+                  <TouchableOpacity onPress={submitForm} activeOpacity={0.85} disabled={formLoading}>
+                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={styles.formBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                      {formLoading ? (
+                        <ActivityIndicator color="#fff" size="small" />
+                      ) : (
+                        <>
+                          <Text style={styles.formBtnText}>Send message</Text>
+                          <Ionicons name="send" size={16} color="#fff" />
+                        </>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </>
+              )}
+            </View>
+          </View>
+
+          {/* ════════ FOOTER ════════ */}
+          <View style={styles.footer}>
+            <View style={styles.footerTop}>
+              <View style={styles.logoRow}>
+                <LinearGradient colors={['#6366f1', '#a855f7']} style={styles.logoBoxSm} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <Text style={styles.logoLettersSm}>SR</Text>
+                </LinearGradient>
+                <Text style={styles.logoLabelSm}>Web Studio</Text>
+              </View>
+              <Text style={styles.footerTagline}>Websites that work</Text>
+            </View>
+
+            <View style={styles.footerLinks}>
+              <TouchableOpacity onPress={openTelegram} style={styles.footerSocial}>
+                <Ionicons name="paper-plane" size={20} color="#8b5cf6" />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={openEmail} style={styles.footerSocial}>
+                <Ionicons name="mail" size={20} color="#8b5cf6" />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.footerDivider} />
+            <Text style={styles.footerCopy}>© {new Date().getFullYear()} SR Web Studio. All rights reserved.</Text>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
+// ═══════════════════════════════════════════
+// STYLES
+// ═══════════════════════════════════════════
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#0a0a0f',
   },
-  scrollView: {
-    flex: 1,
-  },
   scrollContent: {
-    flexGrow: 1,
     paddingBottom: 20,
   },
 
-  // Hero Section
-  heroSection: {
-    minHeight: 540,
+  // ── Hero ──
+  hero: {
     paddingHorizontal: 24,
-    paddingTop: 30,
-    paddingBottom: 40,
+    paddingTop: 20,
+    paddingBottom: 36,
     position: 'relative',
-    overflow: 'hidden',
   },
-  heroGlow: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 450,
-  },
-  heroGlowAnimated: {
-    position: 'absolute',
-    top: -50,
-    left: -50,
-    right: -50,
-    height: 500,
-  },
-  heroGlowGradient: {
-    flex: 1,
-    borderRadius: 200,
-  },
-  orbContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    overflow: 'hidden',
-  },
-  orb: {
-    position: 'absolute',
-    borderRadius: 200,
-  },
-  orbPurple: {
-    width: 250,
-    height: 250,
-    top: -80,
-    right: -100,
-    backgroundColor: 'rgba(139, 92, 246, 0.18)',
-  },
-  orbPink: {
-    width: 180,
-    height: 180,
-    top: 220,
-    left: -80,
-    backgroundColor: 'rgba(236, 72, 153, 0.15)',
-  },
-  orbBlue: {
-    width: 140,
-    height: 140,
-    bottom: 80,
-    right: -50,
-    backgroundColor: 'rgba(59, 130, 246, 0.12)',
-  },
-  orbCyan: {
-    width: 160,
-    height: 160,
-    bottom: 180,
-    left: -70,
-    backgroundColor: 'rgba(6, 182, 212, 0.1)',
-  },
-  orbSmall: {
-    position: 'absolute',
-    borderRadius: 50,
-    width: 60,
-    height: 60,
-  },
-  orbSmallPurple: {
-    top: 350,
-    right: 30,
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
-  },
-  orbSmallPink: {
-    top: 120,
-    left: 50,
-    backgroundColor: 'rgba(236, 72, 153, 0.15)',
-  },
-  heroContent: {
-    alignItems: 'center',
-    zIndex: 1,
-  },
-  logoContainer: {
+  logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    alignSelf: 'center',
-    marginBottom: 28,
     gap: 10,
+    marginBottom: 16,
   },
-  logoGlowWrapper: {
-    borderRadius: 16,
-    padding: 2,
-    position: 'relative',
-  },
-  logoGradient: {
-    width: 62,
-    height: 62,
-    borderRadius: 16,
+  logoBox: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  logoText: {
-    fontSize: 28,
-    fontWeight: '800',
+  logoLetters: {
     color: '#fff',
-    includeFontPadding: false,
+    fontSize: 22,
+    fontWeight: '800',
   },
-  logoName: {
-    fontSize: 26,
+  logoLabel: {
+    color: '#fff',
+    fontSize: 22,
     fontWeight: '700',
-    color: '#fff',
-    includeFontPadding: false,
-    textShadowColor: 'rgba(139, 92, 246, 0.4)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 12,
   },
-  headline: {
-    fontSize: isSmallScreen ? 28 : 36,
+
+  navRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 20,
+    marginBottom: 32,
+    flexWrap: 'wrap',
+  },
+  navLink: {
+    color: '#71717a',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+
+  heroTitle: {
+    fontSize: isSmallScreen ? 30 : 38,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f5f5f5',
     textAlign: 'center',
-    lineHeight: isSmallScreen ? 36 : 46,
+    lineHeight: isSmallScreen ? 38 : 48,
     marginBottom: 14,
+    letterSpacing: -0.5,
   },
-  subheadline: {
+  heroAccent: {
+    color: '#818cf8',
+  },
+  heroSub: {
     fontSize: 16,
     color: '#a1a1aa',
     textAlign: 'center',
-    lineHeight: 26,
+    lineHeight: 24,
     marginBottom: 16,
-    paddingHorizontal: 10,
+    maxWidth: 400,
+    alignSelf: 'center',
   },
-  badgeContainer: {
-    marginBottom: 22,
-  },
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.4)',
-  },
-  badgeText: {
-    color: '#e4e4e7',
-    fontSize: 13,
-    marginLeft: 6,
-  },
-  ctaContainer: {
-    alignItems: 'center',
-    gap: 16,
-  },
-  primaryButtonGlow: {
-    borderRadius: 14,
-    padding: 2,
-  },
-  primaryButton: {
+
+  trustBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 32,
-    paddingVertical: 18,
-    borderRadius: 12,
-    gap: 10,
-    minHeight: 56,
-    ...(isWeb ? { cursor: 'pointer' } : {}),
+    gap: 6,
+    marginBottom: 24,
   },
-  primaryButtonText: {
-    color: '#fff',
-    fontSize: 17,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+  trustText: {
+    color: '#71717a',
+    fontSize: 13,
   },
-  secondaryButton: {
+
+  ctaRow: {
+    flexDirection: isSmallScreen ? 'column' : 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  ctaPrimary: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 24,
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+    minWidth: 200,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  ctaPrimaryText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  ctaSecondary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 20,
     paddingVertical: 14,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.4)',
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    gap: 8,
+    borderColor: 'rgba(139,92,246,0.3)',
+    ...(isWeb ? { cursor: 'pointer' } : {}),
   },
-  secondaryButtonText: {
+  ctaSecondaryText: {
     color: '#8b5cf6',
     fontSize: 15,
     fontWeight: '600',
   },
 
-  // Trust Section Styles
-  trustSection: {
-    paddingHorizontal: 24,
-    paddingTop: 12,
-    paddingBottom: 28,
-  },
-  trustGrid: {
-    gap: 12,
-  },
-  trustCard: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  trustCardGradient: {
-    padding: 18,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  trustIconWrapper: {
-    flexShrink: 0,
-  },
-  trustIconGradient: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  trustCardContent: {
-    flex: 1,
-  },
-  trustCardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-  },
-  trustCardDescription: {
-    fontSize: 13,
-    color: '#a1a1aa',
-    lineHeight: 18,
-  },
-
-  // Section Styles
+  // ── Sections ──
   section: {
     paddingHorizontal: 24,
-    paddingVertical: 40,
+    paddingVertical: 36,
   },
-  sectionHeader: {
-    alignItems: 'center',
-    marginBottom: 28,
+  sectionLabel: {
+    color: '#6366f1',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+    textAlign: 'center',
+    marginBottom: 6,
   },
   sectionTitle: {
-    fontSize: 28,
+    fontSize: isSmallScreen ? 26 : 32,
     fontWeight: '800',
-    color: '#fff',
+    color: '#f5f5f5',
     textAlign: 'center',
-  },
-  sectionSubtitle: {
-    fontSize: 24,
-    fontWeight: '300',
-    color: '#8b5cf6',
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  sectionSubtitleSmall: {
-    fontSize: 16,
-    color: '#71717a',
-    textAlign: 'center',
-    marginTop: 8,
+    marginBottom: 28,
+    letterSpacing: -0.3,
   },
 
-  // Services Grid
+  // ── Services ──
   servicesGrid: {
-    gap: 18,
+    gap: 14,
   },
   serviceCard: {
-    borderRadius: 20,
-    overflow: 'visible',
-    position: 'relative',
+    borderRadius: 16,
+    overflow: 'hidden',
   },
-  cardNeonGlow: {
-    position: 'absolute',
-    top: -3,
-    left: -3,
-    right: -3,
-    bottom: -3,
-    borderRadius: 23,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: 'rgba(139, 92, 246, 0.6)',
-    zIndex: -1,
+  serviceCardInner: {
+    padding: 22,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.12)',
   },
-  cardGlowOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 20,
-    backgroundColor: 'rgba(139, 92, 246, 0.35)',
-    zIndex: 10,
-  },
-  cardShineEffect: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 80,
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    zIndex: 11,
-  },
-  serviceCardGradient: {
-    padding: 26,
-    borderRadius: 20,
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.35)',
-  },
-  iconGlowWrapper: {
-    borderRadius: 14,
-    padding: 2,
-  },
-  serviceIconContainer: {
-    marginBottom: 18,
-  },
-  serviceIconGradient: {
-    width: 54,
-    height: 54,
-    borderRadius: 14,
+  serviceIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 14,
   },
   serviceTitle: {
-    fontSize: 19,
+    color: '#f5f5f5',
+    fontSize: 18,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 10,
+    marginBottom: 6,
   },
-  serviceDescription: {
-    fontSize: 14,
+  serviceDesc: {
     color: '#a1a1aa',
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 20,
   },
 
-  // Portfolio Grid
+  // ── Advantages ──
+  advantagesGrid: {
+    gap: 14,
+  },
+  advantageRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+    backgroundColor: 'rgba(99,102,241,0.06)',
+    padding: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.1)',
+  },
+  advantageIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(139,92,246,0.12)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  advantageTextWrap: {
+    flex: 1,
+  },
+  advantageTitle: {
+    color: '#f5f5f5',
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  advantageDesc: {
+    color: '#71717a',
+    fontSize: 13,
+    marginTop: 2,
+  },
+
+  // ── Portfolio ──
   portfolioGrid: {
-    gap: 22,
+    gap: 16,
   },
   portfolioCard: {
-    borderRadius: 20,
-    overflow: 'visible',
-    backgroundColor: '#18181b',
-    borderWidth: 1.5,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-    position: 'relative',
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(99,102,241,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.1)',
   },
-  portfolioNeonGlow: {
-    position: 'absolute',
-    top: -3,
-    left: -3,
-    right: -3,
-    bottom: -3,
-    borderRadius: 23,
-    backgroundColor: 'transparent',
-    borderWidth: 2,
-    borderColor: 'rgba(236, 72, 153, 0.5)',
-    zIndex: -1,
+  portfolioImage: {
+    height: 160,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  portfolioGlowOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderRadius: 20,
-    backgroundColor: 'rgba(139, 92, 246, 0.3)',
-    zIndex: 10,
+  portfolioInfo: {
+    padding: 18,
   },
-  portfolioShineEffect: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    zIndex: 11,
-  },
-  portfolioCardHeader: {
-    height: 150,
-    padding: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  portfolioTagWrap: {
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(99,102,241,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    marginBottom: 8,
   },
   portfolioTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  portfolioTagText: {
-    color: '#fff',
+    color: '#818cf8',
     fontSize: 12,
     fontWeight: '600',
-  },
-  portfolioCardContent: {
-    padding: 20,
   },
   portfolioTitle: {
-    fontSize: 18,
+    color: '#f5f5f5',
+    fontSize: 17,
     fontWeight: '700',
-    color: '#fff',
-    marginBottom: 8,
-  },
-  portfolioDescription: {
-    fontSize: 14,
-    color: '#a1a1aa',
-    lineHeight: 22,
-  },
-  viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 24,
-    gap: 8,
-  },
-  viewAllButtonText: {
-    color: '#8b5cf6',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-
-  // Process Section
-  processContainer: {
-    paddingLeft: 8,
-  },
-  processStep: {
-    flexDirection: 'row',
-    marginBottom: 8,
-  },
-  processStepLeft: {
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  processNumber: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  processNumberText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  processLine: {
-    width: 2,
-    flex: 1,
-    backgroundColor: 'rgba(139, 92, 246, 0.3)',
-    marginTop: 8,
-    marginBottom: 8,
-    minHeight: 40,
-  },
-  processStepContent: {
-    flex: 1,
-    paddingTop: 4,
-    paddingBottom: 22,
-  },
-  processTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 6,
-  },
-  processDescription: {
-    fontSize: 14,
-    color: '#a1a1aa',
-    lineHeight: 22,
-  },
-
-  // About Section
-  aboutSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-  },
-  aboutGradient: {
-    padding: 24,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.25)',
-    alignItems: 'center',
-  },
-  aboutIconWrapper: {
-    marginBottom: 20,
-  },
-  aboutIconGradient: {
-    width: 60,
-    height: 60,
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  aboutTitle: {
-    fontSize: 24,
-    fontWeight: '800',
-    color: '#fff',
-    marginBottom: 16,
-  },
-  aboutText: {
-    fontSize: 15,
-    color: '#a1a1aa',
-    textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  aboutStats: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 24,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(139, 92, 246, 0.2)',
-    width: '100%',
-  },
-  aboutStat: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  aboutStatNumber: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#a78bfa',
-    marginBottom: 6,
-  },
-  aboutStatLabel: {
-    fontSize: 13,
-    color: '#71717a',
-    fontWeight: '500',
-    textAlign: 'center',
-  },
-  aboutStatDivider: {
-    width: 1,
-    height: 50,
-    backgroundColor: 'rgba(139, 92, 246, 0.25)',
-    marginHorizontal: 8,
-  },
-
-  // CTA Section
-  ctaSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-  },
-  ctaSectionGradient: {
-    padding: 26,
-    borderRadius: 24,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-  },
-  ctaSectionTitle: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  ctaSectionText: {
-    fontSize: 16,
-    color: '#a1a1aa',
-    textAlign: 'center',
-    marginBottom: 20,
-    lineHeight: 24,
-  },
-  ctaButtonGlow: {
-    borderRadius: 14,
-    padding: 2,
-    shadowColor: '#25D366',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 12,
-    elevation: 10,
-  },
-  contactOptions: {
-    flexDirection: 'row',
-    marginTop: 24,
-    gap: 16,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  contactOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    gap: 8,
-  },
-  contactOptionText: {
-    color: '#d4d4d8',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  secondaryContactButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 16,
-    gap: 8,
-    paddingVertical: 8,
-  },
-  secondaryContactText: {
-    color: '#a78bfa',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-
-  // Footer
-  footer: {
-    paddingHorizontal: 24,
-    paddingTop: 28,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(139, 92, 246, 0.15)',
-    alignItems: 'center',
-  },
-  footerLogo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  footerLogoGlowWrapper: {
-    borderRadius: 10,
-    padding: 2,
-  },
-  footerLogoGradient: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  footerLogoText: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: '#fff',
-  },
-  footerLogoName: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#fff',
-  },
-  footerMenu: {
-    flexDirection: 'row',
-    gap: 28,
-    marginBottom: 24,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  footerLink: {
-    color: '#a78bfa',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  socialLinks: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
-  },
-  socialIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: 'rgba(139, 92, 246, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-  },
-  copyright: {
-    color: '#52525b',
-    fontSize: 13,
-    textAlign: 'center',
-  },
-
-  // Portfolio expand button
-  expandButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 10,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Modal Styles
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalBackdrop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  modalContainer: {
-    width: '100%',
-    maxWidth: 400,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#18181b',
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.3)',
-  },
-  modalContent: {
-    width: '100%',
-  },
-  modalHeader: {
-    padding: 20,
-    minHeight: 160,
-    justifyContent: 'space-between',
-  },
-  modalHeaderContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  modalTag: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  modalTagText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  modalCloseButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalHeaderIcon: {
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  modalBody: {
-    padding: 24,
-  },
-  modalTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 12,
-  },
-  modalDescription: {
-    fontSize: 15,
-    color: '#a1a1aa',
-    lineHeight: 24,
-    marginBottom: 24,
-  },
-  modalDetails: {
-    marginBottom: 24,
-    gap: 12,
-  },
-  modalDetailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  modalDetailText: {
-    fontSize: 14,
-    color: '#d4d4d8',
-    fontWeight: '500',
-  },
-  modalCTA: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    gap: 10,
-  },
-  modalCTAText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-
-  // Micro-interaction styles - LARGER particles
-  particlesContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 0,
-    overflow: 'hidden',
-  },
-  particle: {
-    position: 'absolute',
-    borderRadius: 100,
-  },
-  particleBlurred: {
-    opacity: 0.6,
-  },
-  expandButtonInner: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Urgency badge
-  urgencyBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
-    marginBottom: 32,
-  },
-  urgencyBadgeText: {
-    color: '#10b981',
-    fontSize: 13,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-
-  // Trust line
-  trustLine: {
-    color: '#71717a',
-    fontSize: 13,
-    marginTop: 12,
-    marginBottom: 8,
-  },
-
-  // CTA subtitle under button
-  ctaSubtitle: {
-    color: '#a1a1aa',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 14,
-    marginBottom: 6,
-    lineHeight: 20,
-    maxWidth: 320,
-    alignSelf: 'center',
-  },
-
-  // Target audience section ("Dla kogo?")
-  targetSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-  },
-  targetGrid: {
-    flexDirection: isSmallScreen ? 'column' : 'row',
-    gap: 14,
-  },
-  targetCard: {
-    flex: isSmallScreen ? undefined : 1,
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  targetCardGradient: {
-    padding: 20,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.15)',
-    alignItems: 'center',
-  },
-  targetIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(139, 92, 246, 0.12)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  targetTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  targetDesc: {
-    color: '#a1a1aa',
-    fontSize: 13,
-    lineHeight: 18,
-    textAlign: 'center',
-  },
-
-  // Mid-page CTA (after testimonials)
-  midCtaSection: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 24,
-    gap: 14,
-  },
-  midCtaText: {
-    color: '#d4d4d8',
-    fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
     marginBottom: 4,
   },
+  portfolioDesc: {
+    color: '#a1a1aa',
+    fontSize: 14,
+    lineHeight: 20,
+  },
 
-  // Benefits section
-  benefitsSection: {
-    paddingHorizontal: 24,
-    paddingVertical: 34,
+  // ── Pricing ──
+  pricingGrid: {
+    gap: 16,
   },
-  benefitsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 14,
-  },
-  benefitCard: {
-    width: '47%',
+  pricingCard: {
     borderRadius: 16,
+    padding: 24,
+    backgroundColor: 'rgba(99,102,241,0.06)',
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.1)',
+    position: 'relative',
     overflow: 'hidden',
   },
-  benefitCardGradient: {
-    padding: 18,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-    minHeight: 140,
+  pricingCardPopular: {
+    borderColor: 'rgba(99,102,241,0.4)',
+    backgroundColor: 'rgba(99,102,241,0.1)',
   },
-  benefitIconWrapper: {
-    marginBottom: 12,
+  popularBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderBottomLeftRadius: 12,
   },
-  benefitIconGradient: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  benefitTitle: {
-    fontSize: 15,
-    fontWeight: '700',
+  popularBadgeText: {
     color: '#fff',
-    marginBottom: 6,
+    fontSize: 11,
+    fontWeight: '700',
   },
-  benefitDescription: {
-    fontSize: 12,
+  pricingName: {
     color: '#a1a1aa',
-    lineHeight: 18,
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
   },
-
-  // Result badge on portfolio
-  resultBadge: {
+  pricingPrice: {
+    color: '#f5f5f5',
+    fontSize: 36,
+    fontWeight: '800',
+    marginBottom: 18,
+  },
+  pricingFeatures: {
+    gap: 10,
+    marginBottom: 20,
+  },
+  pricingFeatureRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    gap: 8,
   },
-  resultBadgeText: {
-    color: '#10b981',
-    fontSize: 13,
+  pricingFeatureText: {
+    color: '#d4d4d8',
+    fontSize: 14,
+  },
+  pricingBtn: {
+    paddingVertical: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  pricingBtnText: {
+    color: '#fff',
+    fontSize: 15,
     fontWeight: '700',
-    marginLeft: 5,
   },
 
-  // Testimonials section
-  testimonialsSection: {
-    paddingVertical: 34,
-  },
-  carouselContainer: {
+  // ── Testimonials Carousel ──
+  carouselWrap: {
     paddingHorizontal: Math.round((width - (isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400))) / 2),
-    gap: 18,
+    gap: 16,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: 8,
   },
   testimonialCard: {
-    borderRadius: 20,
-    overflow: 'visible',
-  },
-  testimonialCardGradient: {
-    padding: 24,
-    borderRadius: 20,
+    borderRadius: 16,
+    padding: 22,
+    backgroundColor: 'rgba(99,102,241,0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(139, 92, 246, 0.2)',
-    minHeight: 210,
+    borderColor: 'rgba(99,102,241,0.15)',
   },
-  testimonialCardActive: {
-    borderColor: 'rgba(139, 92, 246, 0.45)',
-    shadowColor: '#8b5cf6',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
-  },
-  quoteIconWrapper: {
-    marginBottom: 12,
-    opacity: 0.6,
-  },
-  ratingContainer: {
+  testimonialStars: {
     flexDirection: 'row',
-    marginBottom: 12,
     gap: 2,
+    marginBottom: 12,
   },
   testimonialText: {
+    color: '#d4d4d8',
     fontSize: 15,
-    color: '#e4e4e7',
-    lineHeight: 24,
+    lineHeight: 22,
     fontStyle: 'italic',
     marginBottom: 16,
   },
   testimonialAuthor: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
   testimonialAvatar: {
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     overflow: 'hidden',
   },
-  testimonialAvatarGradient: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  testimonialAvatarBg: {
+    width: 36,
+    height: 36,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  testimonialAvatarText: {
+  testimonialAvatarLetter: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
   testimonialName: {
-    color: '#fff',
+    color: '#f5f5f5',
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
-  testimonialBusiness: {
+  testimonialRole: {
     color: '#71717a',
     fontSize: 12,
   },
-
-  // Carousel dots indicator
-  dotsContainer: {
+  dots: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 24,
-    gap: 10,
+    gap: 8,
+    marginTop: 18,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(139, 92, 246, 0.2)',
+    backgroundColor: 'rgba(99,102,241,0.2)',
   },
   dotActive: {
-    width: 28,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#c084fc',
-    shadowColor: '#a855f7',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 8,
-    elevation: 6,
+    width: 24,
+    backgroundColor: '#6366f1',
   },
 
-  // CTA urgency
-  ctaUrgency: {
-    flexDirection: 'row',
+  // ── Final CTA ──
+  finalCta: {
+    paddingHorizontal: 24,
+    paddingVertical: 28,
+  },
+  finalCtaInner: {
+    padding: 28,
+    borderRadius: 20,
     alignItems: 'center',
-    marginBottom: 20,
-    gap: 6,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.2)',
   },
-  ctaUrgencyText: {
-    color: '#10b981',
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  ctaTrustLine: {
-    color: '#71717a',
-    fontSize: 13,
-    marginTop: 12,
+  finalCtaTitle: {
+    fontSize: isSmallScreen ? 24 : 30,
+    fontWeight: '800',
+    color: '#f5f5f5',
+    textAlign: 'center',
     marginBottom: 8,
   },
-
-  // Enhanced Typography - Stacked Headlines
-  headlineContainer: {
-    alignItems: 'center',
+  finalCtaSub: {
+    color: '#a1a1aa',
+    fontSize: 15,
+    textAlign: 'center',
     marginBottom: 24,
   },
-  headlineLine: {
-    fontSize: isSmallScreen ? 32 : 40,
-    fontWeight: '800',
-    color: '#fff',
-    textAlign: 'center',
-    lineHeight: isSmallScreen ? 40 : 50,
-    letterSpacing: -0.5,
+
+  // ── Contact ──
+  contactBtns: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 20,
   },
-  headlineHighlightRow: {
+  contactBtn: {
+    flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  contactBtnGrad: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 12,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
   },
-  headlineHighlight: {
-    fontSize: isSmallScreen ? 32 : 40,
-    fontWeight: '800',
-    color: '#c4b5fd',
-    textAlign: 'center',
-    lineHeight: isSmallScreen ? 40 : 50,
-    letterSpacing: -0.5,
-    textShadowColor: 'rgba(167, 139, 250, 0.6)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
-  },
-
-  // Subheadline stacked
-  subheadlineContainer: {
-    alignItems: 'center',
-    marginBottom: 28,
-    gap: 4,
-  },
-  subheadlineLine: {
-    fontSize: 17,
-    color: '#a1a1aa',
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  subheadlineHighlight: {
-    fontSize: 17,
-    color: '#f5f5f5',
-    fontWeight: '700',
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-
-  // Section title stacked
-  sectionTitleContainer: {
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  sectionTitleLine: {
-    fontSize: 28,
-    fontWeight: '300',
-    color: '#a1a1aa',
-    textAlign: 'center',
-    lineHeight: 36,
-  },
-  sectionTitleHighlight: {
-    fontSize: 32,
-    fontWeight: '800',
+  contactBtnText: {
     color: '#fff',
-    textAlign: 'center',
-    lineHeight: 42,
+    fontSize: 15,
+    fontWeight: '700',
   },
 
-  // Logo neon glow
-  logoNeonGlow: {
-    position: 'absolute',
-    top: -6,
-    left: -6,
-    right: -6,
-    bottom: -6,
-    borderRadius: 20,
-    backgroundColor: 'rgba(139, 92, 246, 0.5)',
-  },
-
-  // Primary button neon glow wrapper
-  primaryButtonNeonGlow: {
+  // ── Form ──
+  formCard: {
+    backgroundColor: 'rgba(99,102,241,0.06)',
     borderRadius: 16,
-    padding: 3,
-    backgroundColor: 'rgba(168, 85, 247, 0.4)',
-    shadowColor: '#d946ef',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.7,
-    shadowRadius: 18,
-    elevation: 12,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.1)',
+  },
+  formTitle: {
+    color: '#d4d4d8',
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  input: {
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    borderRadius: 10,
+    padding: 14,
+    color: '#f5f5f5',
+    fontSize: 15,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(99,102,241,0.1)',
+  },
+  inputMulti: {
+    minHeight: 100,
+    textAlignVertical: 'top',
+  },
+  formBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+    marginTop: 4,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  formBtnText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  formSuccess: {
+    alignItems: 'center',
+    paddingVertical: 20,
+    gap: 10,
+  },
+  formSuccessText: {
+    color: '#d4d4d8',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  formSuccessLink: {
+    color: '#6366f1',
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 6,
   },
 
-  // CTA pulse animation wrapper
-  ctaPulseWrapper: {
-    alignSelf: 'center',
+  // ── Footer ──
+  footer: {
+    paddingHorizontal: 24,
+    paddingTop: 28,
+    paddingBottom: 20,
+    alignItems: 'center',
   },
-
-  // Benefit icon neon glow
-  benefitIconNeonGlow: {
-    position: 'absolute',
-    top: -3,
-    left: -3,
-    right: -3,
-    bottom: -3,
-    borderRadius: 15,
-    backgroundColor: 'rgba(139, 92, 246, 0.35)',
+  footerTop: {
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  logoBoxSm: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoLettersSm: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  logoLabelSm: {
+    color: '#f5f5f5',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  footerTagline: {
+    color: '#52525b',
+    fontSize: 13,
+    marginTop: 6,
+  },
+  footerLinks: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 16,
+  },
+  footerSocial: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(99,102,241,0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  footerDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    marginBottom: 14,
+  },
+  footerCopy: {
+    color: '#3f3f46',
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
