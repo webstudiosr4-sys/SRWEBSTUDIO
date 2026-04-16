@@ -15,6 +15,7 @@ import {
   KeyboardAvoidingView,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
@@ -60,9 +61,13 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv5: 'Personal approach', adv5d: 'Direct communication',
     // Portfolio
     portLabel: 'PORTFOLIO', portTitle: 'My work',
-    port1: 'Fitness Coach Landing', port1d: 'High-converting landing page for a personal trainer', port1t: 'Landing Page',
-    port2: 'Restaurant Website', port2d: 'Elegant multi-page site for a local café', port2t: 'Business Site',
-    port3: 'Fashion Store', port3d: 'Modern e-commerce with product catalog', port3t: 'Online Store',
+    port1: 'Barber Warszawa Premium', port1d: 'Exclusive barbershop website with online booking system and premium dark design', port1t: 'Landing Page',
+    port1f1: 'Online booking', port1f2: '3D animations', port1f3: 'Mobile-first', port1f4: 'SEO optimized',
+    port2: 'Cafe Retro Warszawa', port2d: 'Elegant café website with menu, gallery and warm retro atmosphere', port2t: 'Business Site',
+    port2f1: 'Digital menu', port2f2: 'Photo gallery', port2f3: 'Contact form', port2f4: 'Google Maps',
+    port3: 'Modern Store', port3d: 'Minimalist e-commerce with product catalog and seamless checkout', port3t: 'Online Store',
+    port3f1: 'Product catalog', port3f2: 'Shopping cart', port3f3: 'Secure payments', port3f4: 'Order tracking',
+    portBtn: 'View website',
     // Pricing
     priceLabel: 'PRICING', priceTitle: 'Simple pricing', priceGet: 'Get started',
     pricePop: 'Most Popular',
@@ -104,9 +109,13 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv4: 'Optymalizacja mobilna', adv4d: 'Świetnie wygląda wszędzie',
     adv5: 'Indywidualne podejście', adv5d: 'Bezpośredni kontakt',
     portLabel: 'PORTFOLIO', portTitle: 'Moje realizacje',
-    port1: 'Landing dla trenera', port1d: 'Skuteczna strona dla trenera personalnego', port1t: 'Landing Page',
-    port2: 'Strona restauracji', port2d: 'Elegancka witryna dla lokalnej kawiarni', port2t: 'Strona firmowa',
-    port3: 'Sklep z modą', port3d: 'Nowoczesny e-commerce z katalogiem produktów', port3t: 'Sklep online',
+    port1: 'Barber Warszawa Premium', port1d: 'Ekskluzywna strona barbershopu z systemem rezerwacji online i ciemnym premium designem', port1t: 'Landing Page',
+    port1f1: 'Rezerwacja online', port1f2: 'Animacje 3D', port1f3: 'Mobile-first', port1f4: 'SEO',
+    port2: 'Cafe Retro Warszawa', port2d: 'Elegancka strona kawiarni z menu, galerią i ciepłą retro atmosferą', port2t: 'Strona firmowa',
+    port2f1: 'Menu online', port2f2: 'Galeria zdjęć', port2f3: 'Formularz kontaktowy', port2f4: 'Google Maps',
+    port3: 'Modern Store', port3d: 'Minimalistyczny e-commerce z katalogiem produktów i prostą finalizacją zakupów', port3t: 'Sklep online',
+    port3f1: 'Katalog produktów', port3f2: 'Koszyk', port3f3: 'Bezpieczne płatności', port3f4: 'Śledzenie zamówień',
+    portBtn: 'Zobacz stronę',
     priceLabel: 'CENNIK', priceTitle: 'Prosty cennik', priceGet: 'Rozpocznij',
     pricePop: 'Najpopularniejszy',
     p1: 'Basic', p1f1: 'Strona 1-stronicowa', p1f2: 'Prosty nowoczesny design', p1f3: 'Optymalizacja mobilna',
@@ -377,20 +386,68 @@ export default function SRWebStudio() {
             <Text style={S.sectionTitle}>{t.portTitle}</Text>
             <View style={S.portfolioGrid}>
               {[
-                { title: t.port1, desc: t.port1d, tag: t.port1t, colors: ['#6366f1', '#8b5cf6'] as [string, string], icon: 'fitness-outline' as const },
-                { title: t.port2, desc: t.port2d, tag: t.port2t, colors: ['#ec4899', '#f472b6'] as [string, string], icon: 'restaurant-outline' as const },
-                { title: t.port3, desc: t.port3d, tag: t.port3t, colors: ['#8b5cf6', '#a855f7'] as [string, string], icon: 'bag-outline' as const },
+                {
+                  title: t.port1, desc: t.port1d, tag: t.port1t,
+                  features: [t.port1f1, t.port1f2, t.port1f3, t.port1f4],
+                  image: 'https://images.unsplash.com/photo-1707836885254-79b6e3d7b18d?w=600&q=80',
+                  url: '#', accent: '#d4a254',
+                },
+                {
+                  title: t.port2, desc: t.port2d, tag: t.port2t,
+                  features: [t.port2f1, t.port2f2, t.port2f3, t.port2f4],
+                  image: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80',
+                  url: '#', accent: '#ec4899',
+                },
+                {
+                  title: t.port3, desc: t.port3d, tag: t.port3t,
+                  features: [t.port3f1, t.port3f2, t.port3f3, t.port3f4],
+                  image: 'https://images.unsplash.com/photo-1649442279006-8bccb4cc63e1?w=600&q=80',
+                  url: '#', accent: '#8b5cf6',
+                },
               ].map((p, i) => (
-                <View key={i} style={S.card3d}>
-                  <LinearGradient colors={p.colors} style={S.portfolioImage} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <Ionicons name={p.icon} size={48} color="rgba(255,255,255,0.7)" />
-                  </LinearGradient>
-                  <View style={S.portfolioInfo}>
-                    <View style={S.portfolioTagWrap}><Text style={S.portfolioTag}>{p.tag}</Text></View>
-                    <Text style={S.portfolioTitle}>{p.title}</Text>
-                    <Text style={S.portfolioDesc}>{p.desc}</Text>
+                <TouchableOpacity
+                  key={i}
+                  activeOpacity={0.92}
+                  onPress={() => p.url !== '#' && Linking.openURL(p.url)}
+                  style={S.portfolioCard}
+                >
+                  {/* Image Preview */}
+                  <View style={S.portfolioImageWrap}>
+                    <Image source={{ uri: p.image }} style={S.portfolioImg} resizeMode="cover" />
+                    <LinearGradient
+                      colors={['transparent', 'rgba(10,10,15,0.85)']}
+                      style={S.portfolioImgOverlay}
+                      start={{ x: 0, y: 0.3 }}
+                      end={{ x: 0, y: 1 }}
+                    />
+                    <View style={[S.portfolioTagFloat, { backgroundColor: `${p.accent}25`, borderColor: `${p.accent}40` }]}>
+                      <Text style={[S.portfolioTagText, { color: p.accent }]}>{p.tag}</Text>
+                    </View>
                   </View>
-                </View>
+
+                  {/* Content */}
+                  <View style={S.portfolioContent}>
+                    <Text style={S.portfolioCardTitle}>{p.title}</Text>
+                    <Text style={S.portfolioCardDesc}>{p.desc}</Text>
+
+                    {/* Features */}
+                    <View style={S.portfolioFeatures}>
+                      {p.features.map((f, fi) => (
+                        <View key={fi} style={[S.portfolioFeaturePill, { borderColor: `${p.accent}30` }]}>
+                          <View style={[S.portfolioFeatureDot, { backgroundColor: p.accent }]} />
+                          <Text style={S.portfolioFeatureText}>{f}</Text>
+                        </View>
+                      ))}
+                    </View>
+
+                    {/* CTA Button */}
+                    <View style={[S.portfolioBtnWrap, { borderColor: `${p.accent}40` }]}>
+                      <Ionicons name="open-outline" size={16} color={p.accent} />
+                      <Text style={[S.portfolioBtnText, { color: p.accent }]}>{t.portBtn}</Text>
+                      <Ionicons name="arrow-forward" size={14} color={p.accent} />
+                    </View>
+                  </View>
+                </TouchableOpacity>
               ))}
             </View>
           </View>
@@ -695,13 +752,61 @@ const S = StyleSheet.create({
   advantageDesc: { color: '#71717a', fontSize: 13, marginTop: 2 },
 
   // ── Portfolio ──
-  portfolioGrid: { gap: 16 },
-  portfolioImage: { height: 160, justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 16, borderTopRightRadius: 16 },
-  portfolioInfo: { padding: 18 },
-  portfolioTagWrap: { alignSelf: 'flex-start', backgroundColor: 'rgba(99,102,241,0.15)', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6, marginBottom: 8 },
-  portfolioTag: { color: '#818cf8', fontSize: 12, fontWeight: '600' },
-  portfolioTitle: { color: '#f5f5f5', fontSize: 17, fontWeight: '700', marginBottom: 4 },
-  portfolioDesc: { color: '#a1a1aa', fontSize: 14, lineHeight: 20 },
+  portfolioGrid: { gap: 24 },
+  portfolioCard: {
+    borderRadius: 20, overflow: 'hidden',
+    backgroundColor: 'rgba(15,15,25,0.9)',
+    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8,
+  },
+  portfolioImageWrap: {
+    height: 200, position: 'relative', overflow: 'hidden',
+  },
+  portfolioImg: {
+    width: '100%', height: '100%',
+  },
+  portfolioImgOverlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  portfolioTagFloat: {
+    position: 'absolute', top: 14, left: 14,
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8,
+    borderWidth: 1,
+  },
+  portfolioTagText: {
+    fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase',
+  },
+  portfolioContent: {
+    padding: 20,
+  },
+  portfolioCardTitle: {
+    color: '#f5f5f5', fontSize: 20, fontWeight: '800', marginBottom: 8, letterSpacing: -0.3,
+  },
+  portfolioCardDesc: {
+    color: '#a1a1aa', fontSize: 14, lineHeight: 20, marginBottom: 16,
+  },
+  portfolioFeatures: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18,
+  },
+  portfolioFeaturePill: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
+  },
+  portfolioFeatureDot: {
+    width: 6, height: 6, borderRadius: 3,
+  },
+  portfolioFeatureText: {
+    color: '#d4d4d8', fontSize: 12, fontWeight: '500',
+  },
+  portfolioBtnWrap: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    paddingVertical: 12, borderRadius: 12, borderWidth: 1,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  portfolioBtnText: {
+    fontSize: 14, fontWeight: '700',
+  },
 
   // ── Pricing ──
   pricingGrid: { gap: 16 },
