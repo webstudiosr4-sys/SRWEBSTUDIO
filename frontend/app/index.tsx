@@ -390,25 +390,25 @@ export default function SRWebStudio() {
                   title: t.port1, desc: t.port1d, tag: t.port1t,
                   features: [t.port1f1, t.port1f2, t.port1f3, t.port1f4],
                   image: 'https://images.unsplash.com/photo-1707836885254-79b6e3d7b18d?w=600&q=80',
-                  url: '#', accent: '#d4a254',
+                  url: 'https://barber-style-27.preview.emergentagent.com/', accent: '#d4a254',
                 },
                 {
                   title: t.port2, desc: t.port2d, tag: t.port2t,
                   features: [t.port2f1, t.port2f2, t.port2f3, t.port2f4],
                   image: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80',
-                  url: '#', accent: '#ec4899',
+                  url: 'https://premium-cafe-43.preview.emergentagent.com/', accent: '#ec4899',
                 },
                 {
                   title: t.port3, desc: t.port3d, tag: t.port3t,
                   features: [t.port3f1, t.port3f2, t.port3f3, t.port3f4],
                   image: 'https://images.unsplash.com/photo-1649442279006-8bccb4cc63e1?w=600&q=80',
-                  url: '#', accent: '#8b5cf6',
+                  url: 'https://demo-ecommerce-1.preview.emergentagent.com/', accent: '#8b5cf6',
                 },
               ].map((p, i) => (
                 <TouchableOpacity
                   key={i}
-                  activeOpacity={0.92}
-                  onPress={() => p.url !== '#' && Linking.openURL(p.url)}
+                  activeOpacity={0.88}
+                  onPress={() => Linking.openURL(p.url)}
                   style={S.portfolioCard}
                 >
                   {/* Image Preview */}
@@ -422,6 +422,11 @@ export default function SRWebStudio() {
                     />
                     <View style={[S.portfolioTagFloat, { backgroundColor: `${p.accent}25`, borderColor: `${p.accent}40` }]}>
                       <Text style={[S.portfolioTagText, { color: p.accent }]}>{p.tag}</Text>
+                    </View>
+                    {/* Live Demo badge */}
+                    <View style={S.liveBadge}>
+                      <View style={S.liveDot} />
+                      <Text style={S.liveBadgeText}>LIVE</Text>
                     </View>
                   </View>
 
@@ -441,11 +446,16 @@ export default function SRWebStudio() {
                     </View>
 
                     {/* CTA Button */}
-                    <View style={[S.portfolioBtnWrap, { borderColor: `${p.accent}40` }]}>
-                      <Ionicons name="open-outline" size={16} color={p.accent} />
+                    <LinearGradient
+                      colors={[`${p.accent}20`, `${p.accent}10`]}
+                      style={[S.portfolioBtnWrap, { borderColor: `${p.accent}50` }]}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                    >
+                      <Ionicons name="globe-outline" size={16} color={p.accent} />
                       <Text style={[S.portfolioBtnText, { color: p.accent }]}>{t.portBtn}</Text>
                       <Ionicons name="arrow-forward" size={14} color={p.accent} />
-                    </View>
+                    </LinearGradient>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -801,11 +811,25 @@ const S = StyleSheet.create({
   },
   portfolioBtnWrap: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingVertical: 12, borderRadius: 12, borderWidth: 1,
+    paddingVertical: 13, borderRadius: 12, borderWidth: 1,
     ...(isWeb ? { cursor: 'pointer' } : {}),
   },
   portfolioBtnText: {
     fontSize: 14, fontWeight: '700',
+  },
+  // Live Demo badge
+  liveBadge: {
+    position: 'absolute', top: 14, right: 14,
+    flexDirection: 'row', alignItems: 'center', gap: 5,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    borderWidth: 1, borderColor: 'rgba(34, 197, 94, 0.5)',
+    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
+  },
+  liveDot: {
+    width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e',
+  },
+  liveBadgeText: {
+    color: '#22c55e', fontSize: 10, fontWeight: '800', letterSpacing: 1,
   },
 
   // ── Pricing ──
