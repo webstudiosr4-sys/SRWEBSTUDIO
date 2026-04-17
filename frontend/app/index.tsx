@@ -9,9 +9,6 @@ import {
   Linking,
   Platform,
   Animated,
-  TextInput,
-  ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -83,11 +80,13 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     ctaFinalTitle: 'Ready to get your website?', ctaFinalSub: "Let's build something that brings you clients",
     ctaOrderNow: 'Order now',
     // Contact
-    contactLabel: 'CONTACT', contactTitle: 'Get in touch',
-    formOr: 'Or send a message', formName: 'Your name', formEmail: 'Email',
-    formMsg: 'Tell me about your project...', formSend: 'Send message',
-    formSent: "Message sent! I'll reply soon.", formAnother: 'Send another',
-    formFill: 'Please fill in all fields', formErr: 'Something went wrong. Try Telegram instead!',
+    contactLabel: 'CONTACT', contactTitle: 'Choose your preferred contact method',
+    contactSub: 'I respond quickly — message me directly',
+    contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
+    contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
+    contactFacebook: 'Facebook', contactFacebookSub: 'Send a message',
+    contactEmail: 'Email', contactEmailSub: 'webstudiosr4@gmail.com',
+    contactResponse: 'I usually reply within 1–2 hours',
     // Footer
     footerTag: 'Websites that work',
   },
@@ -127,11 +126,13 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     t3: 'Sklep online gotowy w 3 dni. Sprzedaż ruszyła od razu.',
     ctaFinalTitle: 'Gotowy na swoją stronę?', ctaFinalSub: 'Zbudujmy coś, co przyciągnie klientów',
     ctaOrderNow: 'Zamów teraz',
-    contactLabel: 'KONTAKT', contactTitle: 'Skontaktuj się',
-    formOr: 'Lub wyślij wiadomość', formName: 'Twoje imię', formEmail: 'Email',
-    formMsg: 'Opowiedz o swoim projekcie...', formSend: 'Wyślij wiadomość',
-    formSent: 'Wiadomość wysłana! Odpowiem wkrótce.', formAnother: 'Wyślij kolejną',
-    formFill: 'Proszę wypełnić wszystkie pola', formErr: 'Coś poszło nie tak. Napisz na Telegram!',
+    contactLabel: 'KONTAKT', contactTitle: 'Wybierz wygodny sposób kontaktu',
+    contactSub: 'Odpowiadam szybko — napisz do mnie bezpośrednio',
+    contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
+    contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
+    contactFacebook: 'Facebook', contactFacebookSub: 'Napisz wiadomość',
+    contactEmail: 'Email', contactEmailSub: 'webstudiosr4@gmail.com',
+    contactResponse: 'Zazwyczaj odpowiadam w ciągu 1–2 godzin',
     footerTag: 'Strony, które działają',
   },
 };
@@ -181,12 +182,7 @@ export default function SRWebStudio() {
   const CARD_GAP = 16;
   const SNAP = CARD_W + CARD_GAP;
 
-  // Contact form
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formMessage, setFormMessage] = useState('');
-  const [formLoading, setFormLoading] = useState(false);
-  const [formSent, setFormSent] = useState(false);
+  // Contact form - removed, using direct contact only
 
   useEffect(() => {
     Animated.parallel([
@@ -243,22 +239,6 @@ export default function SRWebStudio() {
   const openEmail = () => Linking.openURL(`mailto:${CONTACT.email}`);
   const openWhatsApp = () => Linking.openURL(CONTACT.whatsappUrl);
   const openFacebook = () => Linking.openURL(CONTACT.facebookUrl);
-
-  const submitForm = async () => {
-    if (!formName.trim() || !formEmail.trim() || !formMessage.trim()) {
-      Alert.alert(t.formFill);
-      return;
-    }
-    setFormLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formName, email: formEmail, message: formMessage }),
-      });
-      if (res.ok) { setFormSent(true); setFormName(''); setFormEmail(''); setFormMessage(''); }
-    } catch { Alert.alert(t.formErr); } finally { setFormLoading(false); }
-  };
 
   const testimonials = [
     { name: 'Alex M.', role: 'Fitness Coach', text: t.t1, rating: 5 },
@@ -577,65 +557,58 @@ export default function SRWebStudio() {
             </LinearGradient>
           </View>
 
-          {/* ════════ CONTACT ════════ */}
+          {/* ════════ CONTACT — PREMIUM BLOCK ════════ */}
           <View style={S.section} onLayout={e => { contactY.current = e.nativeEvent.layout.y; }}>
             <Text style={S.sectionLabel}>{t.contactLabel}</Text>
             <Text style={S.sectionTitle}>{t.contactTitle}</Text>
+            <Text style={S.contactSubtext}>{t.contactSub}</Text>
 
-            <View style={S.contactGrid}>
-              <View style={S.contactBtnRow}>
-                <TouchableOpacity onPress={openTelegram} activeOpacity={0.85} style={S.contactBtn}>
-                  <LinearGradient colors={['#2AABEE', '#229ED9']} style={S.contactBtnGrad}>
-                    <Ionicons name="paper-plane" size={20} color="#fff" />
-                    <Text style={S.contactBtnText}>Telegram</Text>
+            {/* Row 1: Telegram + WhatsApp */}
+            <View style={S.contactRow}>
+              {[
+                { icon: 'paper-plane' as const, label: t.contactTelegram, sub: t.contactTelegramSub, color: '#2AABEE', gradColors: ['rgba(42,171,238,0.14)', 'rgba(42,171,238,0.04)'] as [string, string], onPress: openTelegram },
+                { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, sub: t.contactWhatsAppSub, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
+              ].map((c, i) => (
+                <TouchableOpacity key={i} onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
+                  <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
+                      <Ionicons name={c.icon} size={24} color={c.color} />
+                    </View>
+                    <Text style={S.contactCardLabel}>{c.label}</Text>
+                    <Text style={[S.contactCardSub, { color: c.color }]}>{c.sub}</Text>
+                    <View style={S.contactCardArrow}>
+                      <Ionicons name="arrow-forward" size={14} color={`${c.color}80`} />
+                    </View>
                   </LinearGradient>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85} style={S.contactBtn}>
-                  <LinearGradient colors={['#25D366', '#128C7E']} style={S.contactBtnGrad}>
-                    <Ionicons name="logo-whatsapp" size={20} color="#fff" />
-                    <Text style={S.contactBtnText}>WhatsApp</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
-              <View style={S.contactBtnRow}>
-                <TouchableOpacity onPress={openFacebook} activeOpacity={0.85} style={S.contactBtn}>
-                  <LinearGradient colors={['#1877F2', '#0C5DC7']} style={S.contactBtnGrad}>
-                    <Ionicons name="logo-facebook" size={20} color="#fff" />
-                    <Text style={S.contactBtnText}>Facebook</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={openEmail} activeOpacity={0.85} style={S.contactBtn}>
-                  <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.contactBtnGrad}>
-                    <Ionicons name="mail" size={20} color="#fff" />
-                    <Text style={S.contactBtnText}>Email</Text>
-                  </LinearGradient>
-                </TouchableOpacity>
-              </View>
+              ))}
             </View>
 
-            {/* Contact Form */}
-            <View style={S.formCard}>
-              <Text style={S.formTitle}>{t.formOr}</Text>
-              {formSent ? (
-                <View style={S.formSuccess}>
-                  <Ionicons name="checkmark-circle" size={40} color="#22c55e" />
-                  <Text style={S.formSuccessText}>{t.formSent}</Text>
-                  <TouchableOpacity onPress={() => setFormSent(false)}><Text style={S.formSuccessLink}>{t.formAnother}</Text></TouchableOpacity>
-                </View>
-              ) : (
-                <>
-                  <TextInput style={S.input} placeholder={t.formName} placeholderTextColor="#52525b" value={formName} onChangeText={setFormName} />
-                  <TextInput style={S.input} placeholder={t.formEmail} placeholderTextColor="#52525b" value={formEmail} onChangeText={setFormEmail} keyboardType="email-address" autoCapitalize="none" />
-                  <TextInput style={[S.input, S.inputMulti]} placeholder={t.formMsg} placeholderTextColor="#52525b" value={formMessage} onChangeText={setFormMessage} multiline numberOfLines={4} textAlignVertical="top" />
-                  <TouchableOpacity onPress={submitForm} activeOpacity={0.85} disabled={formLoading}>
-                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.formBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                      {formLoading ? <ActivityIndicator color="#fff" size="small" /> : (
-                        <><Text style={S.formBtnText}>{t.formSend}</Text><Ionicons name="send" size={16} color="#fff" /></>
-                      )}
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </>
-              )}
+            {/* Row 2: Facebook + Email */}
+            <View style={S.contactRow}>
+              {[
+                { icon: 'logo-facebook' as const, label: t.contactFacebook, sub: t.contactFacebookSub, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
+                { icon: 'mail' as const, label: t.contactEmail, sub: t.contactEmailSub, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
+              ].map((c, i) => (
+                <TouchableOpacity key={i} onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
+                  <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
+                      <Ionicons name={c.icon} size={24} color={c.color} />
+                    </View>
+                    <Text style={S.contactCardLabel}>{c.label}</Text>
+                    <Text style={[S.contactCardSub, { color: c.color }]}>{c.sub}</Text>
+                    <View style={S.contactCardArrow}>
+                      <Ionicons name="arrow-forward" size={14} color={`${c.color}80`} />
+                    </View>
+                  </LinearGradient>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Response time note */}
+            <View style={S.contactResponseRow}>
+              <Ionicons name="time-outline" size={14} color="#6366f1" />
+              <Text style={S.contactResponseText}>{t.contactResponse}</Text>
             </View>
           </View>
 
@@ -887,26 +860,48 @@ const S = StyleSheet.create({
   },
   socialCtaText: { fontSize: 14, fontWeight: '600' },
 
-  // ── Contact ──
-  contactGrid: { gap: 10, marginBottom: 20 },
-  contactBtnRow: { flexDirection: 'row', gap: 10 },
-  contactBtn: { flex: 1, borderRadius: 12, overflow: 'hidden' },
-  contactBtnGrad: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4,
-    ...(isWeb ? { cursor: 'pointer' } : {}),
+  // ── Contact Premium ──
+  contactSubtext: {
+    color: '#a1a1aa', fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 28, maxWidth: 360, alignSelf: 'center',
   },
-  contactBtnText: { color: '#fff', fontSize: 14, fontWeight: '700' },
-
-  formCard: { backgroundColor: 'rgba(99,102,241,0.06)', borderRadius: 16, padding: 22, borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)' },
-  formTitle: { color: '#d4d4d8', fontSize: 16, fontWeight: '600', marginBottom: 16, textAlign: 'center' },
-  input: { backgroundColor: 'rgba(255,255,255,0.05)', borderRadius: 10, padding: 14, color: '#f5f5f5', fontSize: 15, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)' },
-  inputMulti: { minHeight: 100, textAlignVertical: 'top' },
-  formBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 14, borderRadius: 10, marginTop: 4, ...(isWeb ? { cursor: 'pointer' } : {}) },
-  formBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  formSuccess: { alignItems: 'center', paddingVertical: 20, gap: 10 },
-  formSuccessText: { color: '#d4d4d8', fontSize: 16, fontWeight: '600' },
-  formSuccessLink: { color: '#6366f1', fontSize: 14, fontWeight: '600', marginTop: 6 },
+  contactRow: {
+    flexDirection: 'row', gap: 12, marginBottom: 12,
+  },
+  contactCard: {
+    flex: 1,
+    borderRadius: 18, overflow: 'hidden',
+    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 4,
+    ...(isWeb ? { cursor: 'pointer', transition: 'transform 0.3s ease, box-shadow 0.3s ease' } : {}),
+  },
+  contactCardInner: {
+    padding: 20, borderRadius: 18, alignItems: 'center', minHeight: 140, justifyContent: 'center',
+  },
+  contactCardIcon: {
+    width: 50, height: 50, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 12,
+  },
+  contactCardLabel: {
+    color: '#f5f5f5', fontSize: 15, fontWeight: '700', marginBottom: 4, textAlign: 'center',
+  },
+  contactCardSub: {
+    fontSize: 11, fontWeight: '500', textAlign: 'center', opacity: 0.85,
+  },
+  contactCardArrow: {
+    position: 'absolute', top: 12, right: 12,
+    width: 24, height: 24, borderRadius: 12,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    justifyContent: 'center', alignItems: 'center',
+  },
+  contactResponseRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
+    marginTop: 14, paddingVertical: 10, paddingHorizontal: 18,
+    borderRadius: 10, backgroundColor: 'rgba(99,102,241,0.06)',
+    borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
+    alignSelf: 'center',
+  },
+  contactResponseText: {
+    color: '#71717a', fontSize: 13, fontWeight: '500',
+  },
 
   // ── Footer ──
   footer: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 80, alignItems: 'center' },
