@@ -13,8 +13,6 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   Image,
-  TextInput,
-  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -81,8 +79,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     ctaFinalTitle: 'Ready to get your website?', ctaFinalSub: "Let's build something that brings you clients",
     ctaOrderNow: 'Order now',
     contactLabel: 'CONTACT', contactTitle: 'Get in touch',
-    contactHeadline: 'Have a website idea? Write to me — I\'ll reply within hours',
-    contactSub: 'I respond quickly — message me directly',
+    contactHeadline: 'Get in touch — I reply within 1–2 hours',
+    contactSub: 'Choose your preferred contact method',
     contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
     contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
     contactFacebook: 'Facebook', contactFacebookSub: 'Send a message',
@@ -135,8 +133,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     ctaFinalTitle: 'Gotowy na swoją stronę?', ctaFinalSub: 'Zbudujmy coś, co przyciągnie klientów',
     ctaOrderNow: 'Zamów teraz',
     contactLabel: 'KONTAKT', contactTitle: 'Skontaktuj się',
-    contactHeadline: 'Masz pomysł na stronę? Napisz — odpowiem w ciągu kilku godzin',
-    contactSub: 'Odpowiadam szybko — napisz do mnie bezpośrednio',
+    contactHeadline: 'Skontaktuj się ze mną — odpowiadam w ciągu 1–2 godzin',
+    contactSub: 'Wybierz wygodny sposób kontaktu',
     contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
     contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
     contactFacebook: 'Facebook', contactFacebookSub: 'Napisz wiadomość',
@@ -239,32 +237,7 @@ export default function SRWebStudio() {
   const CARD_GAP = 16;
   const SNAP = CARD_W + CARD_GAP;
 
-  // Contact form state
-  const [formName, setFormName] = useState('');
-  const [formEmail, setFormEmail] = useState('');
-  const [formMsg, setFormMsg] = useState('');
-  const [formSending, setFormSending] = useState(false);
-  const [formSent, setFormSent] = useState(false);
-
-  const submitForm = useCallback(async () => {
-    if (!formName.trim() || !formEmail.trim() || !formMsg.trim()) return;
-    setFormSending(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: formName, email: formEmail, message: formMsg }),
-      });
-      if (res.ok) {
-        setFormSent(true);
-        setFormName(''); setFormEmail(''); setFormMsg('');
-        setTimeout(() => setFormSent(false), 5000);
-      }
-    } catch (e) {
-      console.log('Form error:', e);
-    }
-    setFormSending(false);
-  }, [formName, formEmail, formMsg]);
+  // Contact form removed — direct contact only
 
   // ── Init animations ──
   useEffect(() => {
@@ -906,40 +879,29 @@ export default function SRWebStudio() {
             <Text style={S.contactHeadline}>{t.contactHeadline}</Text>
             <Text style={S.contactSubtext}>{t.contactSub}</Text>
 
+            {/* Primary CTA — Telegram */}
+            <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85} style={{ marginBottom: 14 }}>
+              <LinearGradient colors={['#2AABEE', '#1E96D1']} style={S.telegramPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Ionicons name="paper-plane" size={22} color="#fff" />
+                <View>
+                  <Text style={S.telegramPrimaryText}>{t.contactTelegram}</Text>
+                  <Text style={S.telegramPrimarySub}>{t.contactTelegramSub}</Text>
+                </View>
+                <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.7)" style={{ marginLeft: 'auto' }} />
+              </LinearGradient>
+            </TouchableOpacity>
+
+            {/* Secondary contacts — 3 in a row */}
             <View style={S.contactRow}>
               {[
-                { icon: 'paper-plane' as const, label: t.contactTelegram, sub: t.contactTelegramSub, color: '#2AABEE', gradColors: ['rgba(42,171,238,0.14)', 'rgba(42,171,238,0.04)'] as [string, string], onPress: openTelegram },
                 { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, sub: t.contactWhatsAppSub, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
-              ].map((c, i) => (
-                <TouchableOpacity key={i} testID="contactCard" onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
-                  <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
-                      <Ionicons name={c.icon} size={24} color={c.color} />
-                    </View>
-                    <Text style={S.contactCardLabel}>{c.label}</Text>
-                    <Text style={[S.contactCardSub, { color: c.color }]}>{c.sub}</Text>
-                    <View style={S.contactCardArrow}>
-                      <Ionicons name="arrow-forward" size={14} color={`${c.color}80`} />
-                    </View>
-                  </LinearGradient>
-                </TouchableOpacity>
-              ))}
-            </View>
-            <View style={S.contactRow}>
-              {[
                 { icon: 'logo-facebook' as const, label: t.contactFacebook, sub: t.contactFacebookSub, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
                 { icon: 'mail' as const, label: t.contactEmail, sub: t.contactEmailSub, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
               ].map((c, i) => (
                 <TouchableOpacity key={i} testID="contactCard" onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
-                  <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-                    <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
-                      <Ionicons name={c.icon} size={24} color={c.color} />
-                    </View>
-                    <Text style={S.contactCardLabel}>{c.label}</Text>
-                    <Text style={[S.contactCardSub, { color: c.color }]}>{c.sub}</Text>
-                    <View style={S.contactCardArrow}>
-                      <Ionicons name="arrow-forward" size={14} color={`${c.color}80`} />
-                    </View>
+                  <LinearGradient colors={c.gradColors} style={S.contactCardInnerSm} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <Ionicons name={c.icon} size={22} color={c.color} />
+                    <Text style={[S.contactCardLabelSm, { color: c.color }]}>{c.label}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               ))}
@@ -948,33 +910,6 @@ export default function SRWebStudio() {
             <View style={S.contactResponseRow}>
               <Ionicons name="time-outline" size={14} color="#6366f1" />
               <Text style={S.contactResponseText}>{t.contactResponse}</Text>
-            </View>
-
-            {/* ── Working Contact Form ── */}
-            <View style={S.formCard}>
-              <Text style={S.formTitle}>{t.formTitle}</Text>
-              {formSent ? (
-                <View style={S.formSuccess}>
-                  <Ionicons name="checkmark-circle" size={28} color="#22c55e" />
-                  <Text style={S.formSuccessText}>{t.formSuccess}</Text>
-                </View>
-              ) : (
-                <>
-                  <TextInput style={S.formInput} placeholder={t.formName} placeholderTextColor="#52525b" value={formName} onChangeText={setFormName} />
-                  <TextInput style={S.formInput} placeholder={t.formEmail} placeholderTextColor="#52525b" value={formEmail} onChangeText={setFormEmail} keyboardType="email-address" autoCapitalize="none" />
-                  <TextInput style={[S.formInput, S.formTextArea]} placeholder={t.formMessage} placeholderTextColor="#52525b" value={formMsg} onChangeText={setFormMsg} multiline numberOfLines={4} textAlignVertical="top" />
-                  <TouchableOpacity testID="ctaBtn" onPress={submitForm} activeOpacity={0.85} disabled={formSending}>
-                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.formBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                      {formSending ? <ActivityIndicator color="#fff" size="small" /> : (
-                        <>
-                          <Ionicons name="send" size={16} color="#fff" />
-                          <Text style={S.formBtnText}>{t.formSend}</Text>
-                        </>
-                      )}
-                    </LinearGradient>
-                  </TouchableOpacity>
-                </>
-              )}
             </View>
           </Animated.View>
 
@@ -1212,6 +1147,22 @@ const S = StyleSheet.create({
   contactCardArrow: { position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center' },
   contactResponseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)', alignSelf: 'center' },
   contactResponseText: { color: '#71717a', fontSize: 13, fontWeight: '500' },
+
+  // ── Telegram Primary CTA ──
+  telegramPrimary: {
+    flexDirection: 'row', alignItems: 'center', gap: 14,
+    paddingHorizontal: 22, paddingVertical: 18, borderRadius: 16,
+    shadowColor: '#2AABEE', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.35, shadowRadius: 18, elevation: 8,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  telegramPrimaryText: { color: '#fff', fontSize: 17, fontWeight: '800' },
+  telegramPrimarySub: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '500', marginTop: 2 },
+
+  // ── Compact Contact Cards (3 in a row) ──
+  contactCardInnerSm: {
+    padding: 14, borderRadius: 18, alignItems: 'center', justifyContent: 'center', gap: 6, minHeight: 80,
+  },
+  contactCardLabelSm: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
 
   // ── Trust Badges ──
   trustBadgesRow: {
