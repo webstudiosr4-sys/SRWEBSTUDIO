@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,7 @@ import {
   NativeSyntheticEvent,
   Image,
 } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
@@ -153,9 +154,39 @@ export default function SRWebStudio() {
   const insets = useSafeAreaInsets();
   const scrollViewRef = useRef<ScrollView>(null);
 
-  // Language
-  const [lang, setLang] = useState<'en' | 'pl'>('en');
+  // Language — default Polish, persist choice
+  const [lang, setLang] = useState<'en' | 'pl'>('pl');
   const t = TRANSLATIONS[lang];
+  const langReady = useRef(false);
+
+  // Load saved language preference on mount
+  useEffect(() => {
+    const loadLang = async () => {
+      try {
+        if (isWeb && typeof window !== 'undefined' && window.localStorage) {
+          const saved = window.localStorage.getItem('sr_lang');
+          if (saved === 'en' || saved === 'pl') setLang(saved);
+        } else {
+          const saved = await AsyncStorage.getItem('sr_lang');
+          if (saved === 'en' || saved === 'pl') setLang(saved);
+        }
+      } catch {}
+      langReady.current = true;
+    };
+    loadLang();
+  }, []);
+
+  // Persist language when changed
+  const switchLang = useCallback((newLang: 'en' | 'pl') => {
+    setLang(newLang);
+    try {
+      if (isWeb && typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem('sr_lang', newLang);
+      } else {
+        AsyncStorage.setItem('sr_lang', newLang);
+      }
+    } catch {}
+  }, []);
 
   // Section refs
   const servicesY = useRef(0);
@@ -273,10 +304,10 @@ export default function SRWebStudio() {
                 <Text style={S.logoLabel}>Web Studio</Text>
               </View>
               <View style={S.langSwitch}>
-                <TouchableOpacity onPress={() => setLang('en')} style={[S.langBtn, lang === 'en' && S.langBtnActive]}>
+                <TouchableOpacity onPress={() => switchLang('en')} style={[S.langBtn, lang === 'en' && S.langBtnActive]}>
                   <Text style={[S.langText, lang === 'en' && S.langTextActive]}>EN</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => setLang('pl')} style={[S.langBtn, lang === 'pl' && S.langBtnActive]}>
+                <TouchableOpacity onPress={() => switchLang('pl')} style={[S.langBtn, lang === 'pl' && S.langBtnActive]}>
                   <Text style={[S.langText, lang === 'pl' && S.langTextActive]}>PL</Text>
                 </TouchableOpacity>
               </View>
