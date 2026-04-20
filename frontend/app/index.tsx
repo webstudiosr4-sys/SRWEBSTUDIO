@@ -37,27 +37,22 @@ const CONTACT = {
 // ── Translations ──
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   en: {
-    // Nav
     navServices: 'Services', navWork: 'Work', navPricing: 'Pricing', navContact: 'Contact',
-    // Hero
     heroTitle1: 'Websites that bring clients', heroTitle2: '— fast and affordable',
     heroSub: 'I create modern websites for businesses in 2–3 days starting from ',
     heroSubPrice: '400 PLN',
     trustLine: 'Already helped multiple clients launch online',
     ctaOrder: 'Order a website', ctaConsult: 'Free consultation',
-    // Services
     svcLabel: 'SERVICES', svcTitle: 'What I offer',
     svc1: 'Landing Pages', svc1d: 'Perfect for ads and quick sales',
     svc2: 'Business Websites', svc2d: 'Professional sites for your company',
     svc3: 'Online Stores', svc3d: 'Sell your products easily',
-    // Advantages
     advLabel: 'ADVANTAGES', advTitle: 'Why choose SR Web Studio',
     adv1: 'Fast delivery', adv1d: '2–3 days turnaround',
     adv2: 'Affordable prices', adv2d: 'Starting from 400 PLN',
     adv3: 'Modern design', adv3d: 'Clean & professional',
     adv4: 'Mobile optimized', adv4d: 'Looks great everywhere',
     adv5: 'Personal approach', adv5d: 'Direct communication',
-    // Portfolio
     portLabel: 'PORTFOLIO', portTitle: 'My work',
     port1: 'Premium Barbershop Website', port1d: 'Professional barbershop website with online booking system and modern premium design', port1t: 'Landing Page',
     port1f1: 'Online booking', port1f2: '3D animations', port1f3: 'Mobile-first', port1f4: 'SEO optimized',
@@ -66,21 +61,17 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     port3: 'Clothing Store Website', port3d: 'Modern clothing store with product catalog and seamless shopping experience', port3t: 'Online Store',
     port3f1: 'Product catalog', port3f2: 'Shopping cart', port3f3: 'Secure payments', port3f4: 'Order tracking',
     portBtn: 'View website',
-    // Pricing
     priceLabel: 'PRICING', priceTitle: 'Simple pricing', priceGet: 'Get started',
     pricePop: 'Most Popular',
     p1: 'Basic', p1f1: '1 page website', p1f2: 'Simple modern design', p1f3: 'Mobile optimization',
     p2: 'Standard', p2f1: 'Up to 5 pages', p2f2: 'Custom design', p2f3: 'Mobile optimization', p2f4: 'Basic SEO', p2f5: 'Google Maps integration',
     p3: 'Premium', p3f1: 'Full website', p3f2: 'Advanced design', p3f3: 'SEO optimization', p3f4: 'Multi-language support (2 languages)', p3f5: 'Priority support',
-    // Testimonials
     testLabel: 'TESTIMONIALS', testTitle: 'What clients say',
     t1: 'Got my landing page in 2 days. Already got my first clients through it!',
     t2: 'Fast, professional, and affordable. The website looks amazing on mobile.',
     t3: 'My online store was ready in 3 days. Sales started coming in right away.',
-    // Final CTA
     ctaFinalTitle: 'Ready to get your website?', ctaFinalSub: "Let's build something that brings you clients",
     ctaOrderNow: 'Order now',
-    // Contact
     contactLabel: 'CONTACT', contactTitle: 'Choose your preferred contact method',
     contactSub: 'I respond quickly — message me directly',
     contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
@@ -88,7 +79,6 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     contactFacebook: 'Facebook', contactFacebookSub: 'Send a message',
     contactEmail: 'Email', contactEmailSub: 'webstudiosr4@gmail.com',
     contactResponse: 'I usually reply within 1–2 hours',
-    // Footer
     footerTag: 'Websites that work',
   },
   pl: {
@@ -159,7 +149,6 @@ export default function SRWebStudio() {
   const t = TRANSLATIONS[lang];
   const langReady = useRef(false);
 
-  // Load saved language preference on mount
   useEffect(() => {
     const loadLang = async () => {
       try {
@@ -176,7 +165,6 @@ export default function SRWebStudio() {
     loadLang();
   }, []);
 
-  // Persist language when changed
   const switchLang = useCallback((newLang: 'en' | 'pl') => {
     setLang(newLang);
     try {
@@ -188,20 +176,37 @@ export default function SRWebStudio() {
     } catch {}
   }, []);
 
-  // Section refs
+  // Section layout refs
   const servicesY = useRef(0);
+  const advantagesY = useRef(0);
   const portfolioY = useRef(0);
   const pricingY = useRef(0);
+  const testimonialsY = useRef(0);
+  const finalCtaY = useRef(0);
   const contactY = useRef(0);
 
-  // Animations
+  // ── Hero animations ──
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(30)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
-  // Floating orbs
+
+  // ── Global floating orbs (shared across sections) ──
   const orb1 = useRef(new Animated.Value(0)).current;
   const orb2 = useRef(new Animated.Value(0)).current;
   const orb3 = useRef(new Animated.Value(0)).current;
+  const orb4 = useRef(new Animated.Value(0)).current;
+  const orb5 = useRef(new Animated.Value(0)).current;
+
+  // ── Scroll-based section fade-in animations ──
+  const svcFade = useRef(new Animated.Value(0)).current;
+  const advFade = useRef(new Animated.Value(0)).current;
+  const portFade = useRef(new Animated.Value(0)).current;
+  const priceFade = useRef(new Animated.Value(0)).current;
+  const testFade = useRef(new Animated.Value(0)).current;
+  const ctaFade = useRef(new Animated.Value(0)).current;
+  const contFade = useRef(new Animated.Value(0)).current;
+  const footFade = useRef(new Animated.Value(0)).current;
+  const sectionAnimated = useRef<Set<string>>(new Set());
 
   // Testimonials carousel
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -213,20 +218,21 @@ export default function SRWebStudio() {
   const CARD_GAP = 16;
   const SNAP = CARD_W + CARD_GAP;
 
-  // Contact form - removed, using direct contact only
-
+  // ── Init animations ──
   useEffect(() => {
+    // Hero entrance
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 800, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: 0, duration: 800, useNativeDriver: true }),
     ]).start();
 
+    // CTA pulse
     Animated.loop(Animated.sequence([
       Animated.timing(pulseAnim, { toValue: 1.04, duration: 1800, useNativeDriver: true }),
       Animated.timing(pulseAnim, { toValue: 1, duration: 1800, useNativeDriver: true }),
     ])).start();
 
-    // Floating orbs
+    // Floating orbs — staggered durations for organic movement
     const floatOrb = (anim: Animated.Value, dur: number) =>
       Animated.loop(Animated.sequence([
         Animated.timing(anim, { toValue: 1, duration: dur, useNativeDriver: true }),
@@ -235,14 +241,141 @@ export default function SRWebStudio() {
     floatOrb(orb1, 6000);
     floatOrb(orb2, 8000);
     floatOrb(orb3, 7000);
+    floatOrb(orb4, 9000);
+    floatOrb(orb5, 5500);
   }, []);
 
-  // Orb interpolations
+  // Orb interpolations — reused across sections
   const orb1Y = orb1.interpolate({ inputRange: [0, 1], outputRange: [0, -20] });
   const orb1X = orb1.interpolate({ inputRange: [0, 1], outputRange: [0, 15] });
   const orb2Y = orb2.interpolate({ inputRange: [0, 1], outputRange: [0, 18] });
   const orb2X = orb2.interpolate({ inputRange: [0, 1], outputRange: [0, -12] });
   const orb3Y = orb3.interpolate({ inputRange: [0, 1], outputRange: [0, -14] });
+  const orb4Y = orb4.interpolate({ inputRange: [0, 1], outputRange: [0, 16] });
+  const orb4X = orb4.interpolate({ inputRange: [0, 1], outputRange: [0, -18] });
+  const orb5Y = orb5.interpolate({ inputRange: [0, 1], outputRange: [0, -12] });
+  const orb5X = orb5.interpolate({ inputRange: [0, 1], outputRange: [0, 10] });
+
+  // ── Inject web-only CSS for hover effects ──
+  useEffect(() => {
+    if (!isWeb || typeof document === 'undefined') return;
+    const id = 'sr-3d-hover-css';
+    if (document.getElementById(id)) return;
+    const style = document.createElement('style');
+    style.id = id;
+    style.textContent = `
+      [data-testid="card3d"]:hover {
+        transform: translateY(-6px) scale(1.02) !important;
+        box-shadow: 0 12px 40px rgba(99,102,241,0.25), 0 0 20px rgba(139,92,246,0.12) !important;
+        border-color: rgba(99,102,241,0.3) !important;
+      }
+      [data-testid="card3d"] {
+        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
+      }
+      [data-testid="portCard"]:hover {
+        transform: translateY(-8px) scale(1.015) !important;
+        box-shadow: 0 20px 50px rgba(99,102,241,0.3), 0 0 30px rgba(139,92,246,0.15) !important;
+        border-color: rgba(99,102,241,0.35) !important;
+      }
+      [data-testid="portCard"] {
+        transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease, border-color 0.4s ease !important;
+      }
+      [data-testid="priceCard"]:hover {
+        transform: translateY(-6px) scale(1.02) !important;
+        box-shadow: 0 16px 44px rgba(99,102,241,0.25), 0 0 24px rgba(139,92,246,0.1) !important;
+        border-color: rgba(99,102,241,0.35) !important;
+      }
+      [data-testid="priceCard"] {
+        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
+      }
+      [data-testid="advRow"]:hover {
+        transform: translateX(4px) scale(1.01) !important;
+        box-shadow: 0 8px 24px rgba(99,102,241,0.18) !important;
+        border-color: rgba(139,92,246,0.3) !important;
+      }
+      [data-testid="advRow"] {
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+      }
+      [data-testid="contactCard"]:hover {
+        transform: translateY(-5px) scale(1.03) !important;
+        box-shadow: 0 12px 36px rgba(99,102,241,0.22), 0 0 18px rgba(139,92,246,0.1) !important;
+        border-color: rgba(99,102,241,0.3) !important;
+      }
+      [data-testid="contactCard"] {
+        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+      }
+      [data-testid="ctaBtn"]:hover {
+        transform: translateY(-3px) scale(1.04) !important;
+        box-shadow: 0 8px 30px rgba(99,102,241,0.5) !important;
+      }
+      [data-testid="ctaBtn"]:active {
+        transform: translateY(1px) scale(0.97) !important;
+        box-shadow: 0 2px 10px rgba(99,102,241,0.3) !important;
+      }
+      [data-testid="ctaBtn"] {
+        transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease !important;
+      }
+      [data-testid="ctaBtnSec"]:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(139,92,246,0.2) !important;
+        background-color: rgba(139,92,246,0.08) !important;
+      }
+      [data-testid="ctaBtnSec"] {
+        transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease !important;
+      }
+      [data-testid="footSocial"]:hover {
+        transform: translateY(-3px) scale(1.12) !important;
+        box-shadow: 0 6px 18px rgba(99,102,241,0.3) !important;
+      }
+      [data-testid="footSocial"] {
+        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+      }
+      [data-testid="pricingBtn"]:hover {
+        transform: translateY(-2px) scale(1.03) !important;
+        box-shadow: 0 6px 20px rgba(99,102,241,0.35) !important;
+      }
+      [data-testid="pricingBtn"]:active {
+        transform: translateY(1px) scale(0.97) !important;
+      }
+      [data-testid="pricingBtn"] {
+        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      }
+      [data-testid="fabBtn"]:hover {
+        transform: scale(1.15) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+      }
+      [data-testid="fabBtn"] {
+        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+      }
+      [data-testid="navLink"]:hover {
+        color: #a78bfa !important;
+      }
+      [data-testid="navLink"] {
+        transition: color 0.2s ease !important;
+      }
+    `;
+    document.head.appendChild(style);
+  }, []);
+
+  // ── Scroll handler for section fade-in ──
+  const handleMainScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const y = e.nativeEvent.contentOffset.y;
+    const vh = e.nativeEvent.layoutMeasurement.height;
+    const threshold = vh * 0.78;
+    const trigger = (name: string, layoutY: number, anim: Animated.Value) => {
+      if (!sectionAnimated.current.has(name) && y + threshold > layoutY) {
+        sectionAnimated.current.add(name);
+        Animated.spring(anim, { toValue: 1, tension: 50, friction: 9, useNativeDriver: true }).start();
+      }
+    };
+    trigger('svc', servicesY.current, svcFade);
+    trigger('adv', advantagesY.current, advFade);
+    trigger('port', portfolioY.current, portFade);
+    trigger('price', pricingY.current, priceFade);
+    trigger('test', testimonialsY.current, testFade);
+    trigger('cta', finalCtaY.current, ctaFade);
+    trigger('cont', contactY.current, contFade);
+  }, []);
 
   // Testimonials auto-scroll
   useEffect(() => {
@@ -277,18 +410,32 @@ export default function SRWebStudio() {
     { name: 'Mike T.', role: 'E-commerce', text: t.t3, rating: 5 },
   ];
 
+  // Helper: animated section wrapper values
+  const secStyle = (anim: Animated.Value) => ({
+    opacity: anim,
+    transform: [
+      { translateY: anim.interpolate({ inputRange: [0, 1], outputRange: [40, 0] }) },
+    ],
+  });
+
   // ── RENDER ──
   return (
     <View style={[S.container, { paddingTop: insets.top }]}>
       <StatusBar style="light" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView ref={scrollViewRef} showsVerticalScrollIndicator={false} contentContainerStyle={S.scrollContent}>
+        <ScrollView
+          ref={scrollViewRef}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={S.scrollContent}
+          onScroll={handleMainScroll}
+          scrollEventThrottle={16}
+        >
 
           {/* ════════ HERO ════════ */}
           <Animated.View style={[S.hero, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <LinearGradient colors={['rgba(99,102,241,0.14)', 'rgba(0,0,0,0)', 'rgba(139,92,246,0.1)']} style={StyleSheet.absoluteFill} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} />
 
-            {/* Floating orbs for 3D depth */}
+            {/* Floating orbs — 3D depth */}
             <Animated.View style={[S.orb, S.orb1, { transform: [{ translateY: orb1Y }, { translateX: orb1X }] }]} />
             <Animated.View style={[S.orb, S.orb2, { transform: [{ translateY: orb2Y }, { translateX: orb2X }] }]} />
             <Animated.View style={[S.orb, S.orb3, { transform: [{ translateY: orb3Y }] }]} />
@@ -315,10 +462,10 @@ export default function SRWebStudio() {
 
             {/* Nav */}
             <View style={S.navRow}>
-              <TouchableOpacity onPress={() => scrollTo(servicesY)}><Text style={S.navLink}>{t.navServices}</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => scrollTo(portfolioY)}><Text style={S.navLink}>{t.navWork}</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => scrollTo(pricingY)}><Text style={S.navLink}>{t.navPricing}</Text></TouchableOpacity>
-              <TouchableOpacity onPress={() => scrollTo(contactY)}><Text style={S.navLink}>{t.navContact}</Text></TouchableOpacity>
+              <TouchableOpacity testID="navLink" onPress={() => scrollTo(servicesY)}><Text style={S.navLink}>{t.navServices}</Text></TouchableOpacity>
+              <TouchableOpacity testID="navLink" onPress={() => scrollTo(portfolioY)}><Text style={S.navLink}>{t.navWork}</Text></TouchableOpacity>
+              <TouchableOpacity testID="navLink" onPress={() => scrollTo(pricingY)}><Text style={S.navLink}>{t.navPricing}</Text></TouchableOpacity>
+              <TouchableOpacity testID="navLink" onPress={() => scrollTo(contactY)}><Text style={S.navLink}>{t.navContact}</Text></TouchableOpacity>
             </View>
 
             <Text style={S.heroTitle}>{t.heroTitle1}{'\n'}<Text style={S.heroAccent}>{t.heroTitle2}</Text></Text>
@@ -330,7 +477,7 @@ export default function SRWebStudio() {
             </View>
 
             <View style={S.ctaRow}>
-              <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
+              <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
                 <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                   <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                     <Ionicons name="paper-plane" size={18} color="#fff" />
@@ -338,15 +485,22 @@ export default function SRWebStudio() {
                   </LinearGradient>
                 </Animated.View>
               </TouchableOpacity>
-              <TouchableOpacity onPress={() => scrollTo(contactY)} activeOpacity={0.85} style={S.ctaSecondary}>
+              <TouchableOpacity testID="ctaBtnSec" onPress={() => scrollTo(contactY)} activeOpacity={0.85} style={S.ctaSecondary}>
                 <Text style={S.ctaSecondaryText}>{t.ctaConsult}</Text>
                 <Ionicons name="arrow-forward" size={16} color="#8b5cf6" />
               </TouchableOpacity>
             </View>
           </Animated.View>
 
+          {/* ════════ GRADIENT DIVIDER ════════ */}
+          <LinearGradient colors={['rgba(99,102,241,0.2)', 'rgba(139,92,246,0.05)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+
           {/* ════════ SERVICES ════════ */}
-          <View style={S.section} onLayout={e => { servicesY.current = e.nativeEvent.layout.y; }}>
+          <Animated.View style={[S.section, S.sectionRelative, secStyle(svcFade)]} onLayout={e => { servicesY.current = e.nativeEvent.layout.y; }}>
+            {/* Section orbs */}
+            <Animated.View style={[S.orbSec, { top: -30, right: -50, width: 140, height: 140, backgroundColor: 'rgba(99,102,241,0.06)', transform: [{ translateY: orb4Y }, { translateX: orb4X }] }]} />
+            <Animated.View style={[S.orbSec, { bottom: -20, left: -30, width: 100, height: 100, backgroundColor: 'rgba(168,85,247,0.05)', transform: [{ translateY: orb5Y }, { translateX: orb5X }] }]} />
+
             <Text style={S.sectionLabel}>{t.svcLabel}</Text>
             <Text style={S.sectionTitle}>{t.svcTitle}</Text>
             <View style={S.servicesGrid}>
@@ -355,8 +509,8 @@ export default function SRWebStudio() {
                 { icon: 'briefcase-outline' as const, title: t.svc2, desc: t.svc2d, color: '#8b5cf6' },
                 { icon: 'cart-outline' as const, title: t.svc3, desc: t.svc3d, color: '#a855f7' },
               ].map((s, i) => (
-                <View key={i} style={S.card3d}>
-                  <LinearGradient colors={[`${s.color}18`, `${s.color}08`]} style={S.serviceCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <View key={i} testID="card3d" style={S.card3d}>
+                  <LinearGradient colors={[`${s.color}18`, `${s.color}06`]} style={S.serviceCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <View style={[S.serviceIcon, { backgroundColor: `${s.color}20` }]}>
                       <Ionicons name={s.icon} size={26} color={s.color} />
                     </View>
@@ -366,10 +520,12 @@ export default function SRWebStudio() {
                 </View>
               ))}
             </View>
-          </View>
+          </Animated.View>
 
           {/* ════════ WHY CHOOSE ME ════════ */}
-          <View style={S.section}>
+          <Animated.View style={[S.section, S.sectionRelative, secStyle(advFade)]} onLayout={e => { advantagesY.current = e.nativeEvent.layout.y; }}>
+            <Animated.View style={[S.orbSec, { top: 20, left: -40, width: 110, height: 110, backgroundColor: 'rgba(236,72,153,0.05)', transform: [{ translateY: orb2Y }, { translateX: orb2X }] }]} />
+
             <Text style={S.sectionLabel}>{t.advLabel}</Text>
             <Text style={S.sectionTitle}>{t.advTitle}</Text>
             <View style={S.advantagesGrid}>
@@ -380,7 +536,7 @@ export default function SRWebStudio() {
                 { icon: 'phone-portrait-outline' as const, title: t.adv4, desc: t.adv4d },
                 { icon: 'person-outline' as const, title: t.adv5, desc: t.adv5d },
               ].map((a, i) => (
-                <View key={i} style={S.advantageRow}>
+                <View key={i} testID="advRow" style={S.advantageRow}>
                   <View style={S.advantageIconWrap}><Ionicons name={a.icon} size={22} color="#8b5cf6" /></View>
                   <View style={S.advantageTextWrap}>
                     <Text style={S.advantageTitle}>{a.title}</Text>
@@ -389,10 +545,15 @@ export default function SRWebStudio() {
                 </View>
               ))}
             </View>
-          </View>
+          </Animated.View>
+
+          <LinearGradient colors={['transparent', 'rgba(99,102,241,0.08)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ PORTFOLIO ════════ */}
-          <View style={S.section} onLayout={e => { portfolioY.current = e.nativeEvent.layout.y; }}>
+          <Animated.View style={[S.section, S.sectionRelative, secStyle(portFade)]} onLayout={e => { portfolioY.current = e.nativeEvent.layout.y; }}>
+            <Animated.View style={[S.orbSec, { top: -20, right: -40, width: 160, height: 160, backgroundColor: 'rgba(99,102,241,0.06)', transform: [{ translateY: orb1Y }, { translateX: orb1X }] }]} />
+            <Animated.View style={[S.orbSec, { bottom: 40, left: -50, width: 120, height: 120, backgroundColor: 'rgba(236,72,153,0.04)', transform: [{ translateY: orb4Y }] }]} />
+
             <Text style={S.sectionLabel}>{t.portLabel}</Text>
             <Text style={S.sectionTitle}>{t.portTitle}</Text>
             <View style={S.portfolioGrid}>
@@ -417,36 +578,25 @@ export default function SRWebStudio() {
                 },
               ].map((p, i) => (
                 <TouchableOpacity
-                  key={i}
+                  key={i} testID="portCard"
                   activeOpacity={0.88}
                   onPress={() => Linking.openURL(p.url)}
                   style={S.portfolioCard}
                 >
-                  {/* Image Preview */}
                   <View style={S.portfolioImageWrap}>
                     <Image source={{ uri: p.image }} style={S.portfolioImg} resizeMode="cover" />
-                    <LinearGradient
-                      colors={['transparent', 'rgba(10,10,15,0.85)']}
-                      style={S.portfolioImgOverlay}
-                      start={{ x: 0, y: 0.3 }}
-                      end={{ x: 0, y: 1 }}
-                    />
+                    <LinearGradient colors={['transparent', 'rgba(10,10,15,0.85)']} style={S.portfolioImgOverlay} start={{ x: 0, y: 0.3 }} end={{ x: 0, y: 1 }} />
                     <View style={[S.portfolioTagFloat, { backgroundColor: `${p.accent}25`, borderColor: `${p.accent}40` }]}>
                       <Text style={[S.portfolioTagText, { color: p.accent }]}>{p.tag}</Text>
                     </View>
-                    {/* Live Demo badge */}
                     <View style={S.liveBadge}>
                       <View style={S.liveDot} />
                       <Text style={S.liveBadgeText}>LIVE</Text>
                     </View>
                   </View>
-
-                  {/* Content */}
                   <View style={S.portfolioContent}>
                     <Text style={S.portfolioCardTitle}>{p.title}</Text>
                     <Text style={S.portfolioCardDesc}>{p.desc}</Text>
-
-                    {/* Features */}
                     <View style={S.portfolioFeatures}>
                       {p.features.map((f, fi) => (
                         <View key={fi} style={[S.portfolioFeaturePill, { borderColor: `${p.accent}30` }]}>
@@ -455,13 +605,10 @@ export default function SRWebStudio() {
                         </View>
                       ))}
                     </View>
-
-                    {/* CTA Button */}
                     <LinearGradient
                       colors={[`${p.accent}20`, `${p.accent}10`]}
                       style={[S.portfolioBtnWrap, { borderColor: `${p.accent}50` }]}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
+                      start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
                     >
                       <Ionicons name="globe-outline" size={16} color={p.accent} />
                       <Text style={[S.portfolioBtnText, { color: p.accent }]}>{t.portBtn}</Text>
@@ -471,10 +618,15 @@ export default function SRWebStudio() {
                 </TouchableOpacity>
               ))}
             </View>
-          </View>
+          </Animated.View>
+
+          <LinearGradient colors={['transparent', 'rgba(139,92,246,0.1)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ PRICING ════════ */}
-          <View style={S.section} onLayout={e => { pricingY.current = e.nativeEvent.layout.y; }}>
+          <Animated.View style={[S.section, S.sectionRelative, secStyle(priceFade)]} onLayout={e => { pricingY.current = e.nativeEvent.layout.y; }}>
+            <Animated.View style={[S.orbSec, { top: 0, left: -30, width: 130, height: 130, backgroundColor: 'rgba(139,92,246,0.06)', transform: [{ translateY: orb3Y }] }]} />
+            <Animated.View style={[S.orbSec, { bottom: -10, right: -40, width: 100, height: 100, backgroundColor: 'rgba(99,102,241,0.05)', transform: [{ translateY: orb5Y }, { translateX: orb5X }] }]} />
+
             <Text style={S.sectionLabel}>{t.priceLabel}</Text>
             <Text style={S.sectionTitle}>{t.priceTitle}</Text>
             <View style={S.pricingGrid}>
@@ -483,7 +635,7 @@ export default function SRWebStudio() {
                 { name: t.p2, price: 'od 700 PLN', features: [t.p2f1, t.p2f2, t.p2f3, t.p2f4, t.p2f5], popular: true, color: '#8b5cf6' },
                 { name: t.p3, price: 'od 1500 PLN', features: [t.p3f1, t.p3f2, t.p3f3, t.p3f4, t.p3f5], popular: false, color: '#a855f7' },
               ].map((plan, i) => (
-                <View key={i} style={[S.pricingCard, plan.popular && S.pricingCardPop]}>
+                <View key={i} testID="priceCard" style={[S.pricingCard, plan.popular && S.pricingCardPop]}>
                   {plan.popular && (
                     <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.popularBadge} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                       <Text style={S.popularBadgeText}>{t.pricePop}</Text>
@@ -499,7 +651,7 @@ export default function SRWebStudio() {
                       </View>
                     ))}
                   </View>
-                  <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
+                  <TouchableOpacity testID="pricingBtn" onPress={openTelegram} activeOpacity={0.85}>
                     <LinearGradient
                       colors={plan.popular ? ['#6366f1', '#8b5cf6'] : ['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.15)']}
                       style={S.pricingBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
@@ -510,10 +662,10 @@ export default function SRWebStudio() {
                 </View>
               ))}
             </View>
-          </View>
+          </Animated.View>
 
           {/* ════════ TESTIMONIALS ════════ */}
-          <View style={S.section}>
+          <Animated.View style={[S.section, secStyle(testFade)]} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
             <Text style={S.sectionLabel}>{t.testLabel}</Text>
             <Text style={S.sectionTitle}>{t.testTitle}</Text>
             <Animated.ScrollView
@@ -558,15 +710,19 @@ export default function SRWebStudio() {
               })}
             </Animated.ScrollView>
             <View style={S.dots}>{[0, 1, 2].map(i => <View key={i} style={[S.dot, activeTestimonial === i && S.dotActive]} />)}</View>
-          </View>
+          </Animated.View>
+
+          <LinearGradient colors={['transparent', 'rgba(99,102,241,0.1)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ FINAL CTA ════════ */}
-          <View style={S.finalCta}>
+          <Animated.View style={[S.finalCta, S.sectionRelative, secStyle(ctaFade)]} onLayout={e => { finalCtaY.current = e.nativeEvent.layout.y; }}>
+            <Animated.View style={[S.orbSec, { top: -20, left: -20, width: 120, height: 120, backgroundColor: 'rgba(99,102,241,0.08)', transform: [{ translateY: orb1Y }] }]} />
+
             <LinearGradient colors={['rgba(99,102,241,0.18)', 'rgba(139,92,246,0.12)']} style={S.finalCtaInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
               <Text style={S.finalCtaTitle}>{t.ctaFinalTitle}</Text>
               <Text style={S.finalCtaSub}>{t.ctaFinalSub}</Text>
               <View style={S.finalCtaBtns}>
-                <TouchableOpacity onPress={openTelegram} activeOpacity={0.85}>
+                <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
                   <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
                     <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                       <Ionicons name="paper-plane" size={18} color="#fff" />
@@ -575,32 +731,33 @@ export default function SRWebStudio() {
                   </Animated.View>
                 </TouchableOpacity>
                 <View style={S.socialCtaRow}>
-                  <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85} style={S.socialCtaBtn}>
+                  <TouchableOpacity testID="ctaBtnSec" onPress={openWhatsApp} activeOpacity={0.85} style={S.socialCtaBtn}>
                     <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
                     <Text style={[S.socialCtaText, { color: '#25D366' }]}>WhatsApp</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={openFacebook} activeOpacity={0.85} style={S.socialCtaBtn}>
+                  <TouchableOpacity testID="ctaBtnSec" onPress={openFacebook} activeOpacity={0.85} style={S.socialCtaBtn}>
                     <Ionicons name="logo-facebook" size={18} color="#1877F2" />
                     <Text style={[S.socialCtaText, { color: '#1877F2' }]}>Facebook</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </LinearGradient>
-          </View>
+          </Animated.View>
 
-          {/* ════════ CONTACT — PREMIUM BLOCK ════════ */}
-          <View style={S.section} onLayout={e => { contactY.current = e.nativeEvent.layout.y; }}>
+          {/* ════════ CONTACT ════════ */}
+          <Animated.View style={[S.section, S.sectionRelative, secStyle(contFade)]} onLayout={e => { contactY.current = e.nativeEvent.layout.y; }}>
+            <Animated.View style={[S.orbSec, { top: -10, right: -30, width: 100, height: 100, backgroundColor: 'rgba(139,92,246,0.06)', transform: [{ translateY: orb3Y }] }]} />
+
             <Text style={S.sectionLabel}>{t.contactLabel}</Text>
             <Text style={S.sectionTitle}>{t.contactTitle}</Text>
             <Text style={S.contactSubtext}>{t.contactSub}</Text>
 
-            {/* Row 1: Telegram + WhatsApp */}
             <View style={S.contactRow}>
               {[
                 { icon: 'paper-plane' as const, label: t.contactTelegram, sub: t.contactTelegramSub, color: '#2AABEE', gradColors: ['rgba(42,171,238,0.14)', 'rgba(42,171,238,0.04)'] as [string, string], onPress: openTelegram },
                 { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, sub: t.contactWhatsAppSub, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
               ].map((c, i) => (
-                <TouchableOpacity key={i} onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
+                <TouchableOpacity key={i} testID="contactCard" onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
                   <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
                       <Ionicons name={c.icon} size={24} color={c.color} />
@@ -614,14 +771,12 @@ export default function SRWebStudio() {
                 </TouchableOpacity>
               ))}
             </View>
-
-            {/* Row 2: Facebook + Email */}
             <View style={S.contactRow}>
               {[
                 { icon: 'logo-facebook' as const, label: t.contactFacebook, sub: t.contactFacebookSub, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
                 { icon: 'mail' as const, label: t.contactEmail, sub: t.contactEmailSub, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
               ].map((c, i) => (
-                <TouchableOpacity key={i} onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
+                <TouchableOpacity key={i} testID="contactCard" onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
                   <LinearGradient colors={c.gradColors} style={S.contactCardInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <View style={[S.contactCardIcon, { backgroundColor: `${c.color}18` }]}>
                       <Ionicons name={c.icon} size={24} color={c.color} />
@@ -636,12 +791,11 @@ export default function SRWebStudio() {
               ))}
             </View>
 
-            {/* Response time note */}
             <View style={S.contactResponseRow}>
               <Ionicons name="time-outline" size={14} color="#6366f1" />
               <Text style={S.contactResponseText}>{t.contactResponse}</Text>
             </View>
-          </View>
+          </Animated.View>
 
           {/* ════════ FOOTER ════════ */}
           <View style={S.footer}>
@@ -655,10 +809,10 @@ export default function SRWebStudio() {
               <Text style={S.footerTagline}>{t.footerTag}</Text>
             </View>
             <View style={S.footerLinks}>
-              <TouchableOpacity onPress={openTelegram} style={S.footerSocial}><Ionicons name="paper-plane" size={20} color="#2AABEE" /></TouchableOpacity>
-              <TouchableOpacity onPress={openWhatsApp} style={S.footerSocial}><Ionicons name="logo-whatsapp" size={20} color="#25D366" /></TouchableOpacity>
-              <TouchableOpacity onPress={openFacebook} style={S.footerSocial}><Ionicons name="logo-facebook" size={20} color="#1877F2" /></TouchableOpacity>
-              <TouchableOpacity onPress={openEmail} style={S.footerSocial}><Ionicons name="mail" size={20} color="#8b5cf6" /></TouchableOpacity>
+              <TouchableOpacity testID="footSocial" onPress={openTelegram} style={S.footerSocial}><Ionicons name="paper-plane" size={20} color="#2AABEE" /></TouchableOpacity>
+              <TouchableOpacity testID="footSocial" onPress={openWhatsApp} style={S.footerSocial}><Ionicons name="logo-whatsapp" size={20} color="#25D366" /></TouchableOpacity>
+              <TouchableOpacity testID="footSocial" onPress={openFacebook} style={S.footerSocial}><Ionicons name="logo-facebook" size={20} color="#1877F2" /></TouchableOpacity>
+              <TouchableOpacity testID="footSocial" onPress={openEmail} style={S.footerSocial}><Ionicons name="mail" size={20} color="#8b5cf6" /></TouchableOpacity>
             </View>
             <View style={S.footerDivider} />
             <Text style={S.footerCopy}>© {new Date().getFullYear()} SR Web Studio. All rights reserved.</Text>
@@ -668,13 +822,13 @@ export default function SRWebStudio() {
 
       {/* ════════ FLOATING SOCIAL BUTTONS ════════ */}
       <View style={S.fab}>
-        <TouchableOpacity onPress={openTelegram} activeOpacity={0.85} style={S.fabBtn}>
+        <TouchableOpacity testID="fabBtn" onPress={openTelegram} activeOpacity={0.85} style={S.fabBtn}>
           <LinearGradient colors={['#2AABEE', '#229ED9']} style={S.fabGrad}><Ionicons name="paper-plane" size={22} color="#fff" /></LinearGradient>
         </TouchableOpacity>
-        <TouchableOpacity onPress={openWhatsApp} activeOpacity={0.85} style={S.fabBtn}>
+        <TouchableOpacity testID="fabBtn" onPress={openWhatsApp} activeOpacity={0.85} style={S.fabBtn}>
           <LinearGradient colors={['#25D366', '#128C7E']} style={S.fabGrad}><Ionicons name="logo-whatsapp" size={22} color="#fff" /></LinearGradient>
         </TouchableOpacity>
-        <TouchableOpacity onPress={openFacebook} activeOpacity={0.85} style={S.fabBtn}>
+        <TouchableOpacity testID="fabBtn" onPress={openFacebook} activeOpacity={0.85} style={S.fabBtn}>
           <LinearGradient colors={['#1877F2', '#0C5DC7']} style={S.fabGrad}><Ionicons name="logo-facebook" size={22} color="#fff" /></LinearGradient>
         </TouchableOpacity>
       </View>
@@ -692,11 +846,20 @@ const S = StyleSheet.create({
   // ── Hero ──
   hero: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 36, position: 'relative', overflow: 'hidden' },
 
-  // Floating orbs
+  // Floating orbs — hero
   orb: { position: 'absolute', borderRadius: 999 },
   orb1: { width: 180, height: 180, top: -40, right: -60, backgroundColor: 'rgba(99,102,241,0.08)' },
   orb2: { width: 120, height: 120, bottom: 20, left: -40, backgroundColor: 'rgba(168,85,247,0.07)' },
   orb3: { width: 90, height: 90, top: 100, right: 30, backgroundColor: 'rgba(236,72,153,0.06)' },
+
+  // Floating orbs — sections (reusable)
+  orbSec: { position: 'absolute', borderRadius: 999, zIndex: -1 },
+
+  // Section with relative positioning for orbs
+  sectionRelative: { position: 'relative', overflow: 'hidden' },
+
+  // Gradient dividers between sections
+  sectionDivider: { height: 1, marginHorizontal: 40 },
 
   // Header
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
@@ -738,12 +901,13 @@ const S = StyleSheet.create({
   sectionLabel: { color: '#6366f1', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
   sectionTitle: { fontSize: isSmallScreen ? 24 : 30, fontWeight: '800', color: '#f5f5f5', textAlign: 'center', marginBottom: 26, letterSpacing: -0.3 },
 
-  // ── 3D Card ──
+  // ── 3D Card — glassmorphism ──
   card3d: {
     borderRadius: 16, overflow: 'hidden',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 16, elevation: 6,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 20, elevation: 6,
     backgroundColor: 'rgba(99,102,241,0.04)',
-    borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
+    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
   },
 
   // ── Services ──
@@ -758,7 +922,8 @@ const S = StyleSheet.create({
   advantageRow: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 14,
     backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 8, elevation: 3,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 3,
+    ...(isWeb ? { backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' } as any : {}),
   },
   advantageIconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(139,92,246,0.12)', justifyContent: 'center', alignItems: 'center' },
   advantageTextWrap: { flex: 1 },
@@ -771,79 +936,36 @@ const S = StyleSheet.create({
     borderRadius: 20, overflow: 'hidden',
     backgroundColor: 'rgba(15,15,25,0.9)',
     borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.15, shadowRadius: 24, elevation: 8,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.18, shadowRadius: 28, elevation: 8,
+    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
   },
-  portfolioImageWrap: {
-    height: 200, position: 'relative', overflow: 'hidden',
-  },
-  portfolioImg: {
-    width: '100%', height: '100%',
-  },
-  portfolioImgOverlay: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  portfolioTagFloat: {
-    position: 'absolute', top: 14, left: 14,
-    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8,
-    borderWidth: 1,
-  },
-  portfolioTagText: {
-    fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase',
-  },
-  portfolioContent: {
-    padding: 20,
-  },
-  portfolioCardTitle: {
-    color: '#f5f5f5', fontSize: 20, fontWeight: '800', marginBottom: 8, letterSpacing: -0.3,
-  },
-  portfolioCardDesc: {
-    color: '#a1a1aa', fontSize: 14, lineHeight: 20, marginBottom: 16,
-  },
-  portfolioFeatures: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18,
-  },
-  portfolioFeaturePill: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
-    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1,
-  },
-  portfolioFeatureDot: {
-    width: 6, height: 6, borderRadius: 3,
-  },
-  portfolioFeatureText: {
-    color: '#d4d4d8', fontSize: 12, fontWeight: '500',
-  },
-  portfolioBtnWrap: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingVertical: 13, borderRadius: 12, borderWidth: 1,
-    ...(isWeb ? { cursor: 'pointer' } : {}),
-  },
-  portfolioBtnText: {
-    fontSize: 14, fontWeight: '700',
-  },
-  // Live Demo badge
-  liveBadge: {
-    position: 'absolute', top: 14, right: 14,
-    flexDirection: 'row', alignItems: 'center', gap: 5,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    borderWidth: 1, borderColor: 'rgba(34, 197, 94, 0.5)',
-    paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8,
-  },
-  liveDot: {
-    width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e',
-  },
-  liveBadgeText: {
-    color: '#22c55e', fontSize: 10, fontWeight: '800', letterSpacing: 1,
-  },
+  portfolioImageWrap: { height: 200, position: 'relative', overflow: 'hidden' },
+  portfolioImg: { width: '100%', height: '100%' },
+  portfolioImgOverlay: { ...StyleSheet.absoluteFillObject },
+  portfolioTagFloat: { position: 'absolute', top: 14, left: 14, paddingHorizontal: 12, paddingVertical: 5, borderRadius: 8, borderWidth: 1 },
+  portfolioTagText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5, textTransform: 'uppercase' },
+  portfolioContent: { padding: 20 },
+  portfolioCardTitle: { color: '#f5f5f5', fontSize: 20, fontWeight: '800', marginBottom: 8, letterSpacing: -0.3 },
+  portfolioCardDesc: { color: '#a1a1aa', fontSize: 14, lineHeight: 20, marginBottom: 16 },
+  portfolioFeatures: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 18 },
+  portfolioFeaturePill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1 },
+  portfolioFeatureDot: { width: 6, height: 6, borderRadius: 3 },
+  portfolioFeatureText: { color: '#d4d4d8', fontSize: 12, fontWeight: '500' },
+  portfolioBtnWrap: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 13, borderRadius: 12, borderWidth: 1, ...(isWeb ? { cursor: 'pointer' } : {}) },
+  portfolioBtnText: { fontSize: 14, fontWeight: '700' },
+  liveBadge: { position: 'absolute', top: 14, right: 14, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(34,197,94,0.5)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
+  liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' },
+  liveBadgeText: { color: '#22c55e', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
 
   // ── Pricing ──
   pricingGrid: { gap: 16 },
   pricingCard: {
     borderRadius: 16, padding: 24, backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
     position: 'relative', overflow: 'hidden',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.12, shadowRadius: 16, elevation: 4,
+    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
   },
-  pricingCardPop: { borderColor: 'rgba(99,102,241,0.4)', backgroundColor: 'rgba(99,102,241,0.1)', shadowOpacity: 0.25 },
+  pricingCardPop: { borderColor: 'rgba(99,102,241,0.4)', backgroundColor: 'rgba(99,102,241,0.1)', shadowOpacity: 0.28 },
   popularBadge: { position: 'absolute', top: 0, right: 0, paddingHorizontal: 14, paddingVertical: 6, borderBottomLeftRadius: 12 },
   popularBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   pricingName: { color: '#a1a1aa', fontSize: 14, fontWeight: '600', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 },
@@ -862,6 +984,7 @@ const S = StyleSheet.create({
   testimonialCard: {
     borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.15)',
     shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 4,
+    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
   },
   testimonialStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
   testimonialText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 },
@@ -879,7 +1002,8 @@ const S = StyleSheet.create({
   finalCta: { paddingHorizontal: 24, paddingVertical: 28 },
   finalCtaInner: {
     padding: 28, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(99,102,241,0.25)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 20, elevation: 6,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 24, elevation: 6,
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
   },
   finalCtaTitle: { fontSize: isSmallScreen ? 24 : 30, fontWeight: '800', color: '#f5f5f5', textAlign: 'center', marginBottom: 8 },
   finalCtaSub: { color: '#a1a1aa', fontSize: 15, textAlign: 'center', marginBottom: 22 },
@@ -892,47 +1016,21 @@ const S = StyleSheet.create({
   socialCtaText: { fontSize: 14, fontWeight: '600' },
 
   // ── Contact Premium ──
-  contactSubtext: {
-    color: '#a1a1aa', fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 28, maxWidth: 360, alignSelf: 'center',
-  },
-  contactRow: {
-    flexDirection: 'row', gap: 12, marginBottom: 12,
-  },
+  contactSubtext: { color: '#a1a1aa', fontSize: 15, textAlign: 'center', lineHeight: 22, marginBottom: 28, maxWidth: 360, alignSelf: 'center' },
+  contactRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   contactCard: {
-    flex: 1,
-    borderRadius: 18, overflow: 'hidden',
+    flex: 1, borderRadius: 18, overflow: 'hidden',
     borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
     shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 4,
-    ...(isWeb ? { cursor: 'pointer', transition: 'transform 0.3s ease, box-shadow 0.3s ease' } : {}),
+    ...(isWeb ? { cursor: 'pointer' } : {}),
   },
-  contactCardInner: {
-    padding: 20, borderRadius: 18, alignItems: 'center', minHeight: 140, justifyContent: 'center',
-  },
-  contactCardIcon: {
-    width: 50, height: 50, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 12,
-  },
-  contactCardLabel: {
-    color: '#f5f5f5', fontSize: 15, fontWeight: '700', marginBottom: 4, textAlign: 'center',
-  },
-  contactCardSub: {
-    fontSize: 11, fontWeight: '500', textAlign: 'center', opacity: 0.85,
-  },
-  contactCardArrow: {
-    position: 'absolute', top: 12, right: 12,
-    width: 24, height: 24, borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    justifyContent: 'center', alignItems: 'center',
-  },
-  contactResponseRow: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6,
-    marginTop: 14, paddingVertical: 10, paddingHorizontal: 18,
-    borderRadius: 10, backgroundColor: 'rgba(99,102,241,0.06)',
-    borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
-    alignSelf: 'center',
-  },
-  contactResponseText: {
-    color: '#71717a', fontSize: 13, fontWeight: '500',
-  },
+  contactCardInner: { padding: 20, borderRadius: 18, alignItems: 'center', minHeight: 140, justifyContent: 'center' },
+  contactCardIcon: { width: 50, height: 50, borderRadius: 14, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  contactCardLabel: { color: '#f5f5f5', fontSize: 15, fontWeight: '700', marginBottom: 4, textAlign: 'center' },
+  contactCardSub: { fontSize: 11, fontWeight: '500', textAlign: 'center', opacity: 0.85 },
+  contactCardArrow: { position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center' },
+  contactResponseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)', alignSelf: 'center' },
+  contactResponseText: { color: '#71717a', fontSize: 13, fontWeight: '500' },
 
   // ── Footer ──
   footer: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 80, alignItems: 'center' },
@@ -950,9 +1048,7 @@ const S = StyleSheet.create({
   footerCopy: { color: '#3f3f46', fontSize: 12, textAlign: 'center' },
 
   // ── Floating Action Buttons ──
-  fab: {
-    position: 'absolute', right: 16, bottom: 24, gap: 10, alignItems: 'center',
-  },
+  fab: { position: 'absolute', right: 16, bottom: 24, gap: 10, alignItems: 'center' },
   fabBtn: { borderRadius: 24, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 8, elevation: 6 },
   fabGrad: { width: 48, height: 48, borderRadius: 24, justifyContent: 'center', alignItems: 'center' },
 });
