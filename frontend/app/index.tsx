@@ -13,6 +13,8 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   Image,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -38,11 +40,14 @@ const CONTACT = {
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   en: {
     navServices: 'Services', navWork: 'Work', navPricing: 'Pricing', navContact: 'Contact',
-    heroTitle1: 'Websites that bring clients', heroTitle2: '— fast and affordable',
-    heroSub: 'I create modern websites for businesses in 2–3 days starting from ',
-    heroSubPrice: '400 PLN',
+    heroTitle1: 'Boost your business sales', heroTitle2: 'with a website that truly sells',
+    heroSub: 'Modern websites for businesses — ready in as fast as 2–3 days',
+    heroSubPrice: '',
     trustLine: 'Already helped multiple clients launch online',
     ctaOrder: 'Order a website', ctaConsult: 'Free consultation',
+    // Trust badges
+    badge1: '10+ projects', badge2: 'Ready in 3 days', badge3: 'Design + SEO',
+    // Services
     svcLabel: 'SERVICES', svcTitle: 'What I offer',
     svc1: 'Landing Pages', svc1d: 'Perfect for ads and quick sales',
     svc2: 'Business Websites', svc2d: 'Professional sites for your company',
@@ -54,12 +59,15 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv4: 'Mobile optimized', adv4d: 'Looks great everywhere',
     adv5: 'Personal approach', adv5d: 'Direct communication',
     portLabel: 'PORTFOLIO', portTitle: 'My work',
-    port1: 'Premium Barbershop Website', port1d: 'Professional barbershop website with online booking system and modern premium design', port1t: 'Landing Page',
+    port1: 'Premium Barbershop Website', port1d: 'Barbershop website that increases online bookings', port1t: 'Landing Page',
     port1f1: 'Online booking', port1f2: '3D animations', port1f3: 'Mobile-first', port1f4: 'SEO optimized',
-    port2: 'Stylish Cafe Website', port2d: 'Elegant café website with menu, gallery and atmospheric design that attracts clients', port2t: 'Business Site',
+    port1r: '+ more clients',
+    port2: 'Stylish Cafe Website', port2d: 'Café website that attracts customers and builds atmosphere', port2t: 'Business Site',
     port2f1: 'Digital menu', port2f2: 'Photo gallery', port2f3: 'Contact form', port2f4: 'Google Maps',
-    port3: 'Clothing Store Website', port3d: 'Modern clothing store with product catalog and seamless shopping experience', port3t: 'Online Store',
+    port2r: '+ better image',
+    port3: 'Clothing Store Website', port3d: 'Online store designed to boost sales', port3t: 'Online Store',
     port3f1: 'Product catalog', port3f2: 'Shopping cart', port3f3: 'Secure payments', port3f4: 'Order tracking',
+    port3r: '+ online sales',
     portBtn: 'View website',
     priceLabel: 'PRICING', priceTitle: 'Simple pricing', priceGet: 'Get started',
     pricePop: 'Most Popular',
@@ -67,27 +75,33 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     p2: 'Standard', p2f1: 'Up to 5 pages', p2f2: 'Custom design', p2f3: 'Mobile optimization', p2f4: 'Basic SEO', p2f5: 'Google Maps integration',
     p3: 'Premium', p3f1: 'Full website', p3f2: 'Advanced design', p3f3: 'SEO optimization', p3f4: 'Multi-language support (2 languages)', p3f5: 'Priority support',
     testLabel: 'TESTIMONIALS', testTitle: 'What clients say',
-    t1: 'Got my landing page in 2 days. Already got my first clients through it!',
-    t2: 'Fast, professional, and affordable. The website looks amazing on mobile.',
-    t3: 'My online store was ready in 3 days. Sales started coming in right away.',
+    t1: 'Great cooperation, website ready in 2 days and looks mega professional!',
+    t2: 'Thanks to this website I have more clients from the internet.',
+    t3: 'Fast, concrete and at a good price. Highly recommend!',
     ctaFinalTitle: 'Ready to get your website?', ctaFinalSub: "Let's build something that brings you clients",
     ctaOrderNow: 'Order now',
-    contactLabel: 'CONTACT', contactTitle: 'Choose your preferred contact method',
+    contactLabel: 'CONTACT', contactTitle: 'Get in touch',
+    contactHeadline: 'Have a website idea? Write to me — I\'ll reply within hours',
     contactSub: 'I respond quickly — message me directly',
     contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
     contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
     contactFacebook: 'Facebook', contactFacebookSub: 'Send a message',
     contactEmail: 'Email', contactEmailSub: 'webstudiosr4@gmail.com',
     contactResponse: 'I usually reply within 1–2 hours',
+    // Contact form
+    formTitle: 'Or send a message',
+    formName: 'Your name', formEmail: 'Email address', formMessage: 'Your message...',
+    formSend: 'Send message', formSuccess: 'Message sent! I\'ll reply soon.',
     footerTag: 'Websites that work',
   },
   pl: {
     navServices: 'Usługi', navWork: 'Portfolio', navPricing: 'Cennik', navContact: 'Kontakt',
-    heroTitle1: 'Strony, które przyciągają klientów', heroTitle2: '— szybko i w dobrej cenie',
-    heroSub: 'Tworzę nowoczesne strony dla firm w 2–3 dni od ',
-    heroSubPrice: '400 PLN',
+    heroTitle1: 'Zwiększ sprzedaż swojej firmy', heroTitle2: 'dzięki stronie, która naprawdę sprzedaje',
+    heroSub: 'Nowoczesne strony internetowe dla firm — gotowe nawet w 2–3 dni',
+    heroSubPrice: '',
     trustLine: 'Pomogłem wielu klientom zaistnieć w internecie',
     ctaOrder: 'Zamów stronę', ctaConsult: 'Bezpłatna konsultacja',
+    badge1: '10+ projektów', badge2: 'Gotowe w 3 dni', badge3: 'Design + SEO',
     svcLabel: 'USŁUGI', svcTitle: 'Co oferuję',
     svc1: 'Strony Landing Page', svc1d: 'Idealne do reklam i szybkiej sprzedaży',
     svc2: 'Strony firmowe', svc2d: 'Profesjonalne witryny dla Twojej firmy',
@@ -99,12 +113,15 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv4: 'Optymalizacja mobilna', adv4d: 'Świetnie wygląda wszędzie',
     adv5: 'Indywidualne podejście', adv5d: 'Bezpośredni kontakt',
     portLabel: 'PORTFOLIO', portTitle: 'Moje realizacje',
-    port1: 'Barbershop Premium Warszawa', port1d: 'Profesjonalna strona dla barbershopu z systemem rezerwacji i nowoczesnym designem premium', port1t: 'Landing Page',
+    port1: 'Barbershop Premium Warszawa', port1d: 'Strona dla barbera zwiększająca liczbę rezerwacji online', port1t: 'Landing Page',
     port1f1: 'Rezerwacja online', port1f2: 'Animacje 3D', port1f3: 'Mobile-first', port1f4: 'SEO',
-    port2: 'Stylowa Kawiarnia Warszawa', port2d: 'Elegancka strona dla kawiarni z menu, galerią i klimatycznym designem przyciągającym klientów', port2t: 'Strona firmowa',
+    port1r: '+ więcej klientów',
+    port2: 'Stylowa Kawiarnia Warszawa', port2d: 'Strona dla kawiarni, która przyciąga klientów i buduje klimat', port2t: 'Strona firmowa',
     port2f1: 'Menu online', port2f2: 'Galeria zdjęć', port2f3: 'Formularz kontaktowy', port2f4: 'Google Maps',
-    port3: 'Sklep Odzieżowy Premium', port3d: 'Nowoczesny sklep odzieżowy z katalogiem produktów i wygodnym procesem zakupowym', port3t: 'Sklep online',
+    port2r: '+ lepszy wizerunek',
+    port3: 'Sklep Odzieżowy Premium', port3d: 'Sklep internetowy zaprojektowany do zwiększania sprzedaży', port3t: 'Sklep online',
     port3f1: 'Katalog produktów', port3f2: 'Koszyk', port3f3: 'Bezpieczne płatności', port3f4: 'Śledzenie zamówień',
+    port3r: '+ sprzedaż online',
     portBtn: 'Zobacz stronę',
     priceLabel: 'CENNIK', priceTitle: 'Prosty cennik', priceGet: 'Rozpocznij',
     pricePop: 'Najpopularniejszy',
@@ -112,18 +129,22 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     p2: 'Standard', p2f1: 'Do 5 podstron', p2f2: 'Indywidualny design', p2f3: 'Optymalizacja mobilna', p2f4: 'Podstawowe SEO', p2f5: 'Integracja Google Maps',
     p3: 'Premium', p3f1: 'Pełna strona', p3f2: 'Zaawansowany design', p3f3: 'Optymalizacja SEO', p3f4: 'Wielojęzyczność (2 języki)', p3f5: 'Priorytetowe wsparcie',
     testLabel: 'OPINIE', testTitle: 'Co mówią klienci',
-    t1: 'Landing page gotowy w 2 dni. Już mam pierwszych klientów!',
-    t2: 'Szybko, profesjonalnie i w dobrej cenie. Strona świetnie wygląda na telefonie.',
-    t3: 'Sklep online gotowy w 3 dni. Sprzedaż ruszyła od razu.',
+    t1: 'Świetna współpraca, strona gotowa w 2 dni i wygląda mega profesjonalnie!',
+    t2: 'Dzięki tej stronie mam więcej klientów z internetu.',
+    t3: 'Szybko, konkretnie i w dobrej cenie. Polecam!',
     ctaFinalTitle: 'Gotowy na swoją stronę?', ctaFinalSub: 'Zbudujmy coś, co przyciągnie klientów',
     ctaOrderNow: 'Zamów teraz',
-    contactLabel: 'KONTAKT', contactTitle: 'Wybierz wygodny sposób kontaktu',
+    contactLabel: 'KONTAKT', contactTitle: 'Skontaktuj się',
+    contactHeadline: 'Masz pomysł na stronę? Napisz — odpowiem w ciągu kilku godzin',
     contactSub: 'Odpowiadam szybko — napisz do mnie bezpośrednio',
     contactTelegram: 'Telegram', contactTelegramSub: '@srwebstudio',
     contactWhatsApp: 'WhatsApp', contactWhatsAppSub: '+48 452 688 251',
     contactFacebook: 'Facebook', contactFacebookSub: 'Napisz wiadomość',
     contactEmail: 'Email', contactEmailSub: 'webstudiosr4@gmail.com',
     contactResponse: 'Zazwyczaj odpowiadam w ciągu 1–2 godzin',
+    formTitle: 'Lub wyślij wiadomość',
+    formName: 'Twoje imię', formEmail: 'Adres email', formMessage: 'Twoja wiadomość...',
+    formSend: 'Wyślij wiadomość', formSuccess: 'Wiadomość wysłana! Odpowiem wkrótce.',
     footerTag: 'Strony, które działają',
   },
 };
@@ -217,6 +238,33 @@ export default function SRWebStudio() {
   const CARD_W = isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400);
   const CARD_GAP = 16;
   const SNAP = CARD_W + CARD_GAP;
+
+  // Contact form state
+  const [formName, setFormName] = useState('');
+  const [formEmail, setFormEmail] = useState('');
+  const [formMsg, setFormMsg] = useState('');
+  const [formSending, setFormSending] = useState(false);
+  const [formSent, setFormSent] = useState(false);
+
+  const submitForm = useCallback(async () => {
+    if (!formName.trim() || !formEmail.trim() || !formMsg.trim()) return;
+    setFormSending(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: formName, email: formEmail, message: formMsg }),
+      });
+      if (res.ok) {
+        setFormSent(true);
+        setFormName(''); setFormEmail(''); setFormMsg('');
+        setTimeout(() => setFormSent(false), 5000);
+      }
+    } catch (e) {
+      console.log('Form error:', e);
+    }
+    setFormSending(false);
+  }, [formName, formEmail, formMsg]);
 
   // ── Init animations ──
   useEffect(() => {
@@ -555,11 +603,25 @@ export default function SRWebStudio() {
             </View>
 
             <Text style={S.heroTitle}>{t.heroTitle1}{'\n'}<Text style={S.heroAccent}>{t.heroTitle2}</Text></Text>
-            <Text style={S.heroSub}>{t.heroSub}<Text style={S.heroAccent}>{t.heroSubPrice}</Text></Text>
+            <Text style={S.heroSub}>{t.heroSub}</Text>
 
             <View style={S.trustBadge}>
               <Ionicons name="checkmark-circle" size={16} color="#6366f1" />
               <Text style={S.trustText}>{t.trustLine}</Text>
+            </View>
+
+            {/* Trust Badges */}
+            <View style={S.trustBadgesRow}>
+              {[
+                { icon: 'briefcase-outline' as const, text: t.badge1 },
+                { icon: 'flash-outline' as const, text: t.badge2 },
+                { icon: 'color-palette-outline' as const, text: t.badge3 },
+              ].map((b, i) => (
+                <View key={i} style={S.trustBadgeItem}>
+                  <Ionicons name={b.icon} size={16} color="#818cf8" />
+                  <Text style={S.trustBadgeText}>{b.text}</Text>
+                </View>
+              ))}
             </View>
 
             <View style={S.ctaRow}>
@@ -645,19 +707,19 @@ export default function SRWebStudio() {
             <View style={S.portfolioGrid}>
               {[
                 {
-                  title: t.port1, desc: t.port1d, tag: t.port1t,
+                  title: t.port1, desc: t.port1d, tag: t.port1t, result: t.port1r,
                   features: [t.port1f1, t.port1f2, t.port1f3, t.port1f4],
                   image: 'https://images.unsplash.com/photo-1707836885254-79b6e3d7b18d?w=600&q=80',
                   url: 'https://barber-style-27.preview.emergentagent.com/', accent: '#d4a254',
                 },
                 {
-                  title: t.port2, desc: t.port2d, tag: t.port2t,
+                  title: t.port2, desc: t.port2d, tag: t.port2t, result: t.port2r,
                   features: [t.port2f1, t.port2f2, t.port2f3, t.port2f4],
                   image: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80',
                   url: 'https://premium-cafe-43.preview.emergentagent.com/', accent: '#ec4899',
                 },
                 {
-                  title: t.port3, desc: t.port3d, tag: t.port3t,
+                  title: t.port3, desc: t.port3d, tag: t.port3t, result: t.port3r,
                   features: [t.port3f1, t.port3f2, t.port3f3, t.port3f4],
                   image: 'https://images.unsplash.com/photo-1649442279006-8bccb4cc63e1?w=600&q=80',
                   url: 'https://demo-ecommerce-1.preview.emergentagent.com/', accent: '#8b5cf6',
@@ -690,6 +752,11 @@ export default function SRWebStudio() {
                           <Text style={S.portfolioFeatureText}>{f}</Text>
                         </View>
                       ))}
+                    </View>
+                    {/* Result Badge */}
+                    <View style={[S.resultBadge, { borderColor: `${p.accent}40` }]}>
+                      <Ionicons name="trending-up" size={14} color="#22c55e" />
+                      <Text style={S.resultBadgeText}>{p.result}</Text>
                     </View>
                     <LinearGradient
                       colors={[`${p.accent}20`, `${p.accent}10`]}
@@ -836,6 +903,7 @@ export default function SRWebStudio() {
 
             <Text style={S.sectionLabel}>{t.contactLabel}</Text>
             <Text style={S.sectionTitle}>{t.contactTitle}</Text>
+            <Text style={S.contactHeadline}>{t.contactHeadline}</Text>
             <Text style={S.contactSubtext}>{t.contactSub}</Text>
 
             <View style={S.contactRow}>
@@ -880,6 +948,33 @@ export default function SRWebStudio() {
             <View style={S.contactResponseRow}>
               <Ionicons name="time-outline" size={14} color="#6366f1" />
               <Text style={S.contactResponseText}>{t.contactResponse}</Text>
+            </View>
+
+            {/* ── Working Contact Form ── */}
+            <View style={S.formCard}>
+              <Text style={S.formTitle}>{t.formTitle}</Text>
+              {formSent ? (
+                <View style={S.formSuccess}>
+                  <Ionicons name="checkmark-circle" size={28} color="#22c55e" />
+                  <Text style={S.formSuccessText}>{t.formSuccess}</Text>
+                </View>
+              ) : (
+                <>
+                  <TextInput style={S.formInput} placeholder={t.formName} placeholderTextColor="#52525b" value={formName} onChangeText={setFormName} />
+                  <TextInput style={S.formInput} placeholder={t.formEmail} placeholderTextColor="#52525b" value={formEmail} onChangeText={setFormEmail} keyboardType="email-address" autoCapitalize="none" />
+                  <TextInput style={[S.formInput, S.formTextArea]} placeholder={t.formMessage} placeholderTextColor="#52525b" value={formMsg} onChangeText={setFormMsg} multiline numberOfLines={4} textAlignVertical="top" />
+                  <TouchableOpacity testID="ctaBtn" onPress={submitForm} activeOpacity={0.85} disabled={formSending}>
+                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.formBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                      {formSending ? <ActivityIndicator color="#fff" size="small" /> : (
+                        <>
+                          <Ionicons name="send" size={16} color="#fff" />
+                          <Text style={S.formBtnText}>{t.formSend}</Text>
+                        </>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </Animated.View>
 
@@ -1117,6 +1212,54 @@ const S = StyleSheet.create({
   contactCardArrow: { position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.06)', justifyContent: 'center', alignItems: 'center' },
   contactResponseRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 14, paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)', alignSelf: 'center' },
   contactResponseText: { color: '#71717a', fontSize: 13, fontWeight: '500' },
+
+  // ── Trust Badges ──
+  trustBadgesRow: {
+    flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 24, marginTop: 6,
+  },
+  trustBadgeItem: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
+    backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+  },
+  trustBadgeText: { color: '#a1a1aa', fontSize: 12, fontWeight: '600' },
+
+  // ── Portfolio Result Badge ──
+  resultBadge: {
+    flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start',
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, marginBottom: 14,
+    backgroundColor: 'rgba(34,197,94,0.08)', borderWidth: 1,
+  },
+  resultBadgeText: { color: '#22c55e', fontSize: 12, fontWeight: '700' },
+
+  // ── Contact Headline ──
+  contactHeadline: {
+    color: '#d4d4d8', fontSize: 16, fontWeight: '600', textAlign: 'center', lineHeight: 24, marginBottom: 8,
+  },
+
+  // ── Contact Form ──
+  formCard: {
+    marginTop: 24, padding: 22, borderRadius: 18,
+    backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.18)',
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
+  },
+  formTitle: { color: '#a1a1aa', fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 16 },
+  formInput: {
+    backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.15)',
+    borderRadius: 10, paddingHorizontal: 16, paddingVertical: 13, color: '#f5f5f5', fontSize: 14, marginBottom: 12,
+  },
+  formTextArea: { minHeight: 90 },
+  formBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    paddingVertical: 15, borderRadius: 12,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  formBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  formSuccess: {
+    alignItems: 'center', gap: 10, paddingVertical: 20,
+  },
+  formSuccessText: { color: '#22c55e', fontSize: 15, fontWeight: '600', textAlign: 'center' },
 
   // ── Footer ──
   footer: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 80, alignItems: 'center' },
