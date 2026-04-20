@@ -446,6 +446,22 @@ export default function SRWebStudio() {
       [data-testid="neonDivider"] {
         animation: glowBreath 3s ease-in-out infinite !important;
       }
+
+      /* ── Trust Badges — multi-color hover ── */
+      [data-testid="trustBadge"] {
+        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
+        position: relative; overflow: hidden;
+      }
+      [data-testid="trustBadge"]:hover {
+        transform: translateY(-5px) scale(1.06) !important;
+        box-shadow: 0 10px 30px var(--badge-glow, rgba(99,102,241,0.3)), 0 0 15px var(--badge-glow, rgba(99,102,241,0.15)) !important;
+        border-color: var(--badge-glow, rgba(99,102,241,0.4)) !important;
+      }
+      [data-testid="trustBadge"]::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        animation: btnSweep 4s ease-in-out infinite;
+      }
     `;
     document.head.appendChild(style);
 
@@ -583,16 +599,20 @@ export default function SRWebStudio() {
               <Text style={S.trustText}>{t.trustLine}</Text>
             </View>
 
-            {/* Trust Badges */}
+            {/* Trust Badges — Multi-color neon */}
             <View style={S.trustBadgesRow}>
               {[
-                { icon: 'briefcase-outline' as const, text: t.badge1 },
-                { icon: 'flash-outline' as const, text: t.badge2 },
-                { icon: 'color-palette-outline' as const, text: t.badge3 },
+                { icon: 'briefcase-outline' as const, text: t.badge1, colors: ['rgba(34,211,238,0.18)', 'rgba(59,130,246,0.1)'] as [string, string], iconColor: '#22d3ee', glowColor: '#22d3ee' },
+                { icon: 'flash-outline' as const, text: t.badge2, colors: ['rgba(168,85,247,0.18)', 'rgba(236,72,153,0.1)'] as [string, string], iconColor: '#c084fc', glowColor: '#a855f7' },
+                { icon: 'color-palette-outline' as const, text: t.badge3, colors: ['rgba(251,146,60,0.18)', 'rgba(250,204,21,0.1)'] as [string, string], iconColor: '#fb923c', glowColor: '#f59e0b' },
               ].map((b, i) => (
-                <View key={i} style={S.trustBadgeItem}>
-                  <Ionicons name={b.icon} size={16} color="#818cf8" />
-                  <Text style={S.trustBadgeText}>{b.text}</Text>
+                <View key={i} testID="trustBadge" style={[S.trustBadgeItem, { borderColor: `${b.glowColor}30`, shadowColor: b.glowColor }]}>
+                  <LinearGradient colors={b.colors} style={S.trustBadgeGrad} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                    <View style={[S.trustBadgeIconGlow, { backgroundColor: `${b.glowColor}18` }]}>
+                      <Ionicons name={b.icon} size={15} color={b.iconColor} />
+                    </View>
+                    <Text style={[S.trustBadgeText, { color: b.iconColor }]}>{b.text}</Text>
+                  </LinearGradient>
                 </View>
               ))}
             </View>
@@ -1164,16 +1184,23 @@ const S = StyleSheet.create({
   },
   contactCardLabelSm: { fontSize: 12, fontWeight: '700', textAlign: 'center' },
 
-  // ── Trust Badges ──
+  // ── Trust Badges — Multi-color neon ──
   trustBadgesRow: {
     flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', gap: 10, marginBottom: 24, marginTop: 6,
   },
   trustBadgeItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10,
-    backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+    borderRadius: 12, overflow: 'hidden',
+    borderWidth: 1,
+    shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.25, shadowRadius: 12, elevation: 4,
   },
-  trustBadgeText: { color: '#a1a1aa', fontSize: 12, fontWeight: '600' },
+  trustBadgeGrad: {
+    flexDirection: 'row', alignItems: 'center', gap: 8,
+    paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12,
+  },
+  trustBadgeIconGlow: {
+    width: 26, height: 26, borderRadius: 8, justifyContent: 'center', alignItems: 'center',
+  },
+  trustBadgeText: { fontSize: 12, fontWeight: '700' },
 
   // ── Portfolio Result Badge ──
   resultBadge: {
