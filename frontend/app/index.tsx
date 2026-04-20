@@ -256,105 +256,191 @@ export default function SRWebStudio() {
   const orb5Y = orb5.interpolate({ inputRange: [0, 1], outputRange: [0, -12] });
   const orb5X = orb5.interpolate({ inputRange: [0, 1], outputRange: [0, 10] });
 
-  // ── Inject web-only CSS for hover effects ──
+  // ── Inject web-only CSS for NEON hover effects + cursor glow + keyframes ──
   useEffect(() => {
     if (!isWeb || typeof document === 'undefined') return;
-    const id = 'sr-3d-hover-css';
+    const id = 'sr-neon-css';
     if (document.getElementById(id)) return;
     const style = document.createElement('style');
     style.id = id;
     style.textContent = `
-      [data-testid="card3d"]:hover {
-        transform: translateY(-6px) scale(1.02) !important;
-        box-shadow: 0 12px 40px rgba(99,102,241,0.25), 0 0 20px rgba(139,92,246,0.12) !important;
-        border-color: rgba(99,102,241,0.3) !important;
+      /* ── Keyframe Animations ── */
+      @keyframes neonPulse {
+        0%, 100% { box-shadow: 0 0 10px rgba(99,102,241,0.3), 0 0 30px rgba(139,92,246,0.15), 0 0 60px rgba(99,102,241,0.08); }
+        50% { box-shadow: 0 0 15px rgba(99,102,241,0.5), 0 0 45px rgba(139,92,246,0.25), 0 0 80px rgba(99,102,241,0.12); }
       }
+      @keyframes btnSweep {
+        0% { left: -100%; }
+        100% { left: 200%; }
+      }
+      @keyframes glowBreath {
+        0%, 100% { opacity: 0.4; }
+        50% { opacity: 0.8; }
+      }
+      @keyframes borderGlow {
+        0%, 100% { border-color: rgba(99,102,241,0.2); }
+        50% { border-color: rgba(139,92,246,0.45); }
+      }
+
+      /* ── Cursor Glow Follower ── */
+      #sr-cursor-glow {
+        position: fixed; pointer-events: none; z-index: 9999;
+        width: 300px; height: 300px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(99,102,241,0.08) 0%, rgba(139,92,246,0.04) 40%, transparent 70%);
+        transform: translate(-50%, -50%);
+        transition: left 0.15s ease-out, top 0.15s ease-out;
+        mix-blend-mode: screen;
+      }
+
+      /* ── Service Cards ── */
       [data-testid="card3d"] {
-        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
+        transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease, border-color 0.4s ease !important;
+        animation: borderGlow 4s ease-in-out infinite !important;
+      }
+      [data-testid="card3d"]:hover {
+        transform: translateY(-8px) scale(1.03) perspective(600px) rotateX(2deg) !important;
+        box-shadow: 0 15px 50px rgba(99,102,241,0.35), 0 0 30px rgba(139,92,246,0.2), 0 0 60px rgba(99,102,241,0.1) !important;
+        border-color: rgba(139,92,246,0.5) !important;
+      }
+
+      /* ── Portfolio Cards ── */
+      [data-testid="portCard"] {
+        transition: transform 0.45s cubic-bezier(0.22,1,0.36,1), box-shadow 0.45s ease, border-color 0.4s ease !important;
       }
       [data-testid="portCard"]:hover {
-        transform: translateY(-8px) scale(1.015) !important;
-        box-shadow: 0 20px 50px rgba(99,102,241,0.3), 0 0 30px rgba(139,92,246,0.15) !important;
-        border-color: rgba(99,102,241,0.35) !important;
+        transform: translateY(-12px) scale(1.02) perspective(800px) rotateX(1.5deg) !important;
+        box-shadow: 0 25px 60px rgba(99,102,241,0.4), 0 0 40px rgba(139,92,246,0.2), 0 0 80px rgba(99,102,241,0.1) !important;
+        border-color: rgba(139,92,246,0.5) !important;
       }
-      [data-testid="portCard"] {
+
+      /* ── Pricing Cards ── */
+      [data-testid="priceCard"] {
         transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), box-shadow 0.4s ease, border-color 0.4s ease !important;
+        animation: borderGlow 5s ease-in-out infinite !important;
       }
       [data-testid="priceCard"]:hover {
-        transform: translateY(-6px) scale(1.02) !important;
-        box-shadow: 0 16px 44px rgba(99,102,241,0.25), 0 0 24px rgba(139,92,246,0.1) !important;
-        border-color: rgba(99,102,241,0.35) !important;
+        transform: translateY(-10px) scale(1.025) perspective(600px) rotateX(2deg) !important;
+        box-shadow: 0 20px 55px rgba(99,102,241,0.35), 0 0 35px rgba(139,92,246,0.2), 0 0 70px rgba(99,102,241,0.08) !important;
+        border-color: rgba(139,92,246,0.5) !important;
       }
-      [data-testid="priceCard"] {
+
+      /* ── Advantage Rows ── */
+      [data-testid="advRow"] {
         transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
       }
       [data-testid="advRow"]:hover {
-        transform: translateX(4px) scale(1.01) !important;
-        box-shadow: 0 8px 24px rgba(99,102,241,0.18) !important;
-        border-color: rgba(139,92,246,0.3) !important;
+        transform: translateX(6px) scale(1.015) !important;
+        box-shadow: 0 10px 30px rgba(99,102,241,0.25), 0 0 15px rgba(139,92,246,0.12) !important;
+        border-color: rgba(139,92,246,0.4) !important;
       }
-      [data-testid="advRow"] {
-        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+
+      /* ── Contact Cards ── */
+      [data-testid="contactCard"] {
+        transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
       }
       [data-testid="contactCard"]:hover {
-        transform: translateY(-5px) scale(1.03) !important;
-        box-shadow: 0 12px 36px rgba(99,102,241,0.22), 0 0 18px rgba(139,92,246,0.1) !important;
-        border-color: rgba(99,102,241,0.3) !important;
+        transform: translateY(-8px) scale(1.04) perspective(500px) rotateY(2deg) !important;
+        box-shadow: 0 16px 45px rgba(99,102,241,0.3), 0 0 25px rgba(139,92,246,0.15) !important;
+        border-color: rgba(139,92,246,0.45) !important;
       }
-      [data-testid="contactCard"] {
-        transition: transform 0.3s cubic-bezier(0.22,1,0.36,1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+
+      /* ── CTA Buttons — Neon Glow ── */
+      [data-testid="ctaBtn"] {
+        transition: transform 0.25s cubic-bezier(0.22,1,0.36,1), box-shadow 0.25s ease !important;
+        position: relative; overflow: hidden;
+        animation: neonPulse 3s ease-in-out infinite !important;
       }
       [data-testid="ctaBtn"]:hover {
-        transform: translateY(-3px) scale(1.04) !important;
-        box-shadow: 0 8px 30px rgba(99,102,241,0.5) !important;
+        transform: translateY(-4px) scale(1.06) !important;
+        box-shadow: 0 10px 40px rgba(99,102,241,0.6), 0 0 20px rgba(139,92,246,0.4), 0 0 60px rgba(99,102,241,0.15) !important;
       }
       [data-testid="ctaBtn"]:active {
-        transform: translateY(1px) scale(0.97) !important;
-        box-shadow: 0 2px 10px rgba(99,102,241,0.3) !important;
+        transform: translateY(2px) scale(0.96) !important;
+        box-shadow: 0 2px 12px rgba(99,102,241,0.3) !important;
       }
-      [data-testid="ctaBtn"] {
-        transition: transform 0.2s cubic-bezier(0.22,1,0.36,1), box-shadow 0.2s ease !important;
+      [data-testid="ctaBtn"]::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+        animation: btnSweep 3.5s ease-in-out infinite;
+      }
+
+      /* ── Secondary Buttons ── */
+      [data-testid="ctaBtnSec"] {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background-color 0.3s ease !important;
       }
       [data-testid="ctaBtnSec"]:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 20px rgba(139,92,246,0.2) !important;
-        background-color: rgba(139,92,246,0.08) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(139,92,246,0.3), 0 0 15px rgba(99,102,241,0.1) !important;
+        background-color: rgba(139,92,246,0.1) !important;
+        border-color: rgba(139,92,246,0.5) !important;
       }
-      [data-testid="ctaBtnSec"] {
-        transition: transform 0.25s ease, box-shadow 0.25s ease, background-color 0.25s ease !important;
-      }
-      [data-testid="footSocial"]:hover {
-        transform: translateY(-3px) scale(1.12) !important;
-        box-shadow: 0 6px 18px rgba(99,102,241,0.3) !important;
-      }
-      [data-testid="footSocial"] {
+
+      /* ── Pricing Buttons ── */
+      [data-testid="pricingBtn"] {
         transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+        position: relative; overflow: hidden;
       }
       [data-testid="pricingBtn"]:hover {
-        transform: translateY(-2px) scale(1.03) !important;
-        box-shadow: 0 6px 20px rgba(99,102,241,0.35) !important;
+        transform: translateY(-3px) scale(1.04) !important;
+        box-shadow: 0 8px 25px rgba(99,102,241,0.4), 0 0 15px rgba(139,92,246,0.2) !important;
       }
       [data-testid="pricingBtn"]:active {
         transform: translateY(1px) scale(0.97) !important;
       }
-      [data-testid="pricingBtn"] {
-        transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+      [data-testid="pricingBtn"]::after {
+        content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+        animation: btnSweep 4s ease-in-out infinite;
+      }
+
+      /* ── Footer Social ── */
+      [data-testid="footSocial"] {
+        transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+      }
+      [data-testid="footSocial"]:hover {
+        transform: translateY(-4px) scale(1.15) !important;
+        box-shadow: 0 8px 24px rgba(99,102,241,0.4), 0 0 12px rgba(139,92,246,0.2) !important;
+        border-color: rgba(139,92,246,0.4) !important;
+      }
+
+      /* ── FABs ── */
+      [data-testid="fabBtn"] {
+        transition: transform 0.3s ease, box-shadow 0.3s ease !important;
       }
       [data-testid="fabBtn"]:hover {
-        transform: scale(1.15) !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.5) !important;
+        transform: scale(1.18) !important;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(99,102,241,0.3) !important;
       }
-      [data-testid="fabBtn"] {
-        transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+
+      /* ── Nav Links ── */
+      [data-testid="navLink"] {
+        transition: color 0.25s ease, text-shadow 0.25s ease !important;
       }
       [data-testid="navLink"]:hover {
         color: #a78bfa !important;
+        text-shadow: 0 0 10px rgba(167,139,250,0.5) !important;
       }
-      [data-testid="navLink"] {
-        transition: color 0.2s ease !important;
+
+      /* ── Neon Dividers ── */
+      [data-testid="neonDivider"] {
+        animation: glowBreath 3s ease-in-out infinite !important;
       }
     `;
     document.head.appendChild(style);
+
+    // ── Cursor Glow Element ──
+    const glow = document.createElement('div');
+    glow.id = 'sr-cursor-glow';
+    document.body.appendChild(glow);
+    const onMove = (e: MouseEvent) => {
+      glow.style.left = e.clientX + 'px';
+      glow.style.top = e.clientY + 'px';
+    };
+    document.addEventListener('mousemove', onMove);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      glow.remove();
+    };
   }, []);
 
   // ── Scroll handler for section fade-in ──
@@ -492,8 +578,8 @@ export default function SRWebStudio() {
             </View>
           </Animated.View>
 
-          {/* ════════ GRADIENT DIVIDER ════════ */}
-          <LinearGradient colors={['rgba(99,102,241,0.2)', 'rgba(139,92,246,0.05)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          {/* ════════ NEON DIVIDER ════════ */}
+          <LinearGradient testID="neonDivider" colors={['rgba(99,102,241,0.3)', 'rgba(236,72,153,0.2)', 'rgba(139,92,246,0.3)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ SERVICES ════════ */}
           <Animated.View style={[S.section, S.sectionRelative, secStyle(svcFade)]} onLayout={e => { servicesY.current = e.nativeEvent.layout.y; }}>
@@ -547,7 +633,7 @@ export default function SRWebStudio() {
             </View>
           </Animated.View>
 
-          <LinearGradient colors={['transparent', 'rgba(99,102,241,0.08)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          <LinearGradient testID="neonDivider" colors={['rgba(139,92,246,0.3)', 'rgba(99,102,241,0.15)', 'rgba(236,72,153,0.25)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ PORTFOLIO ════════ */}
           <Animated.View style={[S.section, S.sectionRelative, secStyle(portFade)]} onLayout={e => { portfolioY.current = e.nativeEvent.layout.y; }}>
@@ -620,7 +706,7 @@ export default function SRWebStudio() {
             </View>
           </Animated.View>
 
-          <LinearGradient colors={['transparent', 'rgba(139,92,246,0.1)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          <LinearGradient testID="neonDivider" colors={['rgba(236,72,153,0.2)', 'rgba(139,92,246,0.3)', 'rgba(99,102,241,0.2)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ PRICING ════════ */}
           <Animated.View style={[S.section, S.sectionRelative, secStyle(priceFade)]} onLayout={e => { pricingY.current = e.nativeEvent.layout.y; }}>
@@ -712,7 +798,7 @@ export default function SRWebStudio() {
             <View style={S.dots}>{[0, 1, 2].map(i => <View key={i} style={[S.dot, activeTestimonial === i && S.dotActive]} />)}</View>
           </Animated.View>
 
-          <LinearGradient colors={['transparent', 'rgba(99,102,241,0.1)', 'transparent']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
+          <LinearGradient testID="neonDivider" colors={['rgba(99,102,241,0.25)', 'rgba(236,72,153,0.2)', 'rgba(139,92,246,0.25)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
           {/* ════════ FINAL CTA ════════ */}
           <Animated.View style={[S.finalCta, S.sectionRelative, secStyle(ctaFade)]} onLayout={e => { finalCtaY.current = e.nativeEvent.layout.y; }}>
@@ -846,20 +932,20 @@ const S = StyleSheet.create({
   // ── Hero ──
   hero: { paddingHorizontal: 24, paddingTop: 20, paddingBottom: 36, position: 'relative', overflow: 'hidden' },
 
-  // Floating orbs — hero
+  // Floating orbs — hero (BRIGHTER NEON)
   orb: { position: 'absolute', borderRadius: 999 },
-  orb1: { width: 180, height: 180, top: -40, right: -60, backgroundColor: 'rgba(99,102,241,0.08)' },
-  orb2: { width: 120, height: 120, bottom: 20, left: -40, backgroundColor: 'rgba(168,85,247,0.07)' },
-  orb3: { width: 90, height: 90, top: 100, right: 30, backgroundColor: 'rgba(236,72,153,0.06)' },
+  orb1: { width: 220, height: 220, top: -50, right: -70, backgroundColor: 'rgba(99,102,241,0.12)' },
+  orb2: { width: 160, height: 160, bottom: 10, left: -50, backgroundColor: 'rgba(168,85,247,0.1)' },
+  orb3: { width: 110, height: 110, top: 90, right: 20, backgroundColor: 'rgba(236,72,153,0.09)' },
 
-  // Floating orbs — sections (reusable)
+  // Floating orbs — sections (reusable, BRIGHTER)
   orbSec: { position: 'absolute', borderRadius: 999, zIndex: -1 },
 
   // Section with relative positioning for orbs
   sectionRelative: { position: 'relative', overflow: 'hidden' },
 
-  // Gradient dividers between sections
-  sectionDivider: { height: 1, marginHorizontal: 40 },
+  // Gradient dividers between sections — NEON
+  sectionDivider: { height: 2, marginHorizontal: 30 },
 
   // Header
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
@@ -889,7 +975,7 @@ const S = StyleSheet.create({
   ctaRow: { flexDirection: isSmallScreen ? 'column' : 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
   ctaPrimary: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 16, borderRadius: 12, gap: 8, minWidth: 200,
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 14, elevation: 8,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.45, shadowRadius: 18, elevation: 10,
     ...(isWeb ? { cursor: 'pointer' } : {}),
   },
   ctaPrimaryText: { color: '#fff', fontSize: 16, fontWeight: '700' },
@@ -901,13 +987,13 @@ const S = StyleSheet.create({
   sectionLabel: { color: '#6366f1', fontSize: 12, fontWeight: '700', letterSpacing: 2, textAlign: 'center', marginBottom: 6 },
   sectionTitle: { fontSize: isSmallScreen ? 24 : 30, fontWeight: '800', color: '#f5f5f5', textAlign: 'center', marginBottom: 26, letterSpacing: -0.3 },
 
-  // ── 3D Card — glassmorphism ──
+  // ── 3D Card — NEON glassmorphism ──
   card3d: {
     borderRadius: 16, overflow: 'hidden',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 20, elevation: 6,
-    backgroundColor: 'rgba(99,102,241,0.04)',
-    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
-    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.25, shadowRadius: 24, elevation: 8,
+    backgroundColor: 'rgba(99,102,241,0.06)',
+    borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+    ...(isWeb ? { backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' } as any : {}),
   },
 
   // ── Services ──
@@ -921,9 +1007,9 @@ const S = StyleSheet.create({
   advantagesGrid: { gap: 12 },
   advantageRow: {
     flexDirection: 'row', alignItems: 'center', gap: 14, padding: 16, borderRadius: 14,
-    backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.1, shadowRadius: 10, elevation: 3,
-    ...(isWeb ? { backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' } as any : {}),
+    backgroundColor: 'rgba(99,102,241,0.07)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.18)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.15, shadowRadius: 14, elevation: 4,
+    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
   },
   advantageIconWrap: { width: 44, height: 44, borderRadius: 12, backgroundColor: 'rgba(139,92,246,0.12)', justifyContent: 'center', alignItems: 'center' },
   advantageTextWrap: { flex: 1 },
@@ -934,10 +1020,10 @@ const S = StyleSheet.create({
   portfolioGrid: { gap: 24 },
   portfolioCard: {
     borderRadius: 20, overflow: 'hidden',
-    backgroundColor: 'rgba(15,15,25,0.9)',
-    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.18, shadowRadius: 28, elevation: 8,
-    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
+    backgroundColor: 'rgba(15,15,25,0.92)',
+    borderWidth: 1, borderColor: 'rgba(139,92,246,0.18)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 12 }, shadowOpacity: 0.25, shadowRadius: 32, elevation: 10,
+    ...(isWeb ? { backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' } as any : {}),
   },
   portfolioImageWrap: { height: 200, position: 'relative', overflow: 'hidden' },
   portfolioImg: { width: '100%', height: '100%' },
@@ -960,12 +1046,12 @@ const S = StyleSheet.create({
   // ── Pricing ──
   pricingGrid: { gap: 16 },
   pricingCard: {
-    borderRadius: 16, padding: 24, backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.1)',
+    borderRadius: 16, padding: 24, backgroundColor: 'rgba(99,102,241,0.07)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.18)',
     position: 'relative', overflow: 'hidden',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.12, shadowRadius: 16, elevation: 4,
-    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 20, elevation: 6,
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
   },
-  pricingCardPop: { borderColor: 'rgba(99,102,241,0.4)', backgroundColor: 'rgba(99,102,241,0.1)', shadowOpacity: 0.28 },
+  pricingCardPop: { borderColor: 'rgba(139,92,246,0.5)', backgroundColor: 'rgba(99,102,241,0.12)', shadowOpacity: 0.35 },
   popularBadge: { position: 'absolute', top: 0, right: 0, paddingHorizontal: 14, paddingVertical: 6, borderBottomLeftRadius: 12 },
   popularBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
   pricingName: { color: '#a1a1aa', fontSize: 14, fontWeight: '600', marginBottom: 4, textTransform: 'uppercase', letterSpacing: 1 },
@@ -982,9 +1068,9 @@ const S = StyleSheet.create({
     gap: 16, alignItems: 'center', paddingVertical: 8,
   },
   testimonialCard: {
-    borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.08)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.15)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 10, elevation: 4,
-    ...(isWeb ? { backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' } as any : {}),
+    borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.18, shadowRadius: 16, elevation: 5,
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
   },
   testimonialStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
   testimonialText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 },
@@ -1001,9 +1087,9 @@ const S = StyleSheet.create({
   // ── Final CTA ──
   finalCta: { paddingHorizontal: 24, paddingVertical: 28 },
   finalCtaInner: {
-    padding: 28, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(99,102,241,0.25)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 24, elevation: 6,
-    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
+    padding: 28, borderRadius: 20, alignItems: 'center', borderWidth: 1, borderColor: 'rgba(139,92,246,0.3)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.3, shadowRadius: 30, elevation: 8,
+    ...(isWeb ? { backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)' } as any : {}),
   },
   finalCtaTitle: { fontSize: isSmallScreen ? 24 : 30, fontWeight: '800', color: '#f5f5f5', textAlign: 'center', marginBottom: 8 },
   finalCtaSub: { color: '#a1a1aa', fontSize: 15, textAlign: 'center', marginBottom: 22 },
@@ -1020,8 +1106,8 @@ const S = StyleSheet.create({
   contactRow: { flexDirection: 'row', gap: 12, marginBottom: 12 },
   contactCard: {
     flex: 1, borderRadius: 18, overflow: 'hidden',
-    borderWidth: 1, borderColor: 'rgba(99,102,241,0.12)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 14, elevation: 4,
+    borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.15, shadowRadius: 18, elevation: 5,
     ...(isWeb ? { cursor: 'pointer' } : {}),
   },
   contactCardInner: { padding: 20, borderRadius: 18, alignItems: 'center', minHeight: 140, justifyContent: 'center' },
