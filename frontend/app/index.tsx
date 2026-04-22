@@ -13,6 +13,8 @@ import {
   NativeScrollEvent,
   NativeSyntheticEvent,
   Image,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -232,6 +234,51 @@ export default function SRWebStudio() {
   const testimonialFade = useRef(new Animated.Value(1)).current;
 
   // Contact form removed — direct contact only
+
+  // ── Contact Form State ──
+  const [fName, setFName] = useState('');
+  const [fEmail, setFEmail] = useState('');
+  const [fService, setFService] = useState('');
+  const [fMessage, setFMessage] = useState('');
+  const [fConsent, setFConsent] = useState(false);
+  const [fErrors, setFErrors] = useState<Record<string, string>>({});
+  const [fSending, setFSending] = useState(false);
+  const [fSent, setFSent] = useState(false);
+  const [fError, setFError] = useState('');
+
+  const validateForm = useCallback(() => {
+    const errors: Record<string, string> = {};
+    if (!fName.trim()) errors.name = lang === 'pl' ? 'Imię jest wymagane' : 'Name is required';
+    if (!fEmail.trim()) errors.email = lang === 'pl' ? 'Email jest wymagany' : 'Email is required';
+    else if (!/\S+@\S+\.\S+/.test(fEmail)) errors.email = lang === 'pl' ? 'Podaj poprawny adres email' : 'Enter a valid email';
+    if (!fService.trim()) errors.service = lang === 'pl' ? 'Wybierz usługę' : 'Select a service';
+    if (!fMessage.trim()) errors.message = lang === 'pl' ? 'Opis projektu jest wymagany' : 'Project description is required';
+    if (!fConsent) errors.consent = lang === 'pl' ? 'Zgoda jest wymagana' : 'Consent is required';
+    setFErrors(errors);
+    return Object.keys(errors).length === 0;
+  }, [fName, fEmail, fService, fMessage, fConsent, lang]);
+
+  const submitForm = useCallback(async () => {
+    if (!validateForm()) return;
+    setFSending(true);
+    setFError('');
+    try {
+      const res = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: fName, email: fEmail, service: fService, message: fMessage, consent: fConsent }),
+      });
+      if (res.ok) {
+        setFSent(true);
+        setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
+      } else {
+        setFError(lang === 'pl' ? 'Wystąpił błąd. Spróbuj ponownie.' : 'An error occurred. Try again.');
+      }
+    } catch {
+      setFError(lang === 'pl' ? 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.' : 'Connection error. Check internet and try again.');
+    }
+    setFSending(false);
+  }, [fName, fEmail, fService, fMessage, fConsent, lang, validateForm]);
 
   // ── Init animations ──
   useEffect(() => {
@@ -838,36 +885,6 @@ export default function SRWebStudio() {
 
           <LinearGradient testID="neonDivider" colors={['rgba(99,102,241,0.25)', 'rgba(236,72,153,0.2)', 'rgba(139,92,246,0.25)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
-          {/* ════════ FINAL CTA ════════ */}
-          <Animated.View style={[S.finalCta, S.sectionRelative, secStyle(ctaFade)]} onLayout={e => { finalCtaY.current = e.nativeEvent.layout.y; }}>
-            <Animated.View style={[S.orbSec, { top: -20, left: -20, width: 120, height: 120, backgroundColor: 'rgba(99,102,241,0.08)', transform: [{ translateY: orb1Y }] }]} />
-
-            <LinearGradient colors={['rgba(99,102,241,0.18)', 'rgba(139,92,246,0.12)']} style={S.finalCtaInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
-              <Text style={S.finalCtaTitle}>{t.ctaFinalTitle}</Text>
-              <Text style={S.finalCtaSub}>{t.ctaFinalSub}</Text>
-              <View style={S.finalCtaBtns}>
-                <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
-                  <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                      <Ionicons name="paper-plane" size={18} color="#fff" />
-                      <Text style={S.ctaPrimaryText}>{t.ctaOrderNow}</Text>
-                    </LinearGradient>
-                  </Animated.View>
-                </TouchableOpacity>
-                <View style={S.socialCtaRow}>
-                  <TouchableOpacity testID="ctaBtnSec" onPress={openWhatsApp} activeOpacity={0.85} style={S.socialCtaBtn}>
-                    <Ionicons name="logo-whatsapp" size={18} color="#25D366" />
-                    <Text style={[S.socialCtaText, { color: '#25D366' }]}>WhatsApp</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity testID="ctaBtnSec" onPress={openFacebook} activeOpacity={0.85} style={S.socialCtaBtn}>
-                    <Ionicons name="logo-facebook" size={18} color="#1877F2" />
-                    <Text style={[S.socialCtaText, { color: '#1877F2' }]}>Facebook</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </LinearGradient>
-          </Animated.View>
-
           {/* ════════ CONTACT ════════ */}
           <Animated.View style={[S.section, S.sectionRelative, secStyle(contFade)]} onLayout={e => { contactY.current = e.nativeEvent.layout.y; }}>
             <Animated.View style={[S.orbSec, { top: -10, right: -30, width: 100, height: 100, backgroundColor: 'rgba(139,92,246,0.06)', transform: [{ translateY: orb3Y }] }]} />
@@ -875,9 +892,8 @@ export default function SRWebStudio() {
             <Text style={S.sectionLabel}>{t.contactLabel}</Text>
             <Text style={S.sectionTitle}>{t.contactTitle}</Text>
             <Text style={S.contactHeadline}>{t.contactHeadline}</Text>
-            <Text style={S.contactSubtext}>{t.contactSub}</Text>
 
-            {/* Primary CTA — Telegram */}
+            {/* Direct contact buttons */}
             <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85} style={{ marginBottom: 14 }}>
               <LinearGradient colors={['#2AABEE', '#1E96D1']} style={S.telegramPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
                 <Ionicons name="paper-plane" size={22} color="#fff" />
@@ -889,12 +905,11 @@ export default function SRWebStudio() {
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Secondary contacts — 3 in a row */}
             <View style={S.contactRow}>
               {[
-                { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, sub: t.contactWhatsAppSub, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
-                { icon: 'logo-facebook' as const, label: t.contactFacebook, sub: t.contactFacebookSub, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
-                { icon: 'mail' as const, label: t.contactEmail, sub: t.contactEmailSub, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
+                { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
+                { icon: 'logo-facebook' as const, label: t.contactFacebook, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
+                { icon: 'mail' as const, label: t.contactEmail, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
               ].map((c, i) => (
                 <TouchableOpacity key={i} testID="contactCard" onPress={c.onPress} activeOpacity={0.82} style={S.contactCard}>
                   <LinearGradient colors={c.gradColors} style={S.contactCardInnerSm} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
@@ -908,6 +923,73 @@ export default function SRWebStudio() {
             <View style={S.contactResponseRow}>
               <Ionicons name="time-outline" size={14} color="#6366f1" />
               <Text style={S.contactResponseText}>{t.contactResponse}</Text>
+            </View>
+
+            {/* ── Contact Form ── */}
+            <View style={S.formCard}>
+              <Text style={S.formTitle}>{lang === 'pl' ? 'Wyślij zapytanie' : 'Send an inquiry'}</Text>
+
+              {fSent ? (
+                <View style={S.formSuccess}>
+                  <Ionicons name="checkmark-circle" size={36} color="#22c55e" />
+                  <Text style={S.formSuccessTitle}>{lang === 'pl' ? 'Dziękuję!' : 'Thank you!'}</Text>
+                  <Text style={S.formSuccessText}>{lang === 'pl' ? 'Wiadomość została wysłana. Odpowiem w ciągu kilku godzin.' : 'Message sent. I\'ll reply within a few hours.'}</Text>
+                  <TouchableOpacity onPress={() => setFSent(false)} style={S.formAgainBtn}>
+                    <Text style={S.formAgainText}>{lang === 'pl' ? 'Wyślij kolejne zapytanie' : 'Send another inquiry'}</Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <>
+                  {/* Name */}
+                  <Text style={S.formLabel}>{lang === 'pl' ? 'Imię i nazwisko / firma *' : 'Name / company *'}</Text>
+                  <TextInput style={[S.formInput, fErrors.name ? S.formInputErr : null]} placeholder={lang === 'pl' ? 'np. Jan Kowalski' : 'e.g. John Smith'} placeholderTextColor="#52525b" value={fName} onChangeText={v => { setFName(v); setFErrors(e => ({...e, name: ''})); }} />
+                  {fErrors.name ? <Text style={S.formErrText}>{fErrors.name}</Text> : null}
+
+                  {/* Email */}
+                  <Text style={S.formLabel}>{lang === 'pl' ? 'Adres e-mail *' : 'Email address *'}</Text>
+                  <TextInput style={[S.formInput, fErrors.email ? S.formInputErr : null]} placeholder="email@example.com" placeholderTextColor="#52525b" value={fEmail} onChangeText={v => { setFEmail(v); setFErrors(e => ({...e, email: ''})); }} keyboardType="email-address" autoCapitalize="none" />
+                  {fErrors.email ? <Text style={S.formErrText}>{fErrors.email}</Text> : null}
+
+                  {/* Service */}
+                  <Text style={S.formLabel}>{lang === 'pl' ? 'Jakie usługi szukasz? *' : 'What service are you looking for? *'}</Text>
+                  <TextInput style={[S.formInput, fErrors.service ? S.formInputErr : null]} placeholder={lang === 'pl' ? 'np. Landing page, sklep internetowy...' : 'e.g. Landing page, online store...'} placeholderTextColor="#52525b" value={fService} onChangeText={v => { setFService(v); setFErrors(e => ({...e, service: ''})); }} />
+                  {fErrors.service ? <Text style={S.formErrText}>{fErrors.service}</Text> : null}
+
+                  {/* Message */}
+                  <Text style={S.formLabel}>{lang === 'pl' ? 'Opis projektu *' : 'Project description *'}</Text>
+                  <TextInput style={[S.formInput, S.formTextArea, fErrors.message ? S.formInputErr : null]} placeholder={lang === 'pl' ? 'Opisz swój projekt, cele i oczekiwania...' : 'Describe your project, goals and expectations...'} placeholderTextColor="#52525b" value={fMessage} onChangeText={v => { setFMessage(v); setFErrors(e => ({...e, message: ''})); }} multiline numberOfLines={5} textAlignVertical="top" />
+                  {fErrors.message ? <Text style={S.formErrText}>{fErrors.message}</Text> : null}
+
+                  {/* Consent */}
+                  <TouchableOpacity onPress={() => { setFConsent(!fConsent); setFErrors(e => ({...e, consent: ''})); }} style={S.consentRow} activeOpacity={0.8}>
+                    <View style={[S.consentBox, fConsent && S.consentBoxActive, fErrors.consent ? S.consentBoxErr : null]}>
+                      {fConsent && <Ionicons name="checkmark" size={14} color="#fff" />}
+                    </View>
+                    <Text style={S.consentText}>{lang === 'pl' ? 'Wyrażam zgodę na przetwarzanie moich danych w celu kontaktu *' : 'I consent to processing my data for contact purposes *'}</Text>
+                  </TouchableOpacity>
+                  {fErrors.consent ? <Text style={S.formErrText}>{fErrors.consent}</Text> : null}
+
+                  {/* Error */}
+                  {fError ? (
+                    <View style={S.formErrorBanner}>
+                      <Ionicons name="alert-circle" size={16} color="#ef4444" />
+                      <Text style={S.formErrorText}>{fError}</Text>
+                    </View>
+                  ) : null}
+
+                  {/* Submit */}
+                  <TouchableOpacity testID="ctaBtn" onPress={submitForm} activeOpacity={0.85} disabled={fSending} style={{ marginTop: 8 }}>
+                    <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.formBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                      {fSending ? <ActivityIndicator color="#fff" size="small" /> : (
+                        <>
+                          <Ionicons name="send" size={16} color="#fff" />
+                          <Text style={S.formBtnText}>{lang === 'pl' ? 'Wyślij Zapytanie' : 'Send Inquiry'}</Text>
+                        </>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
           </Animated.View>
 
@@ -1191,27 +1273,41 @@ const S = StyleSheet.create({
 
   // ── Contact Form ──
   formCard: {
-    marginTop: 24, padding: 22, borderRadius: 18,
+    marginTop: 24, padding: 24, borderRadius: 18,
     backgroundColor: 'rgba(99,102,241,0.06)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.18)',
     ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
   },
-  formTitle: { color: '#a1a1aa', fontSize: 14, fontWeight: '600', textAlign: 'center', marginBottom: 16 },
+  formTitle: { color: '#f5f5f5', fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 20 },
+  formLabel: { color: '#a1a1aa', fontSize: 13, fontWeight: '600', marginBottom: 6, marginTop: 4 },
   formInput: {
     backgroundColor: 'rgba(255,255,255,0.05)', borderWidth: 1, borderColor: 'rgba(99,102,241,0.15)',
-    borderRadius: 10, paddingHorizontal: 16, paddingVertical: 13, color: '#f5f5f5', fontSize: 14, marginBottom: 12,
+    borderRadius: 10, paddingHorizontal: 16, paddingVertical: 13, color: '#f5f5f5', fontSize: 14, marginBottom: 4,
   },
-  formTextArea: { minHeight: 90 },
+  formInputErr: { borderColor: 'rgba(239,68,68,0.5)' },
+  formTextArea: { minHeight: 100 },
+  formErrText: { color: '#ef4444', fontSize: 12, fontWeight: '500', marginBottom: 6, marginLeft: 4 },
+  consentRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 10, marginBottom: 4 },
+  consentBox: {
+    width: 22, height: 22, borderRadius: 6, borderWidth: 1.5, borderColor: 'rgba(99,102,241,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.04)', justifyContent: 'center', alignItems: 'center', marginTop: 2,
+  },
+  consentBoxActive: { backgroundColor: '#6366f1', borderColor: '#6366f1' },
+  consentBoxErr: { borderColor: 'rgba(239,68,68,0.5)' },
+  consentText: { color: '#a1a1aa', fontSize: 12, lineHeight: 18, flex: 1 },
   formBtn: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-    paddingVertical: 15, borderRadius: 12,
+    paddingVertical: 16, borderRadius: 12,
     shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
     ...(isWeb ? { cursor: 'pointer' } : {}),
   },
-  formBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  formSuccess: {
-    alignItems: 'center', gap: 10, paddingVertical: 20,
-  },
-  formSuccessText: { color: '#22c55e', fontSize: 15, fontWeight: '600', textAlign: 'center' },
+  formBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
+  formSuccess: { alignItems: 'center', gap: 10, paddingVertical: 28 },
+  formSuccessTitle: { color: '#f5f5f5', fontSize: 22, fontWeight: '800' },
+  formSuccessText: { color: '#a1a1aa', fontSize: 15, textAlign: 'center', lineHeight: 22, maxWidth: 300 },
+  formAgainBtn: { marginTop: 12, paddingHorizontal: 18, paddingVertical: 10, borderRadius: 10, borderWidth: 1, borderColor: 'rgba(99,102,241,0.3)', ...(isWeb ? { cursor: 'pointer' } : {}) },
+  formAgainText: { color: '#818cf8', fontSize: 13, fontWeight: '600' },
+  formErrorBanner: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: 'rgba(239,68,68,0.08)', borderWidth: 1, borderColor: 'rgba(239,68,68,0.2)', marginTop: 8 },
+  formErrorText: { color: '#ef4444', fontSize: 13, fontWeight: '500', flex: 1 },
 
   // ── Footer ──
   footer: { paddingHorizontal: 24, paddingTop: 28, paddingBottom: 80, alignItems: 'center' },
