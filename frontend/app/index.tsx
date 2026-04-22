@@ -227,15 +227,9 @@ export default function SRWebStudio() {
   const footFade = useRef(new Animated.Value(0)).current;
   const sectionAnimated = useRef<Set<string>>(new Set());
 
-  // Testimonials carousel
+  // Testimonials — simple auto-cycle
   const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const testimonialScrollRef = useRef<ScrollView>(null);
-  const testimonialScrollX = useRef(new Animated.Value(0)).current;
-  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const touchingRef = useRef(false);
-  const CARD_W = isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400);
-  const CARD_GAP = 16;
-  const SNAP = CARD_W + CARD_GAP;
+  const testimonialFade = useRef(new Animated.Value(1)).current;
 
   // Contact form removed — direct contact only
 
@@ -500,23 +494,16 @@ export default function SRWebStudio() {
     trigger('cont', contactY.current, contFade);
   }, []);
 
-  // Testimonials auto-scroll
+  // Testimonials auto-cycle with fade
   useEffect(() => {
-    autoScrollRef.current = setInterval(() => {
-      if (touchingRef.current) return;
-      setActiveTestimonial(prev => {
-        const next = (prev + 1) % 3;
-        testimonialScrollRef.current?.scrollTo({ x: next * SNAP, animated: true });
-        return next;
+    const interval = setInterval(() => {
+      Animated.timing(testimonialFade, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
+        setActiveTestimonial(prev => (prev + 1) % 3);
+        Animated.timing(testimonialFade, { toValue: 1, duration: 400, useNativeDriver: true }).start();
       });
-    }, 4500);
-    return () => { if (autoScrollRef.current) clearInterval(autoScrollRef.current); };
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
-
-  const onTestimonialScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const idx = Math.round(e.nativeEvent.contentOffset.x / SNAP);
-    if (idx >= 0 && idx < 3 && idx !== activeTestimonial) setActiveTestimonial(idx);
-  };
 
   const scrollTo = (ref: React.MutableRefObject<number>) => {
     scrollViewRef.current?.scrollTo({ y: ref.current - 60, animated: true });
@@ -814,48 +801,39 @@ export default function SRWebStudio() {
           <Animated.View style={[S.section, secStyle(testFade)]} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
             <Text style={S.sectionLabel}>{t.testLabel}</Text>
             <Text style={S.sectionTitle}>{t.testTitle}</Text>
-            <Animated.ScrollView
-              ref={testimonialScrollRef} horizontal showsHorizontalScrollIndicator={false}
-              snapToInterval={SNAP} decelerationRate="fast" contentContainerStyle={S.carouselWrap}
-              onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: testimonialScrollX } } }], { useNativeDriver: true, listener: onTestimonialScroll })}
-              scrollEventThrottle={16}
-              onTouchStart={() => { touchingRef.current = true; if (autoScrollRef.current) clearInterval(autoScrollRef.current); }}
-              onTouchEnd={() => {
-                touchingRef.current = false;
-                autoScrollRef.current = setInterval(() => {
-                  if (touchingRef.current) return;
-                  setActiveTestimonial(prev => { const next = (prev + 1) % 3; testimonialScrollRef.current?.scrollTo({ x: next * SNAP, animated: true }); return next; });
-                }, 4500);
-              }}
-              onMomentumScrollEnd={onTestimonialScroll}
-            >
-              {testimonials.map((tt, i) => {
-                const range = [(i - 1) * SNAP, i * SNAP, (i + 1) * SNAP];
-                const scale = testimonialScrollX.interpolate({ inputRange: range, outputRange: [0.9, 1.02, 0.9], extrapolate: 'clamp' });
-                const opacity = testimonialScrollX.interpolate({ inputRange: range, outputRange: [0.5, 1, 0.5], extrapolate: 'clamp' });
-                const rotY = testimonialScrollX.interpolate({ inputRange: range, outputRange: ['3deg', '0deg', '-3deg'], extrapolate: 'clamp' });
-                return (
-                  <Animated.View key={i} style={[S.testimonialCard, { width: CARD_W, transform: [{ perspective: 800 }, { scale }, { rotateY: rotY }], opacity }]}>
-                    <View style={S.testimonialStars}>
-                      {[...Array(tt.rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
-                    </View>
-                    <Text style={S.testimonialText}>"{tt.text}"</Text>
-                    <View style={S.testimonialAuthor}>
-                      <View style={S.testimonialAvatar}>
-                        <LinearGradient colors={['#6366f1', '#a855f7']} style={S.testimonialAvatarBg}>
-                          <Text style={S.testimonialAvatarLetter}>{tt.name.charAt(0)}</Text>
-                        </LinearGradient>
-                      </View>
-                      <View>
-                        <Text style={S.testimonialName}>{tt.name}</Text>
-                        <Text style={S.testimonialRole}>{tt.role}</Text>
-                      </View>
-                    </View>
-                  </Animated.View>
-                );
-              })}
-            </Animated.ScrollView>
-            <View style={S.dots}>{[0, 1, 2].map(i => <View key={i} style={[S.dot, activeTestimonial === i && S.dotActive]} />)}</View>
+
+            {/* Single visible card with fade transition */}
+            <Animated.View style={[S.testimonialCard, { opacity: testimonialFade }]}>
+              <View style={S.testimonialStars}>
+                {[...Array(testimonials[activeTestimonial].rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
+              </View>
+              <Text style={S.testimonialText}>"{testimonials[activeTestimonial].text}"</Text>
+              <View style={S.testimonialAuthor}>
+                <View style={S.testimonialAvatar}>
+                  <LinearGradient colors={['#6366f1', '#a855f7']} style={S.testimonialAvatarBg}>
+                    <Text style={S.testimonialAvatarLetter}>{testimonials[activeTestimonial].name.charAt(0)}</Text>
+                  </LinearGradient>
+                </View>
+                <View>
+                  <Text style={S.testimonialName}>{testimonials[activeTestimonial].name}</Text>
+                  <Text style={S.testimonialRole}>{testimonials[activeTestimonial].role}</Text>
+                </View>
+              </View>
+            </Animated.View>
+
+            {/* Dots */}
+            <View style={S.dots}>
+              {[0, 1, 2].map(i => (
+                <TouchableOpacity key={i} onPress={() => {
+                  Animated.timing(testimonialFade, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
+                    setActiveTestimonial(i);
+                    Animated.timing(testimonialFade, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+                  });
+                }}>
+                  <View style={[S.dot, activeTestimonial === i && S.dotActive]} />
+                </TouchableOpacity>
+              ))}
+            </View>
           </Animated.View>
 
           <LinearGradient testID="neonDivider" colors={['rgba(99,102,241,0.25)', 'rgba(236,72,153,0.2)', 'rgba(139,92,246,0.25)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
@@ -1113,10 +1091,6 @@ const S = StyleSheet.create({
   pricingBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 
   // ── Testimonials ──
-  carouselWrap: {
-    paddingHorizontal: Math.round((width - (isSmallScreen ? Math.round(width * 0.82) : Math.min(Math.round(width * 0.85), 400))) / 2),
-    gap: 16, alignItems: 'center', paddingVertical: 8,
-  },
   testimonialCard: {
     borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
     shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.18, shadowRadius: 16, elevation: 5,
