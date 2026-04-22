@@ -80,3 +80,6 @@ memory/test_credentials.md
 
 # Mobile development
 android-sdk/
+frontend/.metro-cache/
+node_modules/
+project.zip
