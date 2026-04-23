@@ -262,19 +262,54 @@ export default function SRWebStudio() {
     if (!validateForm()) return;
     setFSending(true);
     setFError('');
+
+    // Get Web3Forms access key from env
+    const w3Key = process.env.EXPO_PUBLIC_WEB3FORMS_KEY || '';
+
+    if (!w3Key) {
+      setFError(lang === 'pl' ? 'Formularz nie jest jeszcze skonfigurowany. Skontaktuj się przez Telegram.' : 'Form not configured yet. Please contact via Telegram.');
+      setFSending(false);
+      return;
+    }
+
     try {
-      const res = await fetch(`${API_BASE}/api/contact`, {
+      // Send via Web3Forms — real email delivery
+      const w3Res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          access_key: w3Key,
+          subject: `Nowe zapytanie od ${fName} - SR Web Studio`,
+          from_name: fName,
+          name: fName,
+          email: fEmail,
+          service: fService,
+          message: fMessage,
+          consent: fConsent ? 'Tak' : 'Nie',
+        }),
+      });
+      const w3Data = await w3Res.json();
+
+      if (!w3Data.success) {
+        console.log('Web3Forms error:', w3Data);
+        setFError(lang === 'pl' ? 'Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na Telegram.' : 'Failed to send message. Try again or contact via Telegram.');
+        setFSending(false);
+        return;
+      }
+
+      console.log('Email sent successfully via Web3Forms');
+
+      // Also save to MongoDB as backup (non-blocking)
+      fetch(`${API_BASE}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: fName, email: fEmail, service: fService, message: fMessage, consent: fConsent }),
-      });
-      if (res.ok) {
-        setFSent(true);
-        setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
-      } else {
-        setFError(lang === 'pl' ? 'Wystąpił błąd. Spróbuj ponownie.' : 'An error occurred. Try again.');
-      }
-    } catch {
+      }).catch(() => {});
+
+      setFSent(true);
+      setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
+    } catch (err) {
+      console.log('Form submission error:', err);
       setFError(lang === 'pl' ? 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.' : 'Connection error. Check internet and try again.');
     }
     setFSending(false);
