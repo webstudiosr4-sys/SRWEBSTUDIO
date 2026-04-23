@@ -229,9 +229,7 @@ export default function SRWebStudio() {
   const footFade = useRef(new Animated.Value(0)).current;
   const sectionAnimated = useRef<Set<string>>(new Set());
 
-  // Testimonials — simple auto-cycle
-  const [activeTestimonial, setActiveTestimonial] = useState(0);
-  const testimonialFade = useRef(new Animated.Value(1)).current;
+  // Testimonials data only — no animation needed
 
   // Contact form removed — direct contact only
 
@@ -547,20 +545,21 @@ export default function SRWebStudio() {
         animation: glowBreath 3s ease-in-out infinite !important;
       }
 
-      /* ── Testimonial card fix — prevent vertical text on mobile ── */
-      [data-testid="testimonialCard"] {
-        width: 100% !important;
-        min-width: 0 !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-        word-break: normal !important;
-        overflow-wrap: break-word !important;
-        writing-mode: horizontal-tb !important;
+      /* ── Testimonials responsive grid ── */
+      [data-testid="tGrid"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
       }
-      [data-testid="testimonialCard"] * {
-        writing-mode: horizontal-tb !important;
-        word-break: normal !important;
+      @media (min-width: 768px) {
+        [data-testid="tGrid"] {
+          flex-direction: row !important;
+        }
+        [data-testid="tGridCard"] {
+          flex: 1 !important;
+        }
       }
+
 
       /* ── Trust Badges — multi-color hover ── */
       [data-testid="trustBadge"] {
@@ -613,17 +612,6 @@ export default function SRWebStudio() {
     trigger('test', testimonialsY.current, testFade);
     trigger('cta', finalCtaY.current, ctaFade);
     trigger('cont', contactY.current, contFade);
-  }, []);
-
-  // Testimonials auto-cycle with fade
-  useEffect(() => {
-    const interval = setInterval(() => {
-      Animated.timing(testimonialFade, { toValue: 0, duration: 300, useNativeDriver: true }).start(() => {
-        setActiveTestimonial(prev => (prev + 1) % 3);
-        Animated.timing(testimonialFade, { toValue: 1, duration: 400, useNativeDriver: true }).start();
-      });
-    }, 5000);
-    return () => clearInterval(interval);
   }, []);
 
   const scrollTo = (ref: React.MutableRefObject<number>) => {
@@ -918,44 +906,31 @@ export default function SRWebStudio() {
             </View>
           </Animated.View>
 
-          {/* ════════ TESTIMONIALS ════════ */}
-          <Animated.View style={[S.section, secStyle(testFade)]} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
+          {/* ════════ TESTIMONIALS — SIMPLE STATIC GRID ════════ */}
+          <View style={S.section} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
             <Text style={S.sectionLabel}>{t.testLabel}</Text>
             <Text style={S.sectionTitle}>{t.testTitle}</Text>
 
-            {/* Single visible card with fade transition */}
-            <Animated.View testID="testimonialCard" style={[S.testimonialCard, { opacity: testimonialFade }]}>
-              <View style={S.testimonialStars}>
-                {[...Array(testimonials[activeTestimonial].rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
-              </View>
-              <Text style={S.testimonialText}>"{testimonials[activeTestimonial].text}"</Text>
-              <View style={S.testimonialAuthor}>
-                <View style={S.testimonialAvatar}>
-                  <LinearGradient colors={['#6366f1', '#a855f7']} style={S.testimonialAvatarBg}>
-                    <Text style={S.testimonialAvatarLetter}>{testimonials[activeTestimonial].name.charAt(0)}</Text>
-                  </LinearGradient>
+            <View testID="tGrid" style={S.testimonialsGrid}>
+              {testimonials.map((tt, i) => (
+                <View key={i} testID="tGridCard" style={S.tCard}>
+                  <View style={S.tStars}>
+                    {[...Array(tt.rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
+                  </View>
+                  <Text style={S.tText}>"{tt.text}"</Text>
+                  <View style={S.tAuthor}>
+                    <LinearGradient colors={['#6366f1', '#a855f7']} style={S.tAvatar}>
+                      <Text style={S.tAvatarLetter}>{tt.name.charAt(0)}</Text>
+                    </LinearGradient>
+                    <View>
+                      <Text style={S.tName}>{tt.name}</Text>
+                      <Text style={S.tRole}>{tt.role}</Text>
+                    </View>
+                  </View>
                 </View>
-                <View>
-                  <Text style={S.testimonialName}>{testimonials[activeTestimonial].name}</Text>
-                  <Text style={S.testimonialRole}>{testimonials[activeTestimonial].role}</Text>
-                </View>
-              </View>
-            </Animated.View>
-
-            {/* Dots */}
-            <View style={S.dots}>
-              {[0, 1, 2].map(i => (
-                <TouchableOpacity key={i} onPress={() => {
-                  Animated.timing(testimonialFade, { toValue: 0, duration: 200, useNativeDriver: true }).start(() => {
-                    setActiveTestimonial(i);
-                    Animated.timing(testimonialFade, { toValue: 1, duration: 300, useNativeDriver: true }).start();
-                  });
-                }}>
-                  <View style={[S.dot, activeTestimonial === i && S.dotActive]} />
-                </TouchableOpacity>
               ))}
             </View>
-          </Animated.View>
+          </View>
 
           <LinearGradient testID="neonDivider" colors={['rgba(99,102,241,0.25)', 'rgba(236,72,153,0.2)', 'rgba(139,92,246,0.25)']} style={S.sectionDivider} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} />
 
@@ -1246,25 +1221,24 @@ const S = StyleSheet.create({
   pricingBtn: { paddingVertical: 14, borderRadius: 10, alignItems: 'center', ...(isWeb ? { cursor: 'pointer' } : {}) },
   pricingBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 
-  // ── Testimonials ──
-  testimonialCard: {
-    width: '100%', alignSelf: 'stretch', flexShrink: 0,
-    borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
-    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.18, shadowRadius: 16, elevation: 5,
-    overflow: 'hidden',
-    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', minWidth: 0, boxSizing: 'border-box' } as any : {}),
+  // ── Testimonials — simple static grid ──
+  testimonialsGrid: {
+    gap: 16,
   },
-  testimonialStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
-  testimonialText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16, flexShrink: 1, flexWrap: 'wrap' },
-  testimonialAuthor: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  testimonialAvatar: { width: 36, height: 36, borderRadius: 18, overflow: 'hidden' },
-  testimonialAvatarBg: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
-  testimonialAvatarLetter: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  testimonialName: { color: '#f5f5f5', fontSize: 14, fontWeight: '700' },
-  testimonialRole: { color: '#71717a', fontSize: 12 },
-  dots: { flexDirection: 'row', justifyContent: 'center', gap: 8, marginTop: 18 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: 'rgba(99,102,241,0.2)' },
-  dotActive: { width: 24, backgroundColor: '#6366f1' },
+  tCard: {
+    backgroundColor: 'rgba(99,102,241,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(139,92,246,0.2)',
+    borderRadius: 16,
+    padding: 22,
+  },
+  tStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
+  tText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 },
+  tAuthor: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  tAvatar: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
+  tAvatarLetter: { color: '#fff', fontSize: 15, fontWeight: '700' },
+  tName: { color: '#f5f5f5', fontSize: 14, fontWeight: '700' },
+  tRole: { color: '#71717a', fontSize: 12 },
 
   // ── Final CTA ──
   finalCta: { paddingHorizontal: 24, paddingVertical: 28 },
