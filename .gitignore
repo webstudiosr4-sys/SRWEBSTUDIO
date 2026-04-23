@@ -93,3 +93,12 @@ memory/test_credentials.md
 android-sdk/
 project.zip
 myproject.zip
+-e 
+# Environment and credential files
+.env
+.env.*
+*.env
+credentials.json
+*.pem
+*.key
+.credentials
