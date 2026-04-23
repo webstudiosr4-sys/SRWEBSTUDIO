@@ -545,18 +545,36 @@ export default function SRWebStudio() {
         animation: glowBreath 3s ease-in-out infinite !important;
       }
 
-      /* ── Testimonials responsive grid ── */
+      /* ── Testimonials responsive grid — NUCLEAR FIX ── */
       [data-testid="tGrid"] {
         display: flex !important;
         flex-direction: column !important;
-        gap: 16px !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+      }
+      [data-testid="tGridCard"] {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+        hyphens: auto !important;
+      }
+      [data-testid="tGridCard"] > * {
+        max-width: 100% !important;
+        word-break: normal !important;
       }
       @media (min-width: 768px) {
         [data-testid="tGrid"] {
           flex-direction: row !important;
+          gap: 16px !important;
         }
         [data-testid="tGridCard"] {
-          flex: 1 !important;
+          flex: 1 1 0% !important;
+          width: auto !important;
         }
       }
 
@@ -906,25 +924,25 @@ export default function SRWebStudio() {
             </View>
           </Animated.View>
 
-          {/* ════════ TESTIMONIALS — SIMPLE STATIC GRID ════════ */}
-          <View style={S.section} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
+          {/* ════════ TESTIMONIALS ════════ */}
+          <View style={{ paddingHorizontal: 24, paddingVertical: 36, width: '100%' }} onLayout={e => { testimonialsY.current = e.nativeEvent.layout.y; }}>
             <Text style={S.sectionLabel}>{t.testLabel}</Text>
             <Text style={S.sectionTitle}>{t.testTitle}</Text>
 
-            <View testID="tGrid" style={S.testimonialsGrid}>
+            <View testID="tGrid" style={{ width: '100%' }}>
               {testimonials.map((tt, i) => (
-                <View key={i} testID="tGridCard" style={S.tCard}>
-                  <View style={S.tStars}>
+                <View key={i} testID="tGridCard" style={{ width: '100%', backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)', borderRadius: 16, padding: 22, marginBottom: 16 }}>
+                  <View style={{ flexDirection: 'row', marginBottom: 12 }}>
                     {[...Array(tt.rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
                   </View>
-                  <Text style={S.tText}>"{tt.text}"</Text>
-                  <View style={S.tAuthor}>
-                    <LinearGradient colors={['#6366f1', '#a855f7']} style={S.tAvatar}>
-                      <Text style={S.tAvatarLetter}>{tt.name.charAt(0)}</Text>
+                  <Text style={{ color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 }}>"{tt.text}"</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <LinearGradient colors={['#6366f1', '#a855f7']} style={{ width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center', marginRight: 10 }}>
+                      <Text style={{ color: '#fff', fontSize: 15, fontWeight: '700' }}>{tt.name.charAt(0)}</Text>
                     </LinearGradient>
                     <View>
-                      <Text style={S.tName}>{tt.name}</Text>
-                      <Text style={S.tRole}>{tt.role}</Text>
+                      <Text style={{ color: '#f5f5f5', fontSize: 14, fontWeight: '700' }}>{tt.name}</Text>
+                      <Text style={{ color: '#71717a', fontSize: 12 }}>{tt.role}</Text>
                     </View>
                   </View>
                 </View>
@@ -1221,24 +1239,7 @@ const S = StyleSheet.create({
   pricingBtn: { paddingVertical: 14, borderRadius: 10, alignItems: 'center', ...(isWeb ? { cursor: 'pointer' } : {}) },
   pricingBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
 
-  // ── Testimonials — simple static grid ──
-  testimonialsGrid: {
-    gap: 16,
-  },
-  tCard: {
-    backgroundColor: 'rgba(99,102,241,0.1)',
-    borderWidth: 1,
-    borderColor: 'rgba(139,92,246,0.2)',
-    borderRadius: 16,
-    padding: 22,
-  },
-  tStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
-  tText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 },
-  tAuthor: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  tAvatar: { width: 36, height: 36, borderRadius: 18, justifyContent: 'center', alignItems: 'center' },
-  tAvatarLetter: { color: '#fff', fontSize: 15, fontWeight: '700' },
-  tName: { color: '#f5f5f5', fontSize: 14, fontWeight: '700' },
-  tRole: { color: '#71717a', fontSize: 12 },
+  // ── Testimonials styles removed — all inline now ──
 
   // ── Final CTA ──
   finalCta: { paddingHorizontal: 24, paddingVertical: 28 },
