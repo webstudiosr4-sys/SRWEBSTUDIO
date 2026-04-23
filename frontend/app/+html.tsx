@@ -37,7 +37,7 @@ export default function Root({ children }: PropsWithChildren) {
                 display: flex !important;
                 flex-direction: column !important;
                 width: 100% !important;
-                min-width: 280px !important;
+                min-width: 0 !important;
                 box-sizing: border-box !important;
                 writing-mode: horizontal-tb !important;
                 white-space: normal !important;
