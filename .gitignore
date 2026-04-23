@@ -30,8 +30,13 @@ next-env.d.ts
 dist/
 dist
 
-# Environment files (comprehensive coverage)
-
+# Environment files
+.env
+.env.local
+.env.production
+.env.development
+frontend/.env
+backend/.env
 *token.json*
 *credentials.json*
 
@@ -75,11 +80,16 @@ agenthub/agents/youtube/db
 
 # Build caches
 .cache/
+.metro-cache/
+frontend/.metro-cache/
+
+# Screenshots and test artifacts
+screenshot_*.png
+test_result.md
 
 memory/test_credentials.md
 
 # Mobile development
 android-sdk/
-frontend/.metro-cache/
-node_modules/
 project.zip
+myproject.zip
