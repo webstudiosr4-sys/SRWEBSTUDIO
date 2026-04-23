@@ -545,39 +545,7 @@ export default function SRWebStudio() {
         animation: glowBreath 3s ease-in-out infinite !important;
       }
 
-      /* ── Testimonials responsive grid — NUCLEAR FIX ── */
-      [data-testid="tGrid"] {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-      }
-      [data-testid="tGridCard"] {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        min-width: 0 !important;
-        box-sizing: border-box !important;
-        word-break: normal !important;
-        overflow-wrap: break-word !important;
-        hyphens: auto !important;
-      }
-      [data-testid="tGridCard"] > * {
-        max-width: 100% !important;
-        word-break: normal !important;
-      }
-      @media (min-width: 768px) {
-        [data-testid="tGrid"] {
-          flex-direction: row !important;
-          gap: 16px !important;
-        }
-        [data-testid="tGridCard"] {
-          flex: 1 1 0% !important;
-          width: auto !important;
-        }
-      }
-
+      /* ── Testimonials CSS now in +html.tsx (SSR-safe) ── */
 
       /* ── Trust Badges — multi-color hover ── */
       [data-testid="trustBadge"] {

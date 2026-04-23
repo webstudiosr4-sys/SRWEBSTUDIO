@@ -24,6 +24,44 @@ export default function Root({ children }: PropsWithChildren) {
               body > div:first-child { position: fixed !important; top: 0; left: 0; right: 0; bottom: 0; }
               [role="tablist"] [role="tab"] * { overflow: visible !important; }
               [role="heading"], [role="heading"] * { overflow: visible !important; }
+
+              /* ═══ TESTIMONIALS FIX — present from first render ═══ */
+              [data-testid="tGrid"] {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+              }
+              [data-testid="tGridCard"] {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                min-width: 280px !important;
+                box-sizing: border-box !important;
+                writing-mode: horizontal-tb !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+              }
+              [data-testid="tGridCard"] * {
+                writing-mode: horizontal-tb !important;
+                white-space: normal !important;
+                word-break: normal !important;
+                overflow-wrap: break-word !important;
+                max-width: 100% !important;
+              }
+              @media (min-width: 768px) {
+                [data-testid="tGrid"] {
+                  flex-direction: row !important;
+                  gap: 16px !important;
+                }
+                [data-testid="tGridCard"] {
+                  flex: 1 1 0% !important;
+                  width: auto !important;
+                  min-width: 0 !important;
+                }
+              }
             `,
           }}
         />
