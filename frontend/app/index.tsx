@@ -151,8 +151,8 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
 
 // ── API ──
 const getApiUrl = () => {
-  const extra = Constants.expoConfig?.extra;
-  if (extra?.EXPO_PUBLIC_BACKEND_URL) return extra.EXPO_PUBLIC_BACKEND_URL;
+  const backendUrl = process.env.EXPO_PUBLIC_BACKEND_URL;
+  if (backendUrl) return backendUrl;
   if (Platform.OS === 'web') return '';
   return 'http://localhost:8001';
 };
@@ -263,54 +263,78 @@ export default function SRWebStudio() {
     setFSending(true);
     setFError('');
 
-    // Get Web3Forms access key from env
     const w3Key = process.env.EXPO_PUBLIC_WEB3FORMS_KEY || '';
+    let emailSent = false;
 
-    if (!w3Key) {
-      setFError(lang === 'pl' ? 'Formularz nie jest jeszcze skonfigurowany. Skontaktuj się przez Telegram.' : 'Form not configured yet. Please contact via Telegram.');
-      setFSending(false);
-      return;
+    // Try Web3Forms (works from HTTPS origins / real browsers)
+    if (w3Key && w3Key !== 'YOUR_ACCESS_KEY_HERE') {
+      try {
+        const formData = new FormData();
+        formData.append('access_key', w3Key);
+        formData.append('subject', `Nowe zapytanie od ${fName} - SR Web Studio`);
+        formData.append('from_name', fName);
+        formData.append('name', fName);
+        formData.append('email', fEmail);
+        formData.append('service', fService);
+        formData.append('message', fMessage);
+        formData.append('consent', fConsent ? 'Tak' : 'Nie');
+
+        const w3Res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          body: formData,
+        });
+        const w3Data = await w3Res.json();
+        if (w3Data.success) {
+          emailSent = true;
+          console.log('Email sent via Web3Forms');
+        } else {
+          console.log('Web3Forms error:', w3Data);
+        }
+      } catch (e) {
+        console.log('Web3Forms fetch failed (CORS on localhost is normal):', e);
+      }
     }
 
+    // Save to backend DB (try multiple endpoints for dev/prod compatibility)
     try {
-      // Send via Web3Forms — real email delivery
-      const w3Res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          access_key: w3Key,
-          subject: `Nowe zapytanie od ${fName} - SR Web Studio`,
-          from_name: fName,
-          name: fName,
-          email: fEmail,
-          service: fService,
-          message: fMessage,
-          consent: fConsent ? 'Tak' : 'Nie',
-        }),
-      });
-      const w3Data = await w3Res.json();
-
-      if (!w3Data.success) {
-        console.log('Web3Forms error:', w3Data);
-        setFError(lang === 'pl' ? 'Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na Telegram.' : 'Failed to send message. Try again or contact via Telegram.');
+      const endpoints = [
+        `${API_BASE}/api/contact`,
+        '/api/contact',
+        'http://localhost:8001/api/contact',
+      ];
+      let saved = false;
+      for (const url of endpoints) {
+        if (saved) break;
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: fName, email: fEmail, service: fService, message: fMessage, consent: fConsent }),
+          });
+          if (res.ok) {
+            const data = await res.json().catch(() => ({}));
+            if (data.email_sent) emailSent = true;
+            saved = true;
+            console.log('Form saved via:', url, 'email_sent:', emailSent);
+          }
+        } catch {}
+      }
+      if (saved) {
+        setFSent(true);
+        setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
         setFSending(false);
         return;
       }
+    } catch (e) {
+      console.log('All backend saves failed:', e);
+    }
 
-      console.log('Email sent successfully via Web3Forms');
-
-      // Also save to MongoDB as backup (non-blocking)
-      fetch(`${API_BASE}/api/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: fName, email: fEmail, service: fService, message: fMessage, consent: fConsent }),
-      }).catch(() => {});
-
+    // If we got here, backend also failed
+    if (emailSent) {
       setFSent(true);
       setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
-    } catch (err) {
-      console.log('Form submission error:', err);
-      setFError(lang === 'pl' ? 'Błąd połączenia. Sprawdź internet i spróbuj ponownie.' : 'Connection error. Check internet and try again.');
+    } else {
+      setFError(lang === 'pl' ? 'Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na Telegram.' : 'Failed to send. Try again or contact via Telegram.');
     }
     setFSending(false);
   }, [fName, fEmail, fService, fMessage, fConsent, lang, validateForm]);
