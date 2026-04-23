@@ -547,6 +547,21 @@ export default function SRWebStudio() {
         animation: glowBreath 3s ease-in-out infinite !important;
       }
 
+      /* ── Testimonial card fix — prevent vertical text on mobile ── */
+      [data-testid="testimonialCard"] {
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        word-break: normal !important;
+        overflow-wrap: break-word !important;
+        writing-mode: horizontal-tb !important;
+      }
+      [data-testid="testimonialCard"] * {
+        writing-mode: horizontal-tb !important;
+        word-break: normal !important;
+      }
+
       /* ── Trust Badges — multi-color hover ── */
       [data-testid="trustBadge"] {
         transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s ease, border-color 0.35s ease !important;
@@ -909,7 +924,7 @@ export default function SRWebStudio() {
             <Text style={S.sectionTitle}>{t.testTitle}</Text>
 
             {/* Single visible card with fade transition */}
-            <Animated.View style={[S.testimonialCard, { opacity: testimonialFade }]}>
+            <Animated.View testID="testimonialCard" style={[S.testimonialCard, { opacity: testimonialFade }]}>
               <View style={S.testimonialStars}>
                 {[...Array(testimonials[activeTestimonial].rating)].map((_, si) => <Ionicons key={si} name="star" size={14} color="#f59e0b" />)}
               </View>
@@ -1233,12 +1248,14 @@ const S = StyleSheet.create({
 
   // ── Testimonials ──
   testimonialCard: {
+    width: '100%', alignSelf: 'stretch', flexShrink: 0,
     borderRadius: 16, padding: 22, backgroundColor: 'rgba(99,102,241,0.1)', borderWidth: 1, borderColor: 'rgba(139,92,246,0.2)',
     shadowColor: '#6366f1', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.18, shadowRadius: 16, elevation: 5,
-    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)' } as any : {}),
+    overflow: 'hidden',
+    ...(isWeb ? { backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', minWidth: 0, boxSizing: 'border-box' } as any : {}),
   },
   testimonialStars: { flexDirection: 'row', gap: 2, marginBottom: 12 },
-  testimonialText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16 },
+  testimonialText: { color: '#d4d4d8', fontSize: 15, lineHeight: 22, fontStyle: 'italic', marginBottom: 16, flexShrink: 1, flexWrap: 'wrap' },
   testimonialAuthor: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   testimonialAvatar: { width: 36, height: 36, borderRadius: 18, overflow: 'hidden' },
   testimonialAvatarBg: { width: 36, height: 36, justifyContent: 'center', alignItems: 'center' },
