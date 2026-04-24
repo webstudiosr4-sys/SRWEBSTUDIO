@@ -785,19 +785,19 @@ export default function SRWebStudio() {
                   title: t.port1, desc: t.port1d, tag: t.port1t, result: t.port1r,
                   features: [t.port1f1, t.port1f2, t.port1f3, t.port1f4],
                   image: 'https://images.unsplash.com/photo-1707836885254-79b6e3d7b18d?w=600&q=80',
-                  url: 'https://barber-style-27.preview.emergentagent.com/', accent: '#d4a254',
+                  url: 'https://srwebstudio.pl', accent: '#d4a254',
                 },
                 {
                   title: t.port2, desc: t.port2d, tag: t.port2t, result: t.port2r,
                   features: [t.port2f1, t.port2f2, t.port2f3, t.port2f4],
                   image: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80',
-                  url: 'https://premium-cafe-43.preview.emergentagent.com/', accent: '#ec4899',
+                  url: 'https://srwebstudio.pl', accent: '#ec4899',
                 },
                 {
                   title: t.port3, desc: t.port3d, tag: t.port3t, result: t.port3r,
                   features: [t.port3f1, t.port3f2, t.port3f3, t.port3f4],
                   image: 'https://images.unsplash.com/photo-1649442279006-8bccb4cc63e1?w=600&q=80',
-                  url: 'https://demo-ecommerce-1.preview.emergentagent.com/', accent: '#8b5cf6',
+                  url: 'https://srwebstudio.pl', accent: '#8b5cf6',
                 },
               ].map((p, i) => (
                 <TouchableOpacity
