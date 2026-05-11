@@ -58,17 +58,19 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv3: 'Modern design', adv3d: 'Clean & professional',
     adv4: 'Mobile optimized', adv4d: 'Looks great everywhere',
     adv5: 'Personal approach', adv5d: 'Direct communication',
-    portLabel: 'PORTFOLIO', portTitle: 'My work',
-    port1: 'Premium Barbershop Website', port1d: 'Barbershop website that increases online bookings', port1t: 'Landing Page',
-    port1f1: 'Online booking', port1f2: '3D animations', port1f3: 'Mobile-first', port1f4: 'SEO optimized',
-    port1r: '+ more clients',
-    port2: 'Stylish Cafe Website', port2d: 'Café website that attracts customers and builds atmosphere', port2t: 'Business Site',
-    port2f1: 'Digital menu', port2f2: 'Photo gallery', port2f3: 'Contact form', port2f4: 'Google Maps',
-    port2r: '+ better image',
-    port3: 'Clothing Store Website', port3d: 'Online store designed to boost sales', port3t: 'Online Store',
-    port3f1: 'Product catalog', port3f2: 'Shopping cart', port3f3: 'Secure payments', port3f4: 'Order tracking',
+    portLabel: 'CASE STUDIES', portTitle: 'Recent Projects',
+    portSub: 'Real websites built for real businesses',
+    port1: 'Premium Barber Studio', port1d: 'Premium barber website with dark luxury style, services section, team showcase and booking-focused CTA.', port1t: 'Barber / Beauty',
+    port1f1: 'Dark luxury design', port1f2: 'Booking CTA', port1f3: 'Team section', port1f4: 'Mobile-first',
+    port1r: '+ more bookings',
+    port2: 'Elegant Café & Restaurant', port2d: 'Modern café landing page with elegant design, menu presentation and atmosphere-focused layout.', port2t: 'Café / Restaurant',
+    port2f1: 'Menu showcase', port2f2: 'Atmosphere design', port2f3: 'Location & hours', port2f4: 'Mobile-ready',
+    port2r: '+ more visitors',
+    port3: 'Luxury Fashion Shop', port3d: 'Luxury fashion shop demo with product cards, cart, responsive mobile layout and custom domain deployment.', port3t: 'E-commerce',
+    port3f1: 'Product catalog', port3f2: 'Shopping cart', port3f3: 'Responsive layout', port3f4: 'Custom domain',
     port3r: '+ online sales',
-    portBtn: 'View website',
+    portBtn: 'View Live Site',
+    portCtaTitle: 'Want a website like this?', portCtaSub: 'Contact SR WebStudio — let\'s build your next project.', portCtaBtn: 'Get Started',
     priceLabel: 'PRICING', priceTitle: 'Simple pricing', priceGet: 'Get started',
     pricePop: 'Most Popular',
     p1: 'Basic', p1f1: '1 page website', p1f2: 'Simple modern design', p1f3: 'Mobile optimization',
@@ -112,17 +114,19 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     adv3: 'Nowoczesny design', adv3d: 'Czysty i profesjonalny',
     adv4: 'Optymalizacja mobilna', adv4d: 'Świetnie wygląda wszędzie',
     adv5: 'Indywidualne podejście', adv5d: 'Bezpośredni kontakt',
-    portLabel: 'PORTFOLIO', portTitle: 'Moje realizacje',
-    port1: 'Barbershop Premium Warszawa', port1d: 'Strona dla barbera zwiększająca liczbę rezerwacji online', port1t: 'Landing Page',
-    port1f1: 'Rezerwacja online', port1f2: 'Animacje 3D', port1f3: 'Mobile-first', port1f4: 'SEO',
-    port1r: '+ więcej klientów',
-    port2: 'Stylowa Kawiarnia Warszawa', port2d: 'Strona dla kawiarni, która przyciąga klientów i buduje klimat', port2t: 'Strona firmowa',
-    port2f1: 'Menu online', port2f2: 'Galeria zdjęć', port2f3: 'Formularz kontaktowy', port2f4: 'Google Maps',
-    port2r: '+ lepszy wizerunek',
-    port3: 'Sklep Odzieżowy Premium', port3d: 'Sklep internetowy zaprojektowany do zwiększania sprzedaży', port3t: 'Sklep online',
-    port3f1: 'Katalog produktów', port3f2: 'Koszyk', port3f3: 'Bezpieczne płatności', port3f4: 'Śledzenie zamówień',
+    portLabel: 'PORTFOLIO', portTitle: 'Nasze realizacje',
+    portSub: 'Prawdziwe strony stworzone dla prawdziwych firm',
+    port1: 'Premium Barber Studio', port1d: 'Strona dla barbera z luksusowym ciemnym stylem, sekcją usług, zespołem i CTA zachęcającym do rezerwacji.', port1t: 'Barber / Uroda',
+    port1f1: 'Luksusowy design', port1f2: 'CTA rezerwacji', port1f3: 'Sekcja zespołu', port1f4: 'Mobile-first',
+    port1r: '+ więcej rezerwacji',
+    port2: 'Elegancka Kawiarnia', port2d: 'Nowoczesna strona kawiarni z eleganckim designem, prezentacją menu i klimatycznym layoutem.', port2t: 'Kawiarnia / Restauracja',
+    port2f1: 'Prezentacja menu', port2f2: 'Klimatyczny design', port2f3: 'Lokalizacja i godziny', port2f4: 'Responsywność',
+    port2r: '+ więcej odwiedzin',
+    port3: 'Luksusowy Sklep Mody', port3d: 'Demo sklepu z modą z kartami produktów, koszykiem, responsywnym layoutem i własną domeną.', port3t: 'E-commerce',
+    port3f1: 'Katalog produktów', port3f2: 'Koszyk zakupowy', port3f3: 'Responsywny layout', port3f4: 'Własna domena',
     port3r: '+ sprzedaż online',
-    portBtn: 'Zobacz stronę',
+    portBtn: 'Zobacz stronę na żywo',
+    portCtaTitle: 'Chcesz taką stronę?', portCtaSub: 'Skontaktuj się z SR WebStudio — zbudujmy Twój kolejny projekt.', portCtaBtn: 'Rozpocznij',
     priceLabel: 'CENNIK', priceTitle: 'Prosty cennik', priceGet: 'Rozpocznij',
     pricePop: 'Najpopularniejszy',
     p1: 'Basic', p1f1: 'Strona 1-stronicowa', p1f2: 'Prosty nowoczesny design', p1f3: 'Optymalizacja mobilna',
@@ -779,25 +783,26 @@ export default function SRWebStudio() {
 
             <Text style={S.sectionLabel}>{t.portLabel}</Text>
             <Text style={S.sectionTitle}>{t.portTitle}</Text>
+            <Text style={S.contactSubtext}>{t.portSub}</Text>
             <View style={S.portfolioGrid}>
               {[
                 {
                   title: t.port1, desc: t.port1d, tag: t.port1t, result: t.port1r,
                   features: [t.port1f1, t.port1f2, t.port1f3, t.port1f4],
-                  image: 'https://images.unsplash.com/photo-1707836885254-79b6e3d7b18d?w=600&q=80',
-                  url: 'https://barber-style-27.preview.emergentagent.com/', accent: '#d4a254',
+                  image: 'https://images.unsplash.com/photo-1585747860019-8e79b4b5a325?w=600&q=80',
+                  url: 'https://barber.srwebstudio.pl', accent: '#d4a254',
                 },
                 {
                   title: t.port2, desc: t.port2d, tag: t.port2t, result: t.port2r,
                   features: [t.port2f1, t.port2f2, t.port2f3, t.port2f4],
-                  image: 'https://images.unsplash.com/photo-1481487196290-c152efe083f5?w=600&q=80',
-                  url: 'https://premium-cafe-43.preview.emergentagent.com/', accent: '#ec4899',
+                  image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=600&q=80',
+                  url: 'https://cafe.srwebstudio.pl', accent: '#ec4899',
                 },
                 {
                   title: t.port3, desc: t.port3d, tag: t.port3t, result: t.port3r,
                   features: [t.port3f1, t.port3f2, t.port3f3, t.port3f4],
-                  image: 'https://images.unsplash.com/photo-1649442279006-8bccb4cc63e1?w=600&q=80',
-                  url: 'https://demo-ecommerce-1.preview.emergentagent.com/', accent: '#8b5cf6',
+                  image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=600&q=80',
+                  url: 'https://shop.srwebstudio.pl', accent: '#6366f1',
                 },
               ].map((p, i) => (
                 <TouchableOpacity
@@ -845,6 +850,20 @@ export default function SRWebStudio() {
                   </View>
                 </TouchableOpacity>
               ))}
+            </View>
+
+            {/* Portfolio CTA */}
+            <View style={S.portCtaWrap}>
+              <LinearGradient colors={['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.08)']} style={S.portCtaInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                <Text style={S.portCtaTitle}>{t.portCtaTitle}</Text>
+                <Text style={S.portCtaSub}>{t.portCtaSub}</Text>
+                <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
+                  <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.portCtaBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Ionicons name="paper-plane" size={16} color="#fff" />
+                    <Text style={S.portCtaBtnText}>{t.portCtaBtn}</Text>
+                  </LinearGradient>
+                </TouchableOpacity>
+              </LinearGradient>
             </View>
           </Animated.View>
 
@@ -1184,6 +1203,22 @@ const S = StyleSheet.create({
   portfolioFeatureText: { color: '#d4d4d8', fontSize: 12, fontWeight: '500' },
   portfolioBtnWrap: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 13, borderRadius: 12, borderWidth: 1, ...(isWeb ? { cursor: 'pointer' } : {}) },
   portfolioBtnText: { fontSize: 14, fontWeight: '700' },
+
+  // ── Portfolio CTA ──
+  portCtaWrap: { marginTop: 28 },
+  portCtaInner: {
+    padding: 28, borderRadius: 20, alignItems: 'center',
+    borderWidth: 1, borderColor: 'rgba(99,102,241,0.25)',
+  },
+  portCtaTitle: { fontSize: 22, fontWeight: '800', color: '#f5f5f5', textAlign: 'center', marginBottom: 8 },
+  portCtaSub: { fontSize: 14, color: '#a1a1aa', textAlign: 'center', lineHeight: 20, marginBottom: 20, maxWidth: 320 },
+  portCtaBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+    paddingHorizontal: 28, paddingVertical: 14, borderRadius: 12,
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 6,
+    ...(isWeb ? { cursor: 'pointer' } : {}),
+  },
+  portCtaBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   liveBadge: { position: 'absolute', top: 14, right: 14, flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: 'rgba(0,0,0,0.6)', borderWidth: 1, borderColor: 'rgba(34,197,94,0.5)', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
   liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#22c55e' },
   liveBadgeText: { color: '#22c55e', fontSize: 10, fontWeight: '800', letterSpacing: 1 },
