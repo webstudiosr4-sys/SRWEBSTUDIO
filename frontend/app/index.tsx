@@ -704,10 +704,10 @@ export default function SRWebStudio() {
             </View>
 
             <View style={S.ctaRow}>
-              <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
+              <TouchableOpacity testID="ctaBtn" onPress={openWhatsApp} activeOpacity={0.85}>
                 <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-                  <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                    <Ionicons name="paper-plane" size={18} color="#fff" />
+                  <LinearGradient colors={['#25D366', '#128C7E']} style={S.ctaPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Ionicons name="logo-whatsapp" size={18} color="#fff" />
                     <Text style={S.ctaPrimaryText}>{t.ctaOrder}</Text>
                   </LinearGradient>
                 </Animated.View>
@@ -857,9 +857,9 @@ export default function SRWebStudio() {
               <LinearGradient colors={['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.08)']} style={S.portCtaInner} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                 <Text style={S.portCtaTitle}>{t.portCtaTitle}</Text>
                 <Text style={S.portCtaSub}>{t.portCtaSub}</Text>
-                <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85}>
-                  <LinearGradient colors={['#6366f1', '#8b5cf6']} style={S.portCtaBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                    <Ionicons name="paper-plane" size={16} color="#fff" />
+                <TouchableOpacity testID="ctaBtn" onPress={openWhatsApp} activeOpacity={0.85}>
+                  <LinearGradient colors={['#25D366', '#128C7E']} style={S.portCtaBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                    <Ionicons name="logo-whatsapp" size={16} color="#fff" />
                     <Text style={S.portCtaBtnText}>{t.portCtaBtn}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
@@ -898,7 +898,7 @@ export default function SRWebStudio() {
                       </View>
                     ))}
                   </View>
-                  <TouchableOpacity testID="pricingBtn" onPress={openTelegram} activeOpacity={0.85}>
+                  <TouchableOpacity testID="pricingBtn" onPress={openWhatsApp} activeOpacity={0.85}>
                     <LinearGradient
                       colors={plan.popular ? ['#6366f1', '#8b5cf6'] : ['rgba(99,102,241,0.15)', 'rgba(139,92,246,0.15)']}
                       style={S.pricingBtn} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
@@ -948,12 +948,12 @@ export default function SRWebStudio() {
             <Text style={S.contactHeadline}>{t.contactHeadline}</Text>
 
             {/* Direct contact buttons */}
-            <TouchableOpacity testID="ctaBtn" onPress={openTelegram} activeOpacity={0.85} style={{ marginBottom: 14 }}>
-              <LinearGradient colors={['#2AABEE', '#1E96D1']} style={S.telegramPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
-                <Ionicons name="paper-plane" size={22} color="#fff" />
+            <TouchableOpacity testID="ctaBtn" onPress={openWhatsApp} activeOpacity={0.85} style={{ marginBottom: 14 }}>
+              <LinearGradient colors={['#25D366', '#128C7E']} style={S.telegramPrimary} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
+                <Ionicons name="logo-whatsapp" size={22} color="#fff" />
                 <View>
-                  <Text style={S.telegramPrimaryText}>{t.contactTelegram}</Text>
-                  <Text style={S.telegramPrimarySub}>{t.contactTelegramSub}</Text>
+                  <Text style={S.telegramPrimaryText}>{t.contactWhatsApp}</Text>
+                  <Text style={S.telegramPrimarySub}>{t.contactWhatsAppSub}</Text>
                 </View>
                 <Ionicons name="arrow-forward" size={18} color="rgba(255,255,255,0.7)" style={{ marginLeft: 'auto' }} />
               </LinearGradient>
@@ -961,7 +961,7 @@ export default function SRWebStudio() {
 
             <View style={S.contactRow}>
               {[
-                { icon: 'logo-whatsapp' as const, label: t.contactWhatsApp, color: '#25D366', gradColors: ['rgba(37,211,102,0.14)', 'rgba(37,211,102,0.04)'] as [string, string], onPress: openWhatsApp },
+                { icon: 'paper-plane' as const, label: t.contactTelegram, color: '#2AABEE', gradColors: ['rgba(42,171,238,0.14)', 'rgba(42,171,238,0.04)'] as [string, string], onPress: openTelegram },
                 { icon: 'logo-facebook' as const, label: t.contactFacebook, color: '#1877F2', gradColors: ['rgba(24,119,242,0.14)', 'rgba(24,119,242,0.04)'] as [string, string], onPress: openFacebook },
                 { icon: 'mail' as const, label: t.contactEmail, color: '#8b5cf6', gradColors: ['rgba(139,92,246,0.14)', 'rgba(139,92,246,0.04)'] as [string, string], onPress: openEmail },
               ].map((c, i) => (
@@ -1072,11 +1072,11 @@ export default function SRWebStudio() {
 
       {/* ════════ FLOATING SOCIAL BUTTONS ════════ */}
       <View style={S.fab}>
-        <TouchableOpacity testID="fabBtn" onPress={openTelegram} activeOpacity={0.85} style={S.fabBtn}>
-          <LinearGradient colors={['#2AABEE', '#229ED9']} style={S.fabGrad}><Ionicons name="paper-plane" size={22} color="#fff" /></LinearGradient>
-        </TouchableOpacity>
         <TouchableOpacity testID="fabBtn" onPress={openWhatsApp} activeOpacity={0.85} style={S.fabBtn}>
           <LinearGradient colors={['#25D366', '#128C7E']} style={S.fabGrad}><Ionicons name="logo-whatsapp" size={22} color="#fff" /></LinearGradient>
+        </TouchableOpacity>
+        <TouchableOpacity testID="fabBtn" onPress={openTelegram} activeOpacity={0.85} style={S.fabBtn}>
+          <LinearGradient colors={['#2AABEE', '#229ED9']} style={S.fabGrad}><Ionicons name="paper-plane" size={22} color="#fff" /></LinearGradient>
         </TouchableOpacity>
         <TouchableOpacity testID="fabBtn" onPress={openFacebook} activeOpacity={0.85} style={S.fabBtn}>
           <LinearGradient colors={['#1877F2', '#0C5DC7']} style={S.fabGrad}><Ionicons name="logo-facebook" size={22} color="#fff" /></LinearGradient>
