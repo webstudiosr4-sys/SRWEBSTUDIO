@@ -241,6 +241,7 @@ export default function SRWebStudio() {
   const [fName, setFName] = useState('');
   const [fEmail, setFEmail] = useState('');
   const [fService, setFService] = useState('');
+  const [fPackage, setFPackage] = useState('');
   const [fMessage, setFMessage] = useState('');
   const [fConsent, setFConsent] = useState(false);
   const [fErrors, setFErrors] = useState<Record<string, string>>({});
@@ -254,11 +255,12 @@ export default function SRWebStudio() {
     if (!fEmail.trim()) errors.email = lang === 'pl' ? 'Email jest wymagany' : 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(fEmail)) errors.email = lang === 'pl' ? 'Podaj poprawny adres email' : 'Enter a valid email';
     if (!fService.trim()) errors.service = lang === 'pl' ? 'Wybierz usługę' : 'Select a service';
+    if (!fPackage) errors.package = lang === 'pl' ? 'Wybierz pakiet' : 'Select a package';
     if (!fMessage.trim()) errors.message = lang === 'pl' ? 'Opis projektu jest wymagany' : 'Project description is required';
     if (!fConsent) errors.consent = lang === 'pl' ? 'Zgoda jest wymagana' : 'Consent is required';
     setFErrors(errors);
     return Object.keys(errors).length === 0;
-  }, [fName, fEmail, fService, fMessage, fConsent, lang]);
+  }, [fName, fEmail, fService, fPackage, fMessage, fConsent, lang]);
 
   const submitForm = useCallback(async () => {
     if (!validateForm()) return;
@@ -278,6 +280,7 @@ export default function SRWebStudio() {
         formData.append('name', fName);
         formData.append('email', fEmail);
         formData.append('service', fService);
+        formData.append('package', fPackage);
         formData.append('message', fMessage);
         formData.append('consent', fConsent ? 'Tak' : 'Nie');
 
@@ -311,7 +314,7 @@ export default function SRWebStudio() {
           const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name: fName, email: fEmail, service: fService, message: fMessage, consent: fConsent }),
+            body: JSON.stringify({ name: fName, email: fEmail, service: fService, package: fPackage, message: fMessage, consent: fConsent }),
           });
           if (res.ok) {
             const data = await res.json().catch(() => ({}));
@@ -323,7 +326,7 @@ export default function SRWebStudio() {
       }
       if (saved) {
         setFSent(true);
-        setFName(''); setFEmail(''); setFService(''); setFMessage(''); setFConsent(false); setFErrors({});
+        setFName(''); setFEmail(''); setFService(''); setFPackage(''); setFMessage(''); setFConsent(false); setFErrors({});
         setFSending(false);
         return;
       }
@@ -339,7 +342,7 @@ export default function SRWebStudio() {
       setFError(lang === 'pl' ? 'Nie udało się wysłać wiadomości. Spróbuj ponownie lub napisz na Telegram.' : 'Failed to send. Try again or contact via Telegram.');
     }
     setFSending(false);
-  }, [fName, fEmail, fService, fMessage, fConsent, lang, validateForm]);
+  }, [fName, fEmail, fService, fPackage, fMessage, fConsent, lang, validateForm]);
 
   // ── Init animations ──
   useEffect(() => {
@@ -1009,6 +1012,19 @@ export default function SRWebStudio() {
                   <TextInput style={[S.formInput, fErrors.service ? S.formInputErr : null]} placeholder={lang === 'pl' ? 'np. Landing page, sklep internetowy...' : 'e.g. Landing page, online store...'} placeholderTextColor="#52525b" value={fService} onChangeText={v => { setFService(v); setFErrors(e => ({...e, service: ''})); }} />
                   {fErrors.service ? <Text style={S.formErrText}>{fErrors.service}</Text> : null}
 
+                  {/* Package Select */}
+                  <Text style={S.formLabel}>{lang === 'pl' ? 'Wybrany pakiet *' : 'Selected package *'}</Text>
+                  <View style={S.pkgRow}>
+                    {['Basic', 'Standard', 'Premium'].map(pkg => (
+                      <TouchableOpacity key={pkg} onPress={() => { setFPackage(pkg); setFErrors(e => ({...e, package: ''})); }} activeOpacity={0.8}
+                        style={[S.pkgOption, fPackage === pkg && S.pkgOptionActive, fErrors.package && !fPackage ? S.pkgOptionErr : null]}>
+                        {fPackage === pkg && <Ionicons name="checkmark-circle" size={16} color="#818cf8" style={{ marginRight: 6 }} />}
+                        <Text style={[S.pkgText, fPackage === pkg && S.pkgTextActive]}>{pkg}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  {fErrors.package ? <Text style={S.formErrText}>{fErrors.package}</Text> : null}
+
                   {/* Message */}
                   <Text style={S.formLabel}>{lang === 'pl' ? 'Opis projektu *' : 'Project description *'}</Text>
                   <TextInput style={[S.formInput, S.formTextArea, fErrors.message ? S.formInputErr : null]} placeholder={lang === 'pl' ? 'Opisz swój projekt, cele i oczekiwania...' : 'Describe your project, goals and expectations...'} placeholderTextColor="#52525b" value={fMessage} onChangeText={v => { setFMessage(v); setFErrors(e => ({...e, message: ''})); }} multiline numberOfLines={5} textAlignVertical="top" />
@@ -1338,6 +1354,22 @@ const S = StyleSheet.create({
     borderRadius: 10, paddingHorizontal: 16, paddingVertical: 13, color: '#f5f5f5', fontSize: 14, marginBottom: 4,
   },
   formInputErr: { borderColor: 'rgba(239,68,68,0.5)' },
+
+  // ── Package Selector ──
+  pkgRow: { flexDirection: 'row', gap: 10, marginBottom: 4 },
+  pkgOption: {
+    flex: 1, paddingVertical: 14, paddingHorizontal: 8, borderRadius: 12, alignItems: 'center', justifyContent: 'center',
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,255,255,0.04)', borderWidth: 1.5, borderColor: 'rgba(99,102,241,0.15)',
+    ...(isWeb ? { cursor: 'pointer', transition: 'all 0.25s ease' } as any : {}),
+  },
+  pkgOptionActive: {
+    backgroundColor: 'rgba(99,102,241,0.12)', borderColor: 'rgba(129,140,248,0.5)',
+    shadowColor: '#6366f1', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 0.25, shadowRadius: 10, elevation: 4,
+  },
+  pkgOptionErr: { borderColor: 'rgba(239,68,68,0.4)' },
+  pkgText: { color: '#71717a', fontSize: 13, fontWeight: '600' },
+  pkgTextActive: { color: '#818cf8' },
   formTextArea: { minHeight: 100 },
   formErrText: { color: '#ef4444', fontSize: 12, fontWeight: '500', marginBottom: 6, marginLeft: 4 },
   consentRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, marginTop: 10, marginBottom: 4 },
